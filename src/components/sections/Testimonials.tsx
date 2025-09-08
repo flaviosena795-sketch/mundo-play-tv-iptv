@@ -1,4 +1,7 @@
 import { Star, Quote } from "lucide-react";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import playIcon from "@/assets/play-icon.png";
+import earthPlanet from "@/assets/earth-planet.png";
 
 const Testimonials = () => {
   const testimonials = [
@@ -124,6 +127,23 @@ const Testimonials = () => {
             <div className="text-center">
               <div className="text-3xl font-bold text-premium-gold mb-2">24/7</div>
               <div className="text-muted-foreground">Suporte Disponível</div>
+            </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="mt-20 text-center">
+            <div className="bg-gradient-card rounded-2xl p-12 border border-subtle-border">
+              <div className="flex justify-center items-center gap-8 mb-8">
+                <img src={playIcon} alt="Play" className="w-16 h-16 opacity-80" />
+                <img src={earthPlanet} alt="Planet Earth" className="w-20 h-20 opacity-80" />
+              </div>
+              <h3 className="text-3xl font-bold mb-4">
+                Pronto para começar sua <span className="text-premium-gold">jornada</span>?
+              </h3>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Entre em contato conosco agora e descubra por que somos a escolha número 1 em IPTV no Brasil.
+              </p>
+              <WhatsAppButton className="text-lg px-8 py-4 h-auto" />
             </div>
           </div>
         </div>

@@ -4,51 +4,22 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const Plans = () => {
   const plans = [
     {
-      name: "Básico",
+      name: "Mundo Play TV",
       price: "R$ 29,90",
       period: "/mês",
-      description: "Ideal para quem quer começar",
-      features: [
-        "Mais de 5.000 canais",
-        "Qualidade Full HD",
-        "2 dispositivos simultâneos",
-        "Suporte por chat",
-        "Filmes e séries",
-      ],
-      popular: false,
-    },
-    {
-      name: "Premium",
-      price: "R$ 49,90",
-      period: "/mês",
-      description: "Nosso plano mais popular",
+      description: "O melhor da TV mundial na sua casa",
       features: [
         "Mais de 15.000 canais",
         "Qualidade 4K Ultra HD",
         "5 dispositivos simultâneos",
-        "Suporte prioritário 24/7",
+        "Suporte 24/7",
         "Filmes, séries e PPV",
-        "Canais adultos",
+        "Canais do mundo inteiro",
         "Lista IPTV personalizada",
+        "Teste grátis disponível",
+        "Ativação imediata",
       ],
       popular: true,
-    },
-    {
-      name: "Elite",
-      price: "R$ 79,90",
-      period: "/mês",
-      description: "Para quem não abre mão do melhor",
-      features: [
-        "Mais de 25.000 canais",
-        "Qualidade 4K Ultra HD",
-        "Dispositivos ilimitados",
-        "Suporte VIP exclusivo",
-        "Todos os recursos Premium",
-        "Acesso a eventos especiais",
-        "Instalação e configuração",
-        "Garantia estendida",
-      ],
-      popular: false,
     },
   ];
 
@@ -68,7 +39,8 @@ const Plans = () => {
           </div>
           
           {/* Plans Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="flex justify-center">
+            <div className="max-w-md w-full">
             {plans.map((plan, index) => (
               <div
                 key={index}
@@ -119,6 +91,7 @@ const Plans = () => {
                 />
               </div>
             ))}
+            </div>
           </div>
           
           {/* Bottom Note */}
