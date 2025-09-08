@@ -47,16 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+        // Custom Mundo Play TV colors
+        'premium-gold': "hsl(var(--premium-gold))",
+        'dark-card': "hsl(var(--dark-card))",
+        'darker-bg': "hsl(var(--darker-bg))",
+        'subtle-border': "hsl(var(--subtle-border))",
       },
       borderRadius: {
         lg: "var(--radius)",
