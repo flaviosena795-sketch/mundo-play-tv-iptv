@@ -19,7 +19,7 @@ const Hero = () => {
           {/* Brand Badge */}
           <div className="inline-flex items-center gap-2 bg-gradient-card px-4 py-2 rounded-full border border-subtle-border mb-8">
             <div className="w-2 h-2 bg-premium-gold rounded-full animate-pulse"></div>
-            <span className="text-premium-gold font-medium text-sm">IPTV Premium</span>
+            <span className="text-premium-gold font-medium text-sm">🎬 IPTV Premium com Qualidade 4K</span>
           </div>
           
           {/* Main Headline */}
@@ -31,8 +31,8 @@ const Hero = () => {
           
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-            Entretenimento sem limites com a melhor qualidade em IPTV.<br />
-            <span className="text-premium-gold font-semibold">Canais premium, estabilidade garantida e suporte 24/7.</span>
+            Entretenimento sem limites com <span className="text-premium-gold font-semibold">+50.000 conteúdos</span> ao vivo e sob demanda.<br />
+            <span className="text-premium-gold font-semibold">Suporte 24h, estabilidade garantida e ativação imediata.</span>
           </p>
           
           {/* Features Grid */}
