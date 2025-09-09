@@ -11,52 +11,32 @@ const FinalCTA = () => {
             {/* Header */}
             <div className="mb-8">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Pronto para começar sua <span className="text-premium-gold">experiência premium</span>?
+                💬 <span className="text-premium-gold">Fale com um Especialista</span> Agora
               </h2>
               <p className="text-xl text-muted-foreground">
-                Junte-se a mais de 5.000 famílias que já escolheram a melhor IPTV do Brasil.
-                Entre em contato agora e configure seu plano em minutos!
+                Tire dúvidas, agende sua instalação ou teste grátis de 24h via WhatsApp.
               </p>
             </div>
             
-            {/* Benefits */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              <div className="flex flex-col items-center gap-3 p-4">
-                <div className="w-12 h-12 bg-premium-gold/10 rounded-full flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-premium-gold" />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-foreground mb-1">Ativação Imediata</div>
-                  <div className="text-sm text-muted-foreground">Configure em minutos</div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col items-center gap-3 p-4">
-                <div className="w-12 h-12 bg-premium-gold/10 rounded-full flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-premium-gold" />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-foreground mb-1">Garantia Total</div>
-                  <div className="text-sm text-muted-foreground">Satisfação garantida</div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col items-center gap-3 p-4">
-                <div className="w-12 h-12 bg-premium-gold/10 rounded-full flex items-center justify-center">
-                  <Star className="w-6 h-6 text-premium-gold" />
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-foreground mb-1">Teste Grátis</div>
-                  <div className="text-sm text-muted-foreground">Experimente sem risco</div>
-                </div>
-              </div>
+            {/* Teste Grátis Section */}
+            <div className="bg-premium-gold/5 rounded-2xl p-8 mb-8 border border-premium-gold/20">
+              <h3 className="text-2xl font-bold text-premium-gold mb-4">
+                🎁 Teste Grátis por 6 horas
+              </h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Experimente agora, sem compromisso.<br />
+                Ativação imediata e suporte 24h.
+              </p>
+              <WhatsAppButton className="text-lg px-8 py-4 shadow-gold mb-4">
+                📲 Quero Testar Grátis
+              </WhatsAppButton>
             </div>
             
-            {/* CTA Button */}
+            {/* Contact Info */}
             <div className="space-y-4">
-              <WhatsAppButton className="text-lg px-8 py-4 shadow-gold" />
-              <p className="text-sm text-muted-foreground">
-                📱 WhatsApp: (21) 96623-8378 • Resposta em até 5 minutos
+              <p className="text-muted-foreground text-lg">
+                📧 contato@mundoplay.com<br />
+                📞 (21) 96623-8378
               </p>
             </div>
           </div>

@@ -8,31 +8,36 @@ const About = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Sobre a <span className="text-premium-gold">Mundo Play TV</span>
+              🎯 Sobre a <span className="text-premium-gold">Mundo Play TV</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Somos especialistas em soluções IPTV premium, oferecendo entretenimento 
-              de alta qualidade com tecnologia de ponta e atendimento excepcional.
+              Especialistas em IPTV Premium, oferecemos conteúdo de qualidade superior 
+              com estabilidade incomparável, atendimento humanizado e tecnologia de ponta.
             </p>
+            <div className="mt-6">
+              <p className="text-lg text-premium-gold font-semibold">
+                Ative em minutos e aproveite o melhor do entretenimento 4K.
+              </p>
+            </div>
           </div>
           
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             <div className="text-center p-8 bg-gradient-card rounded-2xl border border-subtle-border shadow-card">
               <Users className="w-12 h-12 text-premium-gold mx-auto mb-4" />
-              <div className="text-3xl font-bold text-foreground mb-2">5000+</div>
+              <div className="text-3xl font-bold text-foreground mb-2">✅ +5.000</div>
               <div className="text-muted-foreground">Clientes Satisfeitos</div>
             </div>
             
             <div className="text-center p-8 bg-gradient-card rounded-2xl border border-subtle-border shadow-card">
               <Award className="w-12 h-12 text-premium-gold mx-auto mb-4" />
-              <div className="text-3xl font-bold text-foreground mb-2">99.9%</div>
-              <div className="text-muted-foreground">Taxa de Satisfação</div>
+              <div className="text-3xl font-bold text-foreground mb-2">✅ 99,9%</div>
+              <div className="text-muted-foreground">de Uptime</div>
             </div>
             
             <div className="text-center p-8 bg-gradient-card rounded-2xl border border-subtle-border shadow-card">
               <TrendingUp className="w-12 h-12 text-premium-gold mx-auto mb-4" />
-              <div className="text-3xl font-bold text-foreground mb-2">24/7</div>
+              <div className="text-3xl font-bold text-foreground mb-2">✅ 24/7</div>
               <div className="text-muted-foreground">Suporte Técnico</div>
             </div>
           </div>

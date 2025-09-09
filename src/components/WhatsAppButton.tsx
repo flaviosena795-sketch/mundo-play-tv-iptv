@@ -1,7 +1,12 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const WhatsAppButton = ({ className = "" }: { className?: string }) => {
+interface WhatsAppButtonProps {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+const WhatsAppButton = ({ className = "", children }: WhatsAppButtonProps) => {
   const whatsappLink = "https://wa.me/5521966238378";
 
   return (
@@ -18,7 +23,7 @@ const WhatsAppButton = ({ className = "" }: { className?: string }) => {
     >
       <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
         <MessageCircle className="w-5 h-5 mr-2" />
-        Falar no WhatsApp
+        {children || "Falar no WhatsApp"}
       </a>
     </Button>
   );

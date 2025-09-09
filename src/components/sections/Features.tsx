@@ -1,36 +1,36 @@
-import { Shield, Zap, Headphones, Smartphone, Tv, Globe } from "lucide-react";
+import { Shield, Zap, Headphones, Smartphone, Tv, Crown } from "lucide-react";
 
 const Features = () => {
   const features = [
     {
-      icon: Shield,
-      title: "Estabilidade Garantida",
-      description: "Servidores premium com 99.9% de uptime, sem travamentos ou quedas de conexão.",
+      icon: Tv,
+      title: "📺 Canais Premium",
+      description: "Nacionais e internacionais em alta definição",
+    },
+    {
+      icon: Crown,
+      title: "🎬 +50.000 Conteúdos",
+      description: "Filmes, séries, PPV e muito mais",
     },
     {
       icon: Zap,
-      title: "Velocidade Máxima",
-      description: "Streaming em 4K Ultra HD com carregamento instantâneo e zero buffering.",
+      title: "⚙ Estabilidade Garantida",
+      description: "Servidores premium com 99,9% de uptime",
     },
     {
       icon: Headphones,
-      title: "Suporte 24/7",
-      description: "Atendimento especializado disponível todos os dias, a qualquer hora.",
+      title: "📲 Suporte 24/7",
+      description: "Atendimento técnico disponível a qualquer hora",
     },
     {
       icon: Smartphone,
-      title: "Multi-Dispositivos",
-      description: "Assista em TV, smartphone, tablet, computador ou Smart TV com facilidade.",
+      title: "💻 Multiplataforma",
+      description: "Smart TV, celular, PC, tablet e TV Box",
     },
     {
-      icon: Tv,
-      title: "Canais Premium",
-      description: "Milhares de canais nacionais e internacionais em alta definição.",
-    },
-    {
-      icon: Globe,
-      title: "Acesso Global",
-      description: "Conteúdo de todo o mundo disponível na palma da sua mão.",
+      icon: Shield,
+      title: "🎯 Qualidade 4K Ultra HD",
+      description: "Imagem perfeita e áudio cristalino",
     },
   ];
 
@@ -41,11 +41,11 @@ const Features = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Por que escolher a <span className="text-premium-gold">Mundo Play TV</span>?
+              🚀 Por que escolher a <span className="text-premium-gold">Mundo Play TV</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Oferecemos a melhor experiência em IPTV com tecnologia avançada, 
-              conteúdo premium e suporte excepcional.
+              Descubra as vantagens exclusivas que fazem da nossa plataforma 
+              a escolha ideal para seu entretenimento.
             </p>
           </div>
           
