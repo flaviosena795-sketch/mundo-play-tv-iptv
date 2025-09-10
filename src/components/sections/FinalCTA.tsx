@@ -48,7 +48,11 @@ const FinalCTA = () => {
             </div>
             
             {/* Contact Info */}
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <WhatsAppButton className="text-lg px-8 py-4 shadow-gold">
+                💬 Falar no WhatsApp
+              </WhatsAppButton>
+              
               <p className="text-muted-foreground text-lg">
                 📧 contato@mundoplay.com<br />
                 📞 (21) 96623-8378
