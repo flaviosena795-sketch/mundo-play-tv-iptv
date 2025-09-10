@@ -27,6 +27,21 @@ const FinalCTA = () => {
                 Experimente agora, sem compromisso.<br />
                 Ativação imediata e suporte 24h.
               </p>
+              
+              {/* Video explicativo */}
+              <div className="mb-6">
+                <div className="aspect-video bg-darker-bg rounded-lg overflow-hidden">
+                  <iframe
+                    src="https://www.youtube.com/embed/ByhX8yYvE6M"
+                    title="Vídeo explicativo - Teste Grátis"
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+              
               <WhatsAppButton className="text-lg px-8 py-4 shadow-gold mb-4">
                 📲 Quero Testar Grátis
               </WhatsAppButton>

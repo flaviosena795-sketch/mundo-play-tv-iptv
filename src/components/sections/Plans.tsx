@@ -11,7 +11,6 @@ const Plans = () => {
       features: [
         "Mais de 15.000 canais",
         "Qualidade 4K Ultra HD",
-        "5 dispositivos simultâneos",
         "Suporte 24/7",
         "Filmes, séries e PPV",
         "Canais do mundo inteiro",
@@ -30,12 +29,8 @@ const Plans = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Escolha seu <span className="text-premium-gold">Plano Ideal</span>
+              <span className="text-premium-gold">Mundo Play TV</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Temos opções para todos os perfis. Todos os planos incluem teste grátis 
-              e garantia de satisfação.
-            </p>
           </div>
           
           {/* Plans Grid */}

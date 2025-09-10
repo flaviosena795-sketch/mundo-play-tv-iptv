@@ -82,12 +82,17 @@ const Features = () => {
           
           {/* Bottom CTA */}
           <div className="text-center mt-16">
-            <div className="inline-flex items-center gap-2 bg-premium-gold/10 px-6 py-3 rounded-full border border-premium-gold/20">
+            <a 
+              href="https://wa.me/5521966238378" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-premium-gold/10 px-6 py-3 rounded-full border border-premium-gold/20 hover:bg-premium-gold/20 transition-premium cursor-pointer"
+            >
               <div className="w-2 h-2 bg-premium-gold rounded-full animate-pulse"></div>
               <span className="text-premium-gold font-medium">
                 Experimente agora e comprove a diferença
               </span>
-            </div>
+            </a>
           </div>
         </div>
       </div>
