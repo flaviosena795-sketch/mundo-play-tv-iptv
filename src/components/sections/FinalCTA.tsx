@@ -1,5 +1,5 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Clock, Shield, Star } from "lucide-react";
+import { Clock, Shield, Star, MessageCircle } from "lucide-react";
 
 const FinalCTA = () => {
   return (
@@ -49,9 +49,21 @@ const FinalCTA = () => {
             
             {/* Contact Info */}
             <div className="space-y-6">
-              <WhatsAppButton className="text-lg px-8 py-4 shadow-gold">
+              <a
+                href="https://wa.me/5521966238378"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex items-center justify-center gap-2
+                  bg-green-500 hover:bg-green-600 text-white
+                  px-8 py-4 rounded-lg font-semibold text-lg
+                  shadow-lg hover:shadow-xl transform hover:scale-105
+                  transition-all duration-300
+                "
+              >
+                <MessageCircle className="w-6 h-6" />
                 💬 Falar no WhatsApp
-              </WhatsAppButton>
+              </a>
               
               <p className="text-muted-foreground text-lg">
                 📧 contato@mundoplay.com<br />
