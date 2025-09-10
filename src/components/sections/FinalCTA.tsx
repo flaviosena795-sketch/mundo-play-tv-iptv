@@ -1,5 +1,6 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Clock, Shield, Star, MessageCircle, Play } from "lucide-react";
+import { Clock, Shield, Star, MessageCircle } from "lucide-react";
+import playIcon from "@/assets/play-icon.png";
 
 const FinalCTA = () => {
   return (
@@ -61,7 +62,7 @@ const FinalCTA = () => {
                   transition-all duration-300
                 "
               >
-                <Play className="w-6 h-6" />
+                <img src={playIcon} alt="Play" className="w-6 h-6" />
                 💬 Falar no WhatsApp
               </a>
               
