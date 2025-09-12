@@ -1,5 +1,5 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Clock, Shield, Star, MessageCircle, Instagram } from "lucide-react";
+import { Clock, Shield, Star, MessageCircle, Instagram, Facebook } from "lucide-react";
 import playIcon from "@/assets/play-icon.png";
 
 const FinalCTA = () => {
@@ -81,6 +81,22 @@ const FinalCTA = () => {
                 >
                   <Instagram className="w-6 h-6" />
                   📸 Seguir no Instagram
+                </a>
+                
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    inline-flex items-center justify-center gap-2
+                    bg-blue-600 hover:bg-blue-700 text-white
+                    px-8 py-4 rounded-lg font-semibold text-lg
+                    shadow-lg hover:shadow-xl transform hover:scale-105
+                    transition-all duration-300
+                  "
+                >
+                  <Facebook className="w-6 h-6" />
+                  👍 Curtir no Facebook
                 </a>
               </div>
               
