@@ -4,7 +4,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const Plans = () => {
   const plans = [
     {
-      name: "Mundo Play TV",
+      name: "Plano Mensal",
       price: "R$ 29,90",
       period: "/mês",
       description: "O melhor da TV mundial na sua casa",
@@ -18,7 +18,58 @@ const Plans = () => {
         "Teste grátis disponível",
         "Ativação imediata",
       ],
+      popular: false,
+    },
+    {
+      name: "Plano Trimestral",
+      price: "R$ 79,90",
+      period: "/3 meses",
+      description: "3 meses de entretenimento sem limites",
+      features: [
+        "Mais de 15.000 canais",
+        "Qualidade 4K Ultra HD",
+        "Suporte 24/7",
+        "Filmes, séries e PPV",
+        "Canais do mundo inteiro",
+        "Lista IPTV personalizada",
+        "Teste grátis disponível",
+        "Ativação imediata",
+      ],
       popular: true,
+    },
+    {
+      name: "Plano Semestral",
+      price: "R$ 149,90",
+      period: "/6 meses",
+      description: "6 meses com economia garantida",
+      features: [
+        "Mais de 15.000 canais",
+        "Qualidade 4K Ultra HD",
+        "Suporte 24/7",
+        "Filmes, séries e PPV",
+        "Canais do mundo inteiro",
+        "Lista IPTV personalizada",
+        "Teste grátis disponível",
+        "Ativação imediata",
+      ],
+      popular: false,
+    },
+    {
+      name: "Plano Anual",
+      price: "R$ 249,90",
+      period: "/ano",
+      description: "1 ano completo com maior economia",
+      features: [
+        "Mais de 15.000 canais",
+        "Qualidade 4K Ultra HD",
+        "Suporte 24/7",
+        "Filmes, séries e PPV",
+        "Canais do mundo inteiro",
+        "Lista IPTV personalizada",
+        "Teste grátis disponível",
+        "Ativação imediata",
+      ],
+      popular: false,
     },
   ];
 
@@ -34,8 +85,7 @@ const Plans = () => {
           </div>
           
           {/* Plans Grid */}
-          <div className="flex justify-center">
-            <div className="max-w-md w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map((plan, index) => (
               <div
                 key={index}
@@ -85,8 +135,7 @@ const Plans = () => {
                   `} 
                 />
               </div>
-            ))}
-            </div>
+             ))}
           </div>
           
           {/* Bottom Note */}
