@@ -101,7 +101,7 @@ const FinalCTA = () => {
               </div>
               
               <p className="text-muted-foreground text-lg">
-                📧 contato@mundoplay.com<br />
+                📧 contato@mundoplaytv.com.br<br />
                 📞 (21) 96623-8378
               </p>
             </div>
