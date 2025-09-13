@@ -70,6 +70,7 @@ const Plans = () => {
         "Ativação imediata",
       ],
       popular: false,
+      costBenefit: true,
     },
   ];
 
@@ -103,6 +104,15 @@ const Plans = () => {
                     <div className="bg-gradient-gold text-accent-foreground px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                       <Star className="w-4 h-4" />
                       MAIS POPULAR
+                    </div>
+                  </div>
+                )}
+                
+                {/* Cost Benefit Badge */}
+                {plan.costBenefit && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-full text-sm font-bold">
+                      MENOR CUSTO-BENEFÍCIO
                     </div>
                   </div>
                 )}
