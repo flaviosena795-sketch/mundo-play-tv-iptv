@@ -1,4 +1,5 @@
 import paymentMethodsImage from "@/assets/payment-methods.png";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const PaymentMethods = () => {
   return (
@@ -19,7 +20,7 @@ const PaymentMethods = () => {
               className="mx-auto max-w-full h-auto"
             />
             
-            <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+            <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-premium-gold rounded-full"></div>
                 <span>Pagamento 100% Seguro</span>
@@ -33,6 +34,8 @@ const PaymentMethods = () => {
                 <span>Dados Criptografados</span>
               </div>
             </div>
+            
+            <WhatsAppButton className="mx-auto" />
           </div>
         </div>
       </div>
