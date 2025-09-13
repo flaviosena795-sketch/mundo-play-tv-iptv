@@ -2,6 +2,12 @@ import { Star, Quote } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import playIcon from "@/assets/play-icon.png";
 import earthPlanet from "@/assets/earth-planet.png";
+import clientCarlos from "@/assets/client-carlos.jpg";
+import clientAna from "@/assets/client-ana.jpg";
+import clientRoberto from "@/assets/client-roberto.jpg";
+import clientMariana from "@/assets/client-mariana.jpg";
+import clientJoao from "@/assets/client-joao.jpg";
+import clientFernanda from "@/assets/client-fernanda.jpg";
 
 const Testimonials = () => {
   const testimonials = [
@@ -10,42 +16,42 @@ const Testimonials = () => {
       location: "Rio de Janeiro - RJ",
       rating: 5,
       comment: "Melhor serviço de IPTV que já usei! Qualidade excepcional e suporte sempre disponível. A estabilidade dos canais é impressionante, nunca tive problemas.",
-      avatar: "C"
+      avatar: clientCarlos
     },
     {
       name: "Ana Rodrigues",
       location: "São Paulo - SP",
       rating: 5,
       comment: "Estava cansada das operadoras tradicionais. Com a Mundo Play TV tenho muito mais canais por um preço justo. O atendimento é nota 10!",
-      avatar: "A"
+      avatar: clientAna
     },
     {
       name: "Roberto Santos",
       location: "Belo Horizonte - MG",
       rating: 5,
       comment: "Uso há mais de 1 ano e recomendo para toda família. Funciona perfeitamente na Smart TV e no celular. Vale cada centavo investido!",
-      avatar: "R"
+      avatar: clientRoberto
     },
     {
       name: "Mariana Costa",
       location: "Brasília - DF",
       rating: 5,
       comment: "A instalação foi super rápida e fácil. Agora tenho acesso a canais do mundo inteiro com qualidade 4K. Estou muito satisfeita com o serviço!",
-      avatar: "M"
+      avatar: clientMariana
     },
     {
       name: "João Oliveira",
       location: "Salvador - BA",
       rating: 5,
       comment: "Excelente custo-benefício! Cancelei minha TV por assinatura tradicional e não me arrependo. A Mundo Play TV superou todas as expectativas.",
-      avatar: "J"
+      avatar: clientJoao
     },
     {
       name: "Fernanda Lima",
       location: "Recife - PE",
       rating: 5,
       comment: "Suporte técnico excepcional! Sempre que preciso, são muito atenciosos e resolvem rapidamente. A qualidade dos canais é fantástica.",
-      avatar: "F"
+      avatar: clientFernanda
     }
   ];
 
@@ -95,12 +101,11 @@ const Testimonials = () => {
                 
                 {/* Author */}
                 <div className="flex items-center gap-4">
-                  <div className="
-                    w-12 h-12 bg-premium-gold/10 rounded-full flex items-center justify-center
-                    font-bold text-premium-gold border border-premium-gold/20
-                  ">
-                    {testimonial.avatar}
-                  </div>
+                  <img
+                    src={testimonial.avatar}
+                    alt={`Foto de ${testimonial.name}`}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-premium-gold/20"
+                  />
                   <div>
                     <div className="font-semibold text-foreground group-hover:text-premium-gold transition-smooth">
                       {testimonial.name}
