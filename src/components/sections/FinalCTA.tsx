@@ -32,14 +32,15 @@ const FinalCTA = () => {
               {/* Video explicativo */}
               <div className="mb-6">
                 <div className="aspect-video bg-darker-bg rounded-lg overflow-hidden">
-                  <iframe
-                    src="https://www.youtube.com/embed/ByhX8yYvE6M"
+                  <video
+                    src="/assets/promo-video.mp4"
                     title="Vídeo explicativo - Teste Grátis"
-                    className="w-full h-full"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                    className="w-full h-full object-cover"
+                    controls
+                    preload="metadata"
+                  >
+                    Seu navegador não suporta vídeos HTML5.
+                  </video>
                 </div>
               </div>
               
