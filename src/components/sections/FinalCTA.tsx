@@ -70,7 +70,7 @@ const FinalCTA = () => {
                 </a>
                 
                 <a
-                  href="#"
+                  href="http://bit.ly/47Ktf3y"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="
