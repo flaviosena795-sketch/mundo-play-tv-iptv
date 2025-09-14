@@ -29,21 +29,6 @@ const FinalCTA = () => {
                 Ativação imediata e suporte 24h.
               </p>
               
-              {/* Video explicativo */}
-              <div className="mb-6">
-                <div className="aspect-video bg-darker-bg rounded-lg overflow-hidden">
-                  <video
-                    src="/assets/promo-video.mp4"
-                    title="Vídeo explicativo - Teste Grátis"
-                    className="w-full h-full object-cover"
-                    controls
-                    preload="metadata"
-                  >
-                    Seu navegador não suporta vídeos HTML5.
-                  </video>
-                </div>
-              </div>
-              
               <WhatsAppButton className="text-lg px-8 py-4 shadow-gold mb-4">
                 📲 Quero Testar Grátis
               </WhatsAppButton>
