@@ -25,6 +25,21 @@ const FreeTrialBanner = () => {
             Acesso completo a todos os canais em qualidade 4K por 6 horas inteiras!
           </p>
           
+          {/* Vídeo demonstrativo */}
+          <div className="mb-8 max-w-2xl mx-auto">
+            <div className="aspect-video bg-darker-bg rounded-xl overflow-hidden border border-premium-gold/20">
+              <video
+                src="/assets/free-trial-video.mp4"
+                title="Demonstração do Teste Grátis"
+                className="w-full h-full object-cover"
+                controls
+                preload="metadata"
+              >
+                Seu navegador não suporta vídeos HTML5.
+              </video>
+            </div>
+          </div>
+          
           <div className="bg-gradient-card rounded-2xl p-8 border border-premium-gold/30 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <div>
