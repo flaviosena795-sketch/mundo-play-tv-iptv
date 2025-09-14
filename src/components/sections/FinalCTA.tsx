@@ -15,7 +15,7 @@ const FinalCTA = () => {
                 💬 <span className="text-premium-gold">Fale com um Especialista</span> Agora
               </h2>
               <p className="text-xl text-muted-foreground">
-                Tire dúvidas, agende sua instalação ou teste grátis de 24h via WhatsApp.
+                Tire dúvidas, agende sua instalação ou solicite seu teste grátis via WhatsApp.
               </p>
             </div>
             
@@ -26,7 +26,7 @@ const FinalCTA = () => {
               </h3>
               <p className="text-lg text-muted-foreground mb-6">
                 Experimente agora, sem compromisso.<br />
-                Ativação imediata e suporte 24h.
+                Ativação imediata e suporte completo.
               </p>
               
               <WhatsAppButton className="text-lg px-8 py-4 shadow-gold mb-4">

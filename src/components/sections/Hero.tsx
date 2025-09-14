@@ -32,7 +32,7 @@ const Hero = () => {
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
             Entretenimento sem limites com <span className="text-premium-gold font-semibold">+50.000 conteúdos</span> ao vivo e sob demanda.<br />
-            <span className="text-premium-gold font-semibold">Suporte 24h, estabilidade garantida e ativação imediata.</span>
+            <span className="text-premium-gold font-semibold">Suporte completo, estabilidade garantida e ativação imediata.</span>
           </p>
           
           {/* Features Grid */}
@@ -47,7 +47,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center justify-center gap-3 p-4 bg-gradient-card rounded-lg border border-subtle-border">
               <Clock className="w-6 h-6 text-premium-gold" />
-              <span className="font-medium">Suporte 24h</span>
+              <span className="font-medium">Suporte Completo</span>
             </div>
           </div>
           

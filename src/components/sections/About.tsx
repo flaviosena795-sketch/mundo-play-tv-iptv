@@ -58,7 +58,7 @@ const About = () => {
                   <p>
                     Com anos de experiência no mercado, desenvolvemos uma infraestrutura 
                     robusta que garante transmissões sem interrupções e suporte técnico 
-                    especializado disponível 24 horas por dia.
+                    especializado sempre disponível.
                   </p>
                 </div>
               </div>
