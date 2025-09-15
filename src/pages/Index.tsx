@@ -6,6 +6,7 @@ import Plans from "@/components/sections/Plans";
 import PaymentMethods from "@/components/sections/PaymentMethods";
 import VODRequest from "@/components/sections/VODRequest";
 import Testimonials from "@/components/sections/Testimonials";
+import FAQ from "@/components/sections/FAQ";
 import FinalCTA from "@/components/sections/FinalCTA";
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
       <PaymentMethods />
       <VODRequest />
       <Testimonials />
+      <FAQ />
       <FinalCTA />
     </main>
   );
