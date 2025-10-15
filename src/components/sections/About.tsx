@@ -42,6 +42,20 @@ const About = () => {
             </div>
           </div>
           
+          {/* Video Section */}
+          <div className="mb-16">
+            <div className="bg-gradient-card rounded-2xl border border-subtle-border p-4 shadow-card overflow-hidden">
+              <video 
+                className="w-full rounded-lg"
+                controls
+                poster="/assets/hero-iptv.jpg"
+              >
+                <source src="/assets/about-video.mp4" type="video/mp4" />
+                Seu navegador não suporta a reprodução de vídeos.
+              </video>
+            </div>
+          </div>
+
           {/* Description */}
           <div className="bg-gradient-card rounded-2xl border border-subtle-border p-8 md:p-12 shadow-card">
             <div className="grid md:grid-cols-2 gap-8 items-center">
