@@ -25,7 +25,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
 
-      {/* Renderiza o restante do site */}
       <Component {...pageProps} />
     </>
   );
