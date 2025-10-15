@@ -1,13 +1,1 @@
-import React from 'react';
-
-function App() {
-  return (
-    <div>
-      {/* Conteúdo original do seu site */}
-      <h1>Bem-vindo ao Mundo Play TV</h1>
-      <p>Aqui você pode adicionar todo o conteúdo que tinha antes.</p>
-    </div>
-  );
-}
-
-export default App;
+import '../styles/globals.css'; import Script from 'next/script'; function MyApp({ Component, pageProps }) { return ( <> {/* Google Analytics 4 */} <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8" /> <Script id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: window.dataLayer = window.dataLayer || [];
