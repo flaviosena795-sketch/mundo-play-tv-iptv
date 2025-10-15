@@ -1,5 +1,35 @@
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
 
-createRoot(document.getElementById("root")!).render(<App />);
+// =====================
+// Google Analytics 4
+// =====================
+(function() {
+  // Carrega o script do GA4
+  const script1 = document.createElement('script');
+  script1.async = true;
+  script1.src = 'https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8';
+  document.head.appendChild(script1);
+
+  // Inicializa o GA4
+  const script2 = document.createElement('script');
+  script2.innerHTML = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MF1GH610V8');
+  `;
+  document.head.appendChild(script2);
+})();
+
+// =====================
+// Renderiza o app React
+// =====================
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
