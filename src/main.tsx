@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+// =====================
 // Google Analytics 4
+// =====================
 (function() {
   const script1 = document.createElement('script');
   script1.async = true;
@@ -20,6 +22,9 @@ import './index.css';
   document.head.appendChild(script2);
 })();
 
+// =====================
+// Renderiza o app React
+// =====================
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
