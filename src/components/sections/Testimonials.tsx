@@ -104,6 +104,7 @@ const Testimonials = () => {
                   <img
                     src={testimonial.avatar}
                     alt={`Foto de ${testimonial.name}`}
+                    loading="lazy"
                     className="w-12 h-12 rounded-full object-cover border-2 border-premium-gold/20"
                   />
                   <div>
@@ -139,8 +140,8 @@ const Testimonials = () => {
           <div className="mt-20 text-center">
             <div className="bg-gradient-card rounded-2xl p-12 border border-subtle-border">
               <div className="flex justify-center items-center gap-8 mb-8">
-                <img src={playIcon} alt="Play" className="w-16 h-16 opacity-80" />
-                <img src={earthPlanet} alt="Planet Earth" className="w-20 h-20 opacity-80" />
+                <img src={playIcon} alt="Play" loading="lazy" className="w-16 h-16 opacity-80" />
+                <img src={earthPlanet} alt="Planet Earth" loading="lazy" className="w-20 h-20 opacity-80" />
               </div>
               <h3 className="text-3xl font-bold mb-4">
                 Pronto para começar sua <span className="text-premium-gold">jornada</span>?

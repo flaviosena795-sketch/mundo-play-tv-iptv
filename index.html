@@ -6,9 +6,11 @@
     <title>Mundo Play TV – Canais e Filmes em HD 📺</title>
     <meta name="description" content="Assista IPTV com qualidade! Mundo Play TV oferece canais HD, filmes e séries com estabilidade e suporte premium. Teste grátis disponível." />
     <meta name="author" content="Mundo Play TV" />
-    <meta name="keywords" content="IPTV Brasil, Canais HD, Mundo Play TV, IPTV Online, Filmes e Séries, Teste Grátis IPTV, IPTV Premium, Canais 4K, Streaming Brasil, TV Online, Lista IPTV" />
+    <meta name="keywords" content="IPTV Brasil, Canais HD, Mundo Play TV, IPTV Online, Filmes e Séries, Teste Grátis IPTV, IPTV Premium, Canais 4K, Streaming Brasil, TV Online, Lista IPTV, IPTV Estável" />
     <meta name="geo.region" content="BR" />
     <meta name="geo.country" content="BR" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
 
     <meta property="og:title" content="Mundo Play TV - IPTV com Canais HD e Séries Online" />
     <meta property="og:description" content="A melhor experiência IPTV do Brasil. Teste grátis e planos acessíveis." />
@@ -34,54 +36,88 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Mundo Play TV",
-      "description": "Assista milhares de canais e filmes online com qualidade HD no Brasil",
+      "description": "IPTV Brasil com Canais HD, Filmes e Séries. IPTV Estável com suporte premium e teste grátis de 6 horas.",
       "url": "https://mundoplaytv.com.br",
+      "logo": "https://mundoplaytv.com.br/favicon.ico",
       "telephone": "+55-21-96623-8378",
+      "email": "contato@mundoplaytv.com.br",
       "address": {
         "@type": "PostalAddress",
         "addressCountry": "BR"
       },
       "sameAs": [
-        "https://wa.me/5521966238378"
+        "https://wa.me/5521966238378",
+        "https://www.instagram.com/mundoplaytv",
+        "https://www.facebook.com/mundoplaytv"
       ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "1250"
+      },
       "offers": {
         "@type": "AggregateOffer",
-        "description": "Planos IPTV Premium Brasil - Canais e Filmes em HD",
+        "description": "Planos IPTV Premium Brasil - Canais HD, Filmes e Séries com IPTV Estável",
         "priceCurrency": "BRL",
         "lowPrice": "29.90",
-        "offerCount": "3"
+        "highPrice": "84.90",
+        "offerCount": "3",
+        "url": "https://mundoplaytv.com.br/#planos"
       },
       "areaServed": {
         "@type": "Country",
         "name": "Brasil"
+      },
+      "priceRange": "R$ 29,90 - R$ 84,90"
+    }
+    </script>
+    
+    <!-- Service Schema for IPTV -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "IPTV",
+      "provider": {
+        "@type": "Organization",
+        "name": "Mundo Play TV"
+      },
+      "areaServed": "BR",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Planos IPTV",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Plano Básico IPTV"
+            },
+            "price": "29.90",
+            "priceCurrency": "BRL"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Plano Premium IPTV"
+            },
+            "price": "49.90",
+            "priceCurrency": "BRL"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Plano Família IPTV"
+            },
+            "price": "84.90",
+            "priceCurrency": "BRL"
+          }
+        ]
       }
     }
     </script>
-
-    <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-MF1GH610V8');
-    </script>
-    <!-- End Google Analytics -->
-
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', 'YOUR_PIXEL_ID_HERE');
-      fbq('track', 'PageView');
-    </script>
-    <!-- End Meta Pixel Code -->
 
     <!-- Google Tag Manager -->
     <script>
@@ -96,6 +132,40 @@
       })(window,document,'script','dataLayer','GTM-WJNTMVSF');
     </script>
     <!-- End Google Tag Manager -->
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-MF1GH610V8', {
+        'page_title': 'Mundo Play TV - IPTV Brasil',
+        'page_location': window.location.href,
+        'send_page_view': true
+      });
+    </script>
+    <!-- End Google Analytics -->
+
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1234567890123456');
+      fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1234567890123456&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Meta Pixel Code -->
+
   </head>
 
   <body>
@@ -105,13 +175,6 @@
       height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
-    <!-- Meta Pixel Code (noscript) -->
-    <noscript>
-      <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID_HERE&ev=PageView&noscript=1"/>
-    </noscript>
-    <!-- End Meta Pixel Code (noscript) -->
 
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

@@ -17,6 +17,7 @@ const PaymentMethods = () => {
             <img 
               src={paymentMethodsImage} 
               alt="Formas de pagamento aceitas: Visa, Mastercard, Elo, American Express, Hipercard, Diners Club e PIX"
+              loading="lazy"
               className="mx-auto max-w-full h-auto"
             />
             

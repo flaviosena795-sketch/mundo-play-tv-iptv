@@ -48,6 +48,7 @@ const About = () => {
               <video 
                 className="w-full rounded-lg"
                 controls
+                preload="metadata"
                 poster="/assets/hero-iptv.jpg"
               >
                 <source src="/assets/about-video.mp4" type="video/mp4" />
