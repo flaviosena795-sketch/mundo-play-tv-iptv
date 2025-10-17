@@ -19,6 +19,8 @@ const Plans = () => {
         "Ativação imediata",
       ],
       popular: false,
+      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Mensal%20da%20Mundo%20Play%20TV.",
+      buttonVariant: "default" as const,
     },
     {
       name: "Plano Trimestral",
@@ -36,6 +38,8 @@ const Plans = () => {
         "Ativação imediata",
       ],
       popular: true,
+      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Trimestral%20da%20Mundo%20Play%20TV.",
+      buttonVariant: "default" as const,
     },
     {
       name: "Plano Semestral",
@@ -53,6 +57,8 @@ const Plans = () => {
         "Ativação imediata",
       ],
       popular: false,
+      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Semestral%20da%20Mundo%20Play%20TV.",
+      buttonVariant: "default" as const,
     },
     {
       name: "Plano Anual",
@@ -70,6 +76,8 @@ const Plans = () => {
         "Ativação imediata",
       ],
       popular: false,
+      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Anual%20com%20desconto.",
+      buttonVariant: "default" as const,
     },
   ];
 
@@ -129,11 +137,14 @@ const Plans = () => {
                 
                 {/* CTA Button */}
                 <WhatsAppButton 
+                  message={plan.whatsappMessage}
                   className={`
                     w-full justify-center
-                    ${plan.popular ? 'shadow-gold' : ''}
+                    ${plan.popular ? 'shadow-gold animate-pulse hover:animate-none' : 'hover:shadow-gold'}
                   `} 
-                />
+                >
+                  📲 Assinar Agora
+                </WhatsAppButton>
               </div>
              ))}
           </div>
