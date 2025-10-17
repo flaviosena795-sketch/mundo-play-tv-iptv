@@ -12,14 +12,6 @@ const FloatingWhatsApp = () => {
         value: 1
       });
     }
-    
-    // Facebook Pixel tracking
-    if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'Contact', {
-        content_name: 'WhatsApp Floating Button',
-        content_category: 'engagement'
-      });
-    }
   };
 
   return (

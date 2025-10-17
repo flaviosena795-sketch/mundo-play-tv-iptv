@@ -20,14 +20,6 @@ const WhatsAppButton = ({ className = "", children, message }: WhatsAppButtonPro
         value: 1
       });
     }
-    
-    // Facebook Pixel tracking
-    if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'Contact', {
-        content_name: 'WhatsApp Button',
-        content_category: 'engagement'
-      });
-    }
   };
 
   return (
