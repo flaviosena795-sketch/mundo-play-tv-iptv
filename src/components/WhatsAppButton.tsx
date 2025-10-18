@@ -8,7 +8,7 @@ interface WhatsAppButtonProps {
 }
 
 const WhatsAppButton = ({ className = "", children, message }: WhatsAppButtonProps) => {
-  const defaultMessage = "Olá!%20Gostaria%20de%20solicitar%20meu%20teste%20grátis%20de%206%20horas%20do%20Mundo%20Play%20TV.";
+  const defaultMessage = "Olá!%20Gostaria%20de%20solicitar%20meu%20teste%20grátis%20de%205%20horas%20do%20Mundo%20Play%20TV.";
   const whatsappLink = `https://wa.me/5521966238378?text=${message || defaultMessage}`;
 
   const handleClick = () => {

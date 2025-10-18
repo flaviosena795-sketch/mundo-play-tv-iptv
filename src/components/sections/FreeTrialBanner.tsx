@@ -13,7 +13,7 @@ const FreeTrialBanner = () => {
           
           <div className="mb-8">
             <h2 className="text-5xl md:text-6xl font-bold mb-4">
-              <span className="text-premium-gold">6 horas</span> exclusivas
+              <span className="text-premium-gold">5 horas</span> exclusivas
             </h2>
             <h3 className="text-3xl md:text-4xl font-bold text-foreground">
               para o seu <span className="text-premium-gold">Teste GRÁTIS</span>
@@ -22,7 +22,7 @@ const FreeTrialBanner = () => {
           
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
             Experimente nossa plataforma premium sem compromisso. 
-            Acesso completo a todos os canais em qualidade 4K por 6 horas inteiras!
+            Acesso completo a todos os canais em qualidade 4K por 5 horas inteiras!
           </p>
           
           {/* Vídeo demonstrativo */}

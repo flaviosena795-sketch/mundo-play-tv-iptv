@@ -22,7 +22,7 @@ const FinalCTA = () => {
             {/* Teste Grátis Section */}
             <div className="bg-premium-gold/5 rounded-2xl p-8 mb-8 border border-premium-gold/20">
               <h3 className="text-2xl font-bold text-premium-gold mb-4">
-                🎁 Teste Grátis por 6 horas
+                🎁 Teste Grátis por 5 horas
               </h3>
               <p className="text-lg text-muted-foreground mb-6">
                 Experimente agora, sem compromisso.<br />

@@ -17,7 +17,7 @@ const faqData = [
   },
   {
     question: "4. Como funciona o teste grátis?",
-    answer: "Você recebe acesso completo à plataforma por 6 horas, sem custo. É só solicitar pelo WhatsApp e ativamos imediatamente para você testar."
+    answer: "Você recebe acesso completo à plataforma por 5 horas, sem custo. É só solicitar pelo WhatsApp e ativamos imediatamente para você testar."
   },
   {
     question: "5. Preciso assinar contrato ou fidelidade?",
