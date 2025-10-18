@@ -82,12 +82,12 @@ const Plans = () => {
   ];
 
   return (
-    <section className="py-20 bg-background">
+    <section id="planos" className="py-20 bg-background" aria-labelledby="plans-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 id="plans-heading" className="text-4xl md:text-5xl font-bold mb-6">
               <span className="text-premium-gold">Mundo Play TV</span>
             </h2>
           </div>

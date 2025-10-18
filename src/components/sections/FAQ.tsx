@@ -57,10 +57,10 @@ const FAQ = () => {
   };
 
   return (
-    <section className="py-20 bg-background">
+    <section id="faq" className="py-20 bg-background" aria-labelledby="faq-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-12">
+          <h2 id="faq-heading" className="text-4xl md:text-5xl font-bold text-center mb-12">
             ❓ Perguntas <span className="text-premium-gold">Frequentes</span> (FAQ)
           </h2>
           

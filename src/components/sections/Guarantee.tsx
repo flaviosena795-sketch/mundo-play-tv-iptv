@@ -3,7 +3,7 @@ import { Shield } from "lucide-react";
 
 const Guarantee = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-background to-accent/10">
+    <section id="garantia" className="py-16 bg-gradient-to-b from-background to-accent/10" aria-labelledby="guarantee-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-card rounded-3xl p-10 border border-premium-gold/30 shadow-card">
@@ -11,7 +11,7 @@ const Guarantee = () => {
               <Shield className="w-16 h-16 text-premium-gold" />
             </div>
             
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+            <h2 id="guarantee-heading" className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
               🛡️ Garantia Total de <span className="text-premium-gold">7 Dias</span>
             </h2>
             

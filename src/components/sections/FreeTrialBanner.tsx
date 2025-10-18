@@ -3,7 +3,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 
 const FreeTrialBanner = () => {
   return (
-    <section className="py-16 bg-gradient-to-r from-premium-gold/10 via-premium-gold/5 to-transparent border-y border-premium-gold/20">
+    <section id="teste-gratis" className="py-16 bg-gradient-to-r from-premium-gold/10 via-premium-gold/5 to-transparent border-y border-premium-gold/20" aria-labelledby="free-trial-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center items-center gap-4 mb-6">
@@ -12,7 +12,7 @@ const FreeTrialBanner = () => {
           </div>
           
           <div className="mb-8">
-            <h2 className="text-5xl md:text-6xl font-bold mb-4">
+            <h2 id="free-trial-heading" className="text-5xl md:text-6xl font-bold mb-4">
               <span className="text-premium-gold">5 horas</span> exclusivas
             </h2>
             <h3 className="text-3xl md:text-4xl font-bold text-foreground">

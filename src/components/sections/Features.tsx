@@ -35,12 +35,12 @@ const Features = () => {
   ];
 
   return (
-    <section className="py-20 bg-darker-bg">
+    <section id="recursos" className="py-20 bg-darker-bg" aria-labelledby="features-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 id="features-heading" className="text-4xl md:text-5xl font-bold mb-6">
               🚀 Por que escolher a <span className="text-premium-gold">Mundo Play TV</span>?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

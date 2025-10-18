@@ -4,11 +4,13 @@ import { Play, Shield, Clock } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero">
+    <header className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero">
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
+        role="img"
+        aria-label="Mundo Play TV - IPTV Premium com qualidade 4K"
       >
         <div className="absolute inset-0 bg-black/70"></div>
       </div>
@@ -63,7 +65,7 @@ const Hero = () => {
       
       {/* Decorative Elements */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent"></div>
-    </section>
+    </header>
   );
 };
 

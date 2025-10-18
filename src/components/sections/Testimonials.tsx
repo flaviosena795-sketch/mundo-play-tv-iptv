@@ -56,12 +56,12 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 bg-darker-bg">
+    <section id="depoimentos" className="py-20 bg-darker-bg" aria-labelledby="testimonials-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 id="testimonials-heading" className="text-4xl md:text-5xl font-bold mb-6">
               O que nossos <span className="text-premium-gold">Clientes</span> dizem
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -140,8 +140,8 @@ const Testimonials = () => {
           <div className="mt-20 text-center">
             <div className="bg-gradient-card rounded-2xl p-12 border border-subtle-border">
               <div className="flex justify-center items-center gap-8 mb-8">
-                <img src={playIcon} alt="Play" loading="lazy" className="w-16 h-16 opacity-80" />
-                <img src={earthPlanet} alt="Planet Earth" loading="lazy" className="w-20 h-20 opacity-80" />
+                <img src={playIcon} alt="Ícone de Play IPTV Mundo Play TV" loading="lazy" className="w-16 h-16 opacity-80" />
+                <img src={earthPlanet} alt="Planeta Terra - IPTV Mundial" loading="lazy" className="w-20 h-20 opacity-80" />
               </div>
               <h3 className="text-3xl font-bold mb-4">
                 Pronto para começar sua <span className="text-premium-gold">jornada</span>?

@@ -3,7 +3,7 @@ import { Clapperboard, Film, Tv, Star } from "lucide-react";
 
 const VODRequest = () => {
   return (
-    <section className="py-20 bg-gradient-card border-y border-subtle-border">
+    <section className="py-20 bg-gradient-card border-y border-subtle-border" aria-labelledby="vod-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           {/* Header */}
@@ -13,7 +13,7 @@ const VODRequest = () => {
                 <Clapperboard className="w-12 h-12 text-premium-gold" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 id="vod-heading" className="text-4xl md:text-5xl font-bold mb-6">
               🎬 <span className="text-premium-gold">Solicite seus VODs!</span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8">

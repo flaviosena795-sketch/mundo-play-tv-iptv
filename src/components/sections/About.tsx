@@ -2,12 +2,12 @@ import { Users, Award, TrendingUp } from "lucide-react";
 
 const About = () => {
   return (
-    <section className="py-20 bg-background">
+    <section id="sobre" className="py-20 bg-background" aria-labelledby="about-heading">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 id="about-heading" className="text-4xl md:text-5xl font-bold mb-6">
               🎯 Sobre a <span className="text-premium-gold">Mundo Play TV</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
