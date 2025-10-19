@@ -1,5 +1,5 @@
-import { Check, Star } from "lucide-react";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import { motion } from "framer-motion";
+import { Check, Star, MessageCircle } from "lucide-react";
 
 const Plans = () => {
   const plans = [
@@ -7,77 +7,73 @@ const Plans = () => {
       name: "Plano Mensal",
       price: "R$ 29,90",
       period: "/mês",
-      description: "O melhor da TV mundial na sua casa",
+      color: "blue",
+      borderColor: "border-blue-500",
+      textColor: "text-blue-400",
+      bgColor: "bg-blue-500 hover:bg-blue-600",
+      shadowColor: "hover:shadow-blue-500/40",
+      link: "https://mpago.la/2JZBKqd",
       features: [
-        "Mais de 15.000 canais",
+        "+15.000 canais",
         "Qualidade 4K Ultra HD",
-        "Suporte 24/7",
         "Filmes, séries e PPV",
-        "Canais do mundo inteiro",
-        "Lista IPTV personalizada",
-        "Teste grátis disponível",
-        "Ativação imediata",
+        "Suporte 24/7",
       ],
       popular: false,
-      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Mensal%20da%20Mundo%20Play%20TV.",
-      buttonVariant: "default" as const,
     },
     {
       name: "Plano Trimestral",
       price: "R$ 79,90",
       period: "/3 meses",
-      description: "3 meses de entretenimento sem limites",
+      color: "yellow",
+      borderColor: "border-yellow-500",
+      textColor: "text-yellow-400",
+      bgColor: "bg-yellow-500 hover:bg-yellow-600",
+      shadowColor: "hover:shadow-yellow-500/40",
+      link: "https://mpago.la/28VRTT5",
       features: [
-        "Mais de 15.000 canais",
-        "Qualidade 4K Ultra HD",
-        "Suporte 24/7",
+        "+15.000 canais",
+        "4K Ultra HD",
         "Filmes, séries e PPV",
-        "Canais do mundo inteiro",
-        "Lista IPTV personalizada",
-        "Teste grátis disponível",
-        "Ativação imediata",
+        "Suporte 24/7",
       ],
       popular: true,
-      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Trimestral%20da%20Mundo%20Play%20TV.",
-      buttonVariant: "default" as const,
     },
     {
       name: "Plano Semestral",
       price: "R$ 149,90",
       period: "/6 meses",
-      description: "6 meses com economia garantida",
+      color: "green",
+      borderColor: "border-green-500",
+      textColor: "text-green-400",
+      bgColor: "bg-green-500 hover:bg-green-600",
+      shadowColor: "hover:shadow-green-500/40",
+      link: "https://mpago.la/1xVXUV1",
       features: [
-        "Mais de 15.000 canais",
-        "Qualidade 4K Ultra HD",
-        "Suporte 24/7",
+        "+15.000 canais",
+        "4K Ultra HD",
         "Filmes, séries e PPV",
-        "Canais do mundo inteiro",
-        "Lista IPTV personalizada",
-        "Teste grátis disponível",
-        "Ativação imediata",
+        "Suporte 24/7",
       ],
       popular: false,
-      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Semestral%20da%20Mundo%20Play%20TV.",
-      buttonVariant: "default" as const,
     },
     {
       name: "Plano Anual",
-      price: "R$ 249,90",
+      price: "R$ 289,90",
       period: "/ano",
-      description: "1 ano completo com maior economia",
+      color: "purple",
+      borderColor: "border-purple-500",
+      textColor: "text-purple-400",
+      bgColor: "bg-purple-500 hover:bg-purple-600",
+      shadowColor: "hover:shadow-purple-500/40",
+      link: "https://mpago.la/1awVzsz",
       features: [
-        "Mais de 15.000 canais",
-        "Qualidade 4K Ultra HD",
-        "Suporte 24/7",
+        "+15.000 canais",
+        "4K Ultra HD",
         "Filmes, séries e PPV",
-        "Canais do mundo inteiro",
-        "Lista IPTV personalizada",
-        "Teste grátis disponível",
-        "Ativação imediata",
+        "Suporte 24/7",
       ],
       popular: false,
-      whatsappMessage: "Olá!%20Quero%20assinar%20o%20plano%20Anual%20com%20desconto.",
-      buttonVariant: "default" as const,
     },
   ];
 
@@ -87,23 +83,40 @@ const Plans = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 id="plans-heading" className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="text-premium-gold">Mundo Play TV</span>
-            </h2>
+            <motion.h2
+              id="plans-heading"
+              className="text-4xl md:text-5xl font-bold mb-6 text-premium-gold"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              🌎 MUNDO PLAY TV
+            </motion.h2>
+
+            <motion.p
+              className="text-lg text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Escolha seu plano e tenha acesso imediato ao melhor da TV mundial!
+            </motion.p>
           </div>
           
           {/* Plans Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map((plan, index) => (
-              <div
+              <motion.div
                 key={index}
                 className={`
-                  relative p-8 rounded-2xl border transition-premium
-                  ${plan.popular 
-                    ? 'border-premium-gold bg-gradient-card shadow-gold scale-105' 
-                    : 'border-subtle-border bg-gradient-card hover:border-premium-gold/20 hover:shadow-card'
-                  }
+                  relative p-6 rounded-2xl border-t-4 transition-all
+                  bg-gradient-card shadow-lg
+                  ${plan.borderColor} ${plan.shadowColor}
+                  ${plan.popular ? 'scale-105' : ''}
                 `}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
@@ -116,42 +129,65 @@ const Plans = () => {
                 )}
                 
                 {/* Plan Header */}
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold mb-2 text-foreground">{plan.name}</h3>
-                  <p className="text-muted-foreground mb-4">{plan.description}</p>
-                  <div className="flex items-center justify-center">
-                    <span className="text-4xl font-bold text-premium-gold">{plan.price}</span>
-                    <span className="text-muted-foreground ml-2">{plan.period}</span>
-                  </div>
+                <div className="text-center mb-6">
+                  <h3 className={`text-2xl font-bold mb-2 ${plan.textColor}`}>
+                    {plan.name}
+                  </h3>
+                  <p className="text-3xl font-bold text-foreground mb-2">
+                    {plan.price}
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  </p>
                 </div>
                 
                 {/* Features List */}
-                <div className="space-y-4 mb-8">
+                <ul className="text-sm mb-6 space-y-2">
                   {plan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-start gap-3">
+                    <li key={featureIndex} className="flex items-start gap-2 text-muted-foreground">
                       <Check className="w-5 h-5 text-premium-gold mt-0.5 flex-shrink-0" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </div>
+                      {feature}
+                    </li>
                   ))}
-                </div>
+                </ul>
                 
                 {/* CTA Button */}
-                <WhatsAppButton 
-                  message={plan.whatsappMessage}
+                <a
+                  href={plan.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`
-                    w-full justify-center
-                    ${plan.popular ? 'shadow-gold animate-pulse hover:animate-none' : 'hover:shadow-gold'}
-                  `} 
+                    ${plan.bgColor} 
+                    text-white font-semibold py-3 px-4 rounded-lg 
+                    block text-center transition-all
+                    hover:scale-105 shadow-md
+                  `}
                 >
                   📲 Assinar Agora
-                </WhatsAppButton>
-              </div>
-             ))}
+                </a>
+              </motion.div>
+            ))}
           </div>
           
+          {/* WhatsApp Support Button */}
+          <motion.div
+            className="mt-12 flex justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <a
+              href="https://wa.me/5521966238378?text=Ol%C3%A1%20👋%20quero%20suporte%20Mundo%20Play%20TV"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all hover:scale-105"
+            >
+              <MessageCircle className="w-5 h-5" />
+              💬 Falar com Suporte
+            </a>
+          </motion.div>
+
           {/* Bottom Note */}
-          <div className="text-center mt-12">
-            <p className="text-muted-foreground">
+          <div className="text-center mt-8">
+            <p className="text-muted-foreground text-sm">
               🔒 Pagamento 100% seguro • ⚡ Ativação imediata • 🎯 Teste grátis disponível
             </p>
           </div>
