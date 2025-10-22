@@ -1,18 +1,26 @@
 import { motion } from "framer-motion";
 import { Check, Star, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Plans = () => {
+  const [nomeCliente, setNomeCliente] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+
+  const MERCADO_PAGO_PUBLIC_KEY = "APP_USR-f4773550-ddef-42fb-bed4-1ce301820f02";
+  const WHATSAPP_NUMBER = "5521966238378";
+
   const plans = [
     {
-      name: "Plano Mensal",
+      name: "Mensal",
       price: "R$ 29,90",
+      valor: 29.9,
       period: "/mês",
       color: "blue",
       borderColor: "border-blue-500",
       textColor: "text-blue-400",
       bgColor: "bg-blue-500 hover:bg-blue-600",
       shadowColor: "hover:shadow-blue-500/40",
-      link: "https://mpago.la/2JZBKqd",
       features: [
         "+15.000 canais",
         "Qualidade 4K Ultra HD",
@@ -22,15 +30,15 @@ const Plans = () => {
       popular: false,
     },
     {
-      name: "Plano Trimestral",
+      name: "Trimestral",
       price: "R$ 79,90",
+      valor: 79.9,
       period: "/3 meses",
       color: "yellow",
       borderColor: "border-yellow-500",
       textColor: "text-yellow-400",
       bgColor: "bg-yellow-500 hover:bg-yellow-600",
       shadowColor: "hover:shadow-yellow-500/40",
-      link: "https://mpago.la/28VRTT5",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -40,15 +48,15 @@ const Plans = () => {
       popular: true,
     },
     {
-      name: "Plano Semestral",
+      name: "Semestral",
       price: "R$ 149,90",
+      valor: 149.9,
       period: "/6 meses",
       color: "green",
       borderColor: "border-green-500",
       textColor: "text-green-400",
       bgColor: "bg-green-500 hover:bg-green-600",
       shadowColor: "hover:shadow-green-500/40",
-      link: "https://mpago.la/1xVXUV1",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -58,15 +66,15 @@ const Plans = () => {
       popular: false,
     },
     {
-      name: "Plano Anual",
+      name: "Anual",
       price: "R$ 289,90",
+      valor: 289.9,
       period: "/ano",
       color: "purple",
       borderColor: "border-purple-500",
       textColor: "text-purple-400",
       bgColor: "bg-purple-500 hover:bg-purple-600",
       shadowColor: "hover:shadow-purple-500/40",
-      link: "https://mpago.la/1awVzsz",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -76,6 +84,41 @@ const Plans = () => {
       popular: false,
     },
   ];
+
+  const handlePagar = async (plan: typeof plans[0]) => {
+    const nome = nomeCliente[plan.name]?.trim();
+    
+    if (!nome) {
+      alert("Por favor, digite seu nome antes de pagar.");
+      return;
+    }
+
+    setLoading({ ...loading, [plan.name]: true });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('criar-preferencia', {
+        body: {
+          plano: { nome: plan.name, valor: plan.valor },
+          nomeCliente: nome
+        }
+      });
+
+      if (error) {
+        console.error('Error creating preference:', error);
+        alert('Erro ao criar preferência de pagamento. Tente novamente.');
+        return;
+      }
+
+      if (data?.initPoint) {
+        window.location.href = data.initPoint;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Erro ao processar pagamento. Tente novamente.');
+    } finally {
+      setLoading({ ...loading, [plan.name]: false });
+    }
+  };
 
   return (
     <section id="planos" className="py-20 bg-background" aria-labelledby="plans-heading">
@@ -149,20 +192,29 @@ const Plans = () => {
                   ))}
                 </ul>
                 
+                {/* Nome Input */}
+                <input
+                  type="text"
+                  placeholder="Digite seu nome"
+                  value={nomeCliente[plan.name] || ""}
+                  onChange={(e) => setNomeCliente({ ...nomeCliente, [plan.name]: e.target.value })}
+                  className="w-full px-4 py-2 mb-4 rounded-lg border border-subtle-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-premium-gold"
+                />
+                
                 {/* CTA Button */}
-                <a
-                  href={plan.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => handlePagar(plan)}
+                  disabled={loading[plan.name]}
                   className={`
                     ${plan.bgColor} 
                     text-white font-semibold py-3 px-4 rounded-lg 
-                    block text-center transition-all
+                    w-full text-center transition-all
                     hover:scale-105 shadow-md
+                    disabled:opacity-50 disabled:cursor-not-allowed
                   `}
                 >
-                  📲 Assinar Agora
-                </a>
+                  {loading[plan.name] ? "Processando..." : "📲 Pagar Agora"}
+                </button>
               </motion.div>
             ))}
           </div>

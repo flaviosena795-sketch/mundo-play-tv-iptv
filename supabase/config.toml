@@ -1,1 +1,4 @@
 project_id = "ychdztoixsefnpurmmhi"
+
+[functions.criar-preferencia]
+verify_jwt = false
