@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, Star, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 const Plans = () => {
   const [nomeCliente, setNomeCliente] = useState<{ [key: string]: string }>({});
@@ -96,18 +95,27 @@ const Plans = () => {
     setLoading({ ...loading, [plan.name]: true });
 
     try {
-      const { data, error } = await supabase.functions.invoke('criar-preferencia', {
-        body: {
-          plano: { nome: plan.name, valor: plan.valor },
-          nomeCliente: nome
+      const response = await fetch(
+        'https://ychdztoixsefnpurmmhi.supabase.co/functions/v1/criar-preferencia',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            plano: { nome: plan.name, valor: plan.valor },
+            nomeCliente: nome
+          })
         }
-      });
+      );
 
-      if (error) {
-        console.error('Error creating preference:', error);
+      if (!response.ok) {
+        console.error('Error creating preference');
         alert('Erro ao criar preferência de pagamento. Tente novamente.');
         return;
       }
+
+      const data = await response.json();
 
       if (data?.initPoint) {
         window.location.href = data.initPoint;
