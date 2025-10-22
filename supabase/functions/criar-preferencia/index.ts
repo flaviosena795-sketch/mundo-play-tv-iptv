@@ -21,6 +21,8 @@ serve(async (req) => {
       throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
     }
 
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://ychdztoixsefnpurmmhi.supabase.co';
+    
     const preferenceData = {
       items: [
         {
@@ -35,12 +37,12 @@ serve(async (req) => {
         name: nomeCliente
       },
       back_urls: {
-        success: `${Deno.env.get('VITE_SUPABASE_URL')}/functions/v1/payment-success`,
-        failure: `${Deno.env.get('VITE_SUPABASE_URL')}/functions/v1/payment-failure`,
-        pending: `${Deno.env.get('VITE_SUPABASE_URL')}/functions/v1/payment-pending`
+        success: `${supabaseUrl}/functions/v1/payment-success`,
+        failure: `${supabaseUrl}/functions/v1/payment-failure`,
+        pending: `${supabaseUrl}/functions/v1/payment-pending`
       },
       auto_return: 'approved',
-      notification_url: `${Deno.env.get('VITE_SUPABASE_URL')}/functions/v1/payment-webhook`,
+      notification_url: `${supabaseUrl}/functions/v1/payment-webhook`,
       statement_descriptor: 'MUNDO PLAY TV',
       external_reference: `${plano.nome}-${Date.now()}`
     };
