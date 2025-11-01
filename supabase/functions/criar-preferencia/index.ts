@@ -20,29 +20,25 @@ serve(async (req) => {
     if (!mercadoPagoAccessToken) {
       throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://ychdztoixsefnpurmmhi.supabase.co';
     
     const preferenceData = {
       items: [
         {
-          title: `Mundo Play TV - ${plano.nome}`,
-          description: `Plano ${plano.nome} - +15.000 canais, 4K Ultra HD, Filmes, Séries, PPV`,
+          title: `Plano ${plano.nome} - Mundo Play TV`,
           quantity: 1,
-          unit_price: plano.valor,
-          currency_id: 'BRL'
+          currency_id: 'BRL',
+          unit_price: Number(plano.valor)
         }
       ],
       payer: {
         name: nomeCliente
       },
       back_urls: {
-        success: `${supabaseUrl}/functions/v1/payment-success`,
-        failure: `${supabaseUrl}/functions/v1/payment-failure`,
-        pending: `${supabaseUrl}/functions/v1/payment-pending`
+        success: `https://wa.me/5521966238378?text=✅%20Olá!%20Meu%20nome%20é%20${encodeURIComponent(nomeCliente)}%20e%20acabei%20de%20pagar%20o%20plano%20${encodeURIComponent(plano.nome)}%20no%20site.%20Poderia%20me%20enviar%20minha%20lista%20IPTV?`,
+        failure: 'https://mundoplaytv.com.br/falha',
+        pending: 'https://mundoplaytv.com.br/aguardando'
       },
       auto_return: 'approved',
-      notification_url: `${supabaseUrl}/functions/v1/payment-webhook`,
       statement_descriptor: 'MUNDO PLAY TV',
       external_reference: `${plano.nome}-${Date.now()}`
     };
