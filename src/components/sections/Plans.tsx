@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import { Check, Star, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const Plans = () => {
   const [nomeCliente, setNomeCliente] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const [confirmacao, setConfirmacao] = useState<{ show: boolean; plan: any } | null>(null);
 
-  const MERCADO_PAGO_PUBLIC_KEY = "APP_USR-f4773550-ddef-42fb-bed4-1ce301820f02";
-  const WHATSAPP_NUMBER = "5521966238378";
+  const WHATSAPP_NUMBER = "5521964269985";
 
   const plans = [
     {
@@ -15,11 +16,6 @@ const Plans = () => {
       price: "R$ 29,90",
       valor: 29.9,
       period: "/mês",
-      color: "blue",
-      borderColor: "border-blue-500",
-      textColor: "text-blue-400",
-      bgColor: "bg-blue-500 hover:bg-blue-600",
-      shadowColor: "hover:shadow-blue-500/40",
       features: [
         "+15.000 canais",
         "Qualidade 4K Ultra HD",
@@ -33,11 +29,6 @@ const Plans = () => {
       price: "R$ 79,90",
       valor: 79.9,
       period: "/3 meses",
-      color: "yellow",
-      borderColor: "border-yellow-500",
-      textColor: "text-yellow-400",
-      bgColor: "bg-yellow-500 hover:bg-yellow-600",
-      shadowColor: "hover:shadow-yellow-500/40",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -51,11 +42,6 @@ const Plans = () => {
       price: "R$ 149,90",
       valor: 149.9,
       period: "/6 meses",
-      color: "green",
-      borderColor: "border-green-500",
-      textColor: "text-green-400",
-      bgColor: "bg-green-500 hover:bg-green-600",
-      shadowColor: "hover:shadow-green-500/40",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -69,11 +55,6 @@ const Plans = () => {
       price: "R$ 289,90",
       valor: 289.9,
       period: "/ano",
-      color: "purple",
-      borderColor: "border-purple-500",
-      textColor: "text-purple-400",
-      bgColor: "bg-purple-500 hover:bg-purple-600",
-      shadowColor: "hover:shadow-purple-500/40",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -84,13 +65,22 @@ const Plans = () => {
     },
   ];
 
-  const handlePagar = async (plan: typeof plans[0]) => {
+  const handlePagar = (plan: typeof plans[0]) => {
     const nome = nomeCliente[plan.name]?.trim();
     
     if (!nome) {
-      alert("Por favor, digite seu nome antes de pagar.");
+      alert("Por favor, digite seu nome completo antes de continuar.");
       return;
     }
+
+    setConfirmacao({ show: true, plan });
+  };
+
+  const confirmarPagamento = async () => {
+    if (!confirmacao) return;
+    
+    const { plan } = confirmacao;
+    const nome = nomeCliente[plan.name]?.trim();
 
     setLoading({ ...loading, [plan.name]: true });
 
@@ -109,22 +99,25 @@ const Plans = () => {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        console.error('Error creating preference');
-        alert('Erro ao criar preferência de pagamento. Tente novamente.');
+        console.error('Error creating preference:', data);
+        alert(`Erro ao criar pagamento: ${data.error || 'Tente novamente.'}`);
         return;
       }
 
-      const data = await response.json();
-
       if (data?.initPoint) {
         window.location.href = data.initPoint;
+      } else {
+        alert('Erro: Link de pagamento não recebido.');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Erro ao processar pagamento. Tente novamente.');
+      alert('Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
     } finally {
       setLoading({ ...loading, [plan.name]: false });
+      setConfirmacao(null);
     }
   };
 
@@ -160,10 +153,9 @@ const Plans = () => {
               <motion.div
                 key={index}
                 className={`
-                  relative p-6 rounded-2xl border-t-4 transition-all
-                  bg-gradient-card shadow-lg
-                  ${plan.borderColor} ${plan.shadowColor}
-                  ${plan.popular ? 'scale-105' : ''}
+                  relative p-6 rounded-2xl border-t-4 border-premium-gold transition-all
+                  bg-gradient-card shadow-card hover:shadow-gold
+                  ${plan.popular ? 'ring-2 ring-premium-gold scale-105' : ''}
                 `}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -181,7 +173,7 @@ const Plans = () => {
                 
                 {/* Plan Header */}
                 <div className="text-center mb-6">
-                  <h3 className={`text-2xl font-bold mb-2 ${plan.textColor}`}>
+                  <h3 className="text-2xl font-bold mb-2 text-premium-gold">
                     {plan.name}
                   </h3>
                   <p className="text-3xl font-bold text-foreground mb-2">
@@ -210,19 +202,14 @@ const Plans = () => {
                 />
                 
                 {/* CTA Button */}
-                <button
+                <Button
                   onClick={() => handlePagar(plan)}
                   disabled={loading[plan.name]}
-                  className={`
-                    ${plan.bgColor} 
-                    text-white font-semibold py-3 px-4 rounded-lg 
-                    w-full text-center transition-all
-                    hover:scale-105 shadow-md
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
+                  variant="default"
+                  className="w-full"
                 >
                   {loading[plan.name] ? "Processando..." : "📲 Pagar Agora"}
-                </button>
+                </Button>
               </motion.div>
             ))}
           </div>
@@ -235,7 +222,7 @@ const Plans = () => {
             transition={{ delay: 0.8 }}
           >
             <a
-              href="https://wa.me/5521966238378?text=Ol%C3%A1%20👋%20quero%20suporte%20Mundo%20Play%20TV"
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Ol%C3%A1%20👋%20quero%20suporte%20Mundo%20Play%20TV`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all hover:scale-105"
@@ -253,6 +240,49 @@ const Plans = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Confirmação */}
+      {confirmacao?.show && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <motion.div
+            className="bg-gradient-card border border-subtle-border p-6 rounded-xl max-w-md w-full shadow-premium"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <h2 className="text-2xl font-bold mb-4 text-premium-gold text-center">
+              Confirme seu pagamento
+            </h2>
+            <p className="mb-6 text-center text-foreground">
+              Você está prestes a pagar o plano{" "}
+              <strong className="text-premium-gold">{confirmacao.plan.name}</strong>{" "}
+              por{" "}
+              <strong className="text-premium-gold">
+                R$ {confirmacao.plan.valor.toFixed(2)}
+              </strong>
+              .
+            </p>
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setConfirmacao(null)}
+                variant="secondary"
+                className="flex-1"
+                disabled={loading[confirmacao.plan.name]}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={confirmarPagamento}
+                variant="default"
+                className="flex-1"
+                disabled={loading[confirmacao.plan.name]}
+              >
+                {loading[confirmacao.plan.name] ? "Processando..." : "Confirmar"}
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 };
