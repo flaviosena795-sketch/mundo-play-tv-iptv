@@ -21,10 +21,12 @@ serve(async (req) => {
       throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
     }
     
+    const whatsappMessage = `Olá ${nomeCliente}, seu pagamento para o plano ${plano.nome} (R$${Number(plano.valor).toFixed(2)}) foi confirmado!`;
+    
     const preferenceData = {
       items: [
         {
-          title: `Plano ${plano.nome} - Mundo Play TV`,
+          title: plano.nome,
           quantity: 1,
           currency_id: 'BRL',
           unit_price: Number(plano.valor)
@@ -34,13 +36,11 @@ serve(async (req) => {
         name: nomeCliente
       },
       back_urls: {
-        success: `https://wa.me/5521966238378?text=✅%20Olá!%20Meu%20nome%20é%20${encodeURIComponent(nomeCliente)}%20e%20acabei%20de%20pagar%20o%20plano%20${encodeURIComponent(plano.nome)}%20no%20site.%20Poderia%20me%20enviar%20minha%20lista%20IPTV?`,
+        success: `https://wa.me/5521964269985?text=${encodeURIComponent(whatsappMessage)}`,
         failure: 'https://mundoplaytv.com.br/falha',
-        pending: 'https://mundoplaytv.com.br/aguardando'
+        pending: 'https://mundoplaytv.com.br/pending'
       },
-      auto_return: 'approved',
-      statement_descriptor: 'MUNDO PLAY TV',
-      external_reference: `${plano.nome}-${Date.now()}`
+      auto_return: 'approved'
     };
 
     console.log('Sending to Mercado Pago:', preferenceData);
