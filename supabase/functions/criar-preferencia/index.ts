@@ -1,5 +1,4 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.181.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,85 +11,116 @@ serve(async (req) => {
   }
 
   try {
-    const { plano, nomeCliente } = await req.json();
-    console.log('Creating preference for:', { plano, nomeCliente });
-
-    const mercadoPagoAccessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
-    
-    if (!mercadoPagoAccessToken) {
-      throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
+    const mpToken = Deno.env.get("MP_ACCESS_TOKEN");
+    if (!mpToken) {
+      console.error("[criar-preferencia] MP_ACCESS_TOKEN ausente");
+      return new Response(
+        JSON.stringify({ error: "MP_ACCESS_TOKEN não configurado" }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
     }
 
-    // Log token type (first chars only for security)
-    const tokenPrefix = mercadoPagoAccessToken.substring(0, 10);
-    console.log('Token prefix:', tokenPrefix);
-    console.log('Token type:', mercadoPagoAccessToken.startsWith('TEST-') ? 'TEST' : 'PRODUCTION');
-    
-    const whatsappMessage = `Olá ${nomeCliente}, seu pagamento para o plano ${plano.nome} (R$${Number(plano.valor).toFixed(2)}) foi confirmado!`;
-    
-    const preferenceData = {
-      items: [
-        {
-          title: plano.nome,
-          quantity: 1,
-          currency_id: 'BRL',
-          unit_price: Number(plano.valor)
+    if (req.method !== "POST") {
+      return new Response(
+        JSON.stringify({ error: "Use POST" }), 
+        { 
+          status: 405, 
+          headers: { ...corsHeaders, "Allow": "POST", "Content-Type": "application/json" }
         }
-      ],
-      payer: {
-        name: nomeCliente
-      },
-      back_urls: {
-        success: `https://wa.me/5521964269985?text=${encodeURIComponent(whatsappMessage)}`,
-        failure: 'https://mundoplaytv.com.br/falha',
-        pending: 'https://mundoplaytv.com.br/pending'
-      },
-      auto_return: 'approved'
+      );
+    }
+
+    const body = await req.json().catch(() => null);
+    
+    // Exemplo de mapeamento de planos — ajuste conforme seu front
+    const PLANS: Record<string, { title: string; price: number }> = {
+      mensal: { title: "Plano Mensal - Mundo Play TV", price: 29.9 },
+      trimestral: { title: "Plano Trimestral - Mundo Play TV", price: 79.9 },
+      semestral: { title: "Plano Semestral - Mundo Play TV", price: 149.9 },
+      anual: { title: "Plano Anual - Mundo Play TV", price: 289.9 },
     };
 
-    console.log('Sending to Mercado Pago:', preferenceData);
-
-    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${mercadoPagoAccessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(preferenceData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Mercado Pago API error:', errorText);
-      console.error('Response status:', response.status);
-      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (response.status === 403) {
-        throw new Error('Token do Mercado Pago sem permissões. Verifique se o token tem escopo para criar preferências de pagamento.');
-      }
-      
-      throw new Error(`Mercado Pago API error: ${errorText}`);
+    const planId = body?.planId || "mensal";
+    const plan = PLANS[planId];
+    if (!plan) {
+      return new Response(
+        JSON.stringify({ error: "Plano inválido" }), 
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
     }
 
-    const data = await response.json();
-    console.log('Preference created successfully:', data.id);
+    const prefPayload = {
+      items: [
+        {
+          title: plan.title,
+          quantity: 1,
+          unit_price: Number(plan.price),
+          currency_id: "BRL"
+        }
+      ],
+      back_urls: {
+        success: Deno.env.get("MP_SUCCESS_URL") || "https://mundoplaytv.com.br/success",
+        failure: Deno.env.get("MP_FAILURE_URL") || "https://mundoplaytv.com.br/failure",
+        pending: Deno.env.get("MP_PENDING_URL") || "https://mundoplaytv.com.br/pending"
+      },
+      auto_return: "approved",
+      external_reference: body?.external_reference || undefined
+    };
+
+    console.log("[criar-preferencia] Criando preferência para plano:", planId);
+
+    const mpResp = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${mpToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(prefPayload)
+    });
+
+    const mpJson = await mpResp.json().catch(() => ({ error: "Resposta inválida do Mercado Pago" }));
+
+    if (!mpResp.ok) {
+      console.error("[criar-preferencia] MercadoPago erro:", mpResp.status, mpJson);
+      return new Response(
+        JSON.stringify({
+          error: "Erro ao criar preferência no Mercado Pago",
+          status: mpResp.status,
+          details: mpJson
+        }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
+
+    console.log("[criar-preferencia] Preferência criada com sucesso:", mpJson.id);
 
     return new Response(
-      JSON.stringify({ 
-        preferenceId: data.id,
-        initPoint: data.init_point 
+      JSON.stringify({
+        init_point: mpJson.init_point,
+        preference_id: mpJson.id
       }), 
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
-  } catch (error) {
-    console.error('Error in criar-preferencia function:', error);
+
+  } catch (err) {
+    console.error("[criar-preferencia] erro interno:", err);
     return new Response(
-      JSON.stringify({ error: error.message }), 
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      JSON.stringify({ error: "Erro interno" }), 
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   }
