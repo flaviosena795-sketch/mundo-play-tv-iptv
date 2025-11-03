@@ -102,15 +102,16 @@ const Plans = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Error creating preference:', data);
-        alert(`Erro ao criar pagamento: ${data.error || 'Tente novamente.'}`);
+        console.error('Erro ao criar preferência:', data);
+        alert(`Erro ao criar pagamento: ${data.error || 'Verifique se o token do Mercado Pago está configurado corretamente.'}`);
         return;
       }
 
       if (data?.initPoint) {
         window.location.href = data.initPoint;
       } else {
-        alert('Erro: Link de pagamento não recebido.');
+        console.error('Resposta do servidor:', data);
+        alert('Erro: Link de pagamento não recebido. Contate o suporte.');
       }
     } catch (error) {
       console.error('Error:', error);
