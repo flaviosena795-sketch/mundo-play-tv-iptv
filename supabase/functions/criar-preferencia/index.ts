@@ -20,6 +20,11 @@ serve(async (req) => {
     if (!mercadoPagoAccessToken) {
       throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
     }
+
+    // Log token type (first chars only for security)
+    const tokenPrefix = mercadoPagoAccessToken.substring(0, 10);
+    console.log('Token prefix:', tokenPrefix);
+    console.log('Token type:', mercadoPagoAccessToken.startsWith('TEST-') ? 'TEST' : 'PRODUCTION');
     
     const whatsappMessage = `Olá ${nomeCliente}, seu pagamento para o plano ${plano.nome} (R$${Number(plano.valor).toFixed(2)}) foi confirmado!`;
     
@@ -57,6 +62,13 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Mercado Pago API error:', errorText);
+      console.error('Response status:', response.status);
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      if (response.status === 403) {
+        throw new Error('Token do Mercado Pago sem permissões. Verifique se o token tem escopo para criar preferências de pagamento.');
+      }
+      
       throw new Error(`Mercado Pago API error: ${errorText}`);
     }
 
