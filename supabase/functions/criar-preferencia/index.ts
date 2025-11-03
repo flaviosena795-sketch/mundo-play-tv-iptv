@@ -11,11 +11,11 @@ serve(async (req) => {
   }
 
   try {
-    const mpToken = Deno.env.get("MP_ACCESS_TOKEN");
+    const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!mpToken) {
-      console.error("[criar-preferencia] MP_ACCESS_TOKEN ausente");
+      console.error("[criar-preferencia] MERCADO_PAGO_ACCESS_TOKEN ausente");
       return new Response(
-        JSON.stringify({ error: "MP_ACCESS_TOKEN não configurado" }), 
+        JSON.stringify({ error: "MERCADO_PAGO_ACCESS_TOKEN não configurado" }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, "Content-Type": "application/json" }
