@@ -1,12 +1,18 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
+import MenuButton from "@/components/MenuButton";
 import heroImage from "@/assets/hero-iptv.jpg";
 import { Play, Shield, Clock } from "lucide-react";
 
 const Hero = () => {
   return (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero">
+      {/* Menu Button */}
+      <div className="absolute top-6 right-6 z-20">
+        <MenuButton />
+      </div>
+
       {/* Background Image with Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
         role="img"
