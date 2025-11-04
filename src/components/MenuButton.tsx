@@ -10,8 +10,8 @@ const MenuButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="p-2 rounded-full hover:bg-accent transition">
-          <MoreVertical className="w-6 h-6 text-white" />
+        <button className="p-3 rounded-full bg-gradient-card border border-premium-gold/50 hover:border-premium-gold hover:shadow-gold hover:scale-110 transition-premium backdrop-blur-sm">
+          <MoreVertical className="w-6 h-6 text-premium-gold" />
         </button>
       </DropdownMenuTrigger>
 
