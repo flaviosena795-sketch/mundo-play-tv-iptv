@@ -203,14 +203,24 @@ const Plans = () => {
                 />
                 
                 {/* CTA Button */}
-                <Button
-                  onClick={() => handlePagar(plan)}
-                  disabled={loading[plan.name]}
-                  variant="default"
-                  className="w-full"
-                >
-                  {loading[plan.name] ? "Processando..." : "📲 Pagar Agora"}
-                </Button>
+                {plan.name === "Mensal" ? (
+                  <div id="mp-payment-container">
+                    <script 
+                      src="https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js"
+                      data-preference-id="2958149440-beaddb38-3fd4-452e-9c84-5e79ba6eb449" 
+                      data-source="button"
+                    />
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => handlePagar(plan)}
+                    disabled={loading[plan.name]}
+                    variant="default"
+                    className="w-full"
+                  >
+                    {loading[plan.name] ? "Processando..." : "📲 Pagar Agora"}
+                  </Button>
+                )}
               </motion.div>
             ))}
           </div>
