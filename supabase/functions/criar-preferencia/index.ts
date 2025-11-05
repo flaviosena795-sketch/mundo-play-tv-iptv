@@ -35,45 +35,30 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => null);
     
-    // Exemplo de mapeamento de planos — ajuste conforme seu front
-    const PLANS: Record<string, { title: string; price: number }> = {
-      mensal: { title: "Plano Mensal - Mundo Play TV", price: 29.9 },
-      trimestral: { title: "Plano Trimestral - Mundo Play TV", price: 79.9 },
-      semestral: { title: "Plano Semestral - Mundo Play TV", price: 149.9 },
-      anual: { title: "Plano Anual - Mundo Play TV", price: 289.9 },
-    };
+    const planNome = body?.plano?.nome || "Mensal";
+    const planValor = body?.plano?.valor || 29.9;
 
-    const planId = body?.planId || "mensal";
-    const plan = PLANS[planId];
-    if (!plan) {
-      return new Response(
-        JSON.stringify({ error: "Plano inválido" }), 
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
-      );
-    }
+    const whatsappMessage = `✅+Olá!+Acabei+de+realizar+o+pagamento+do+Plano+${encodeURIComponent(planNome)}+na+Mundo+Play+TV.%0A%0APoderia+me+enviar+a+minha+lista+IPTV,+por+favor?%0A%0A📞+Agradeço+desde+já!`;
+    const whatsappUrl = `https://wa.me/5521966238378?text=${whatsappMessage}`;
 
     const prefPayload = {
       items: [
         {
-          title: plan.title,
+          title: `Plano ${planNome}`,
           quantity: 1,
-          unit_price: Number(plan.price),
+          unit_price: Number(planValor),
           currency_id: "BRL"
         }
       ],
       back_urls: {
-        success: Deno.env.get("MP_SUCCESS_URL") || "https://mundoplaytv.com.br/success",
-        failure: Deno.env.get("MP_FAILURE_URL") || "https://mundoplaytv.com.br/failure",
-        pending: Deno.env.get("MP_PENDING_URL") || "https://mundoplaytv.com.br/pending"
+        success: whatsappUrl,
+        failure: "https://mundoplaytv.com.br/pagamento-falhou"
       },
       auto_return: "approved",
-      external_reference: body?.external_reference || undefined
+      external_reference: planNome.replace(/\s+/g, '_').toUpperCase()
     };
 
-    console.log("[criar-preferencia] Criando preferência para plano:", planId);
+    console.log("[criar-preferencia] Criando preferência para plano:", planNome);
 
     const mpResp = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",

@@ -4,11 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Plans = () => {
-  const [nomeCliente, setNomeCliente] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
-  const [confirmacao, setConfirmacao] = useState<{ show: boolean; plan: any } | null>(null);
-
-  const WHATSAPP_NUMBER = "5521964269985";
 
   const plans = [
     {
@@ -65,23 +61,7 @@ const Plans = () => {
     },
   ];
 
-  const handlePagar = (plan: typeof plans[0]) => {
-    const nome = nomeCliente[plan.name]?.trim();
-    
-    if (!nome) {
-      alert("Por favor, digite seu nome completo antes de continuar.");
-      return;
-    }
-
-    setConfirmacao({ show: true, plan });
-  };
-
-  const confirmarPagamento = async () => {
-    if (!confirmacao) return;
-    
-    const { plan } = confirmacao;
-    const nome = nomeCliente[plan.name]?.trim();
-
+  const handlePagar = async (plan: typeof plans[0]) => {
     setLoading({ ...loading, [plan.name]: true });
 
     try {
@@ -93,8 +73,7 @@ const Plans = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            plano: { nome: plan.name, valor: plan.valor },
-            nomeCliente: nome
+            plano: { nome: plan.name, valor: plan.valor }
           })
         }
       );
@@ -107,8 +86,8 @@ const Plans = () => {
         return;
       }
 
-      if (data?.initPoint) {
-        window.location.href = data.initPoint;
+      if (data?.init_point) {
+        window.location.href = data.init_point;
       } else {
         console.error('Resposta do servidor:', data);
         alert('Erro: Link de pagamento não recebido. Contate o suporte.');
@@ -118,7 +97,6 @@ const Plans = () => {
       alert('Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
     } finally {
       setLoading({ ...loading, [plan.name]: false });
-      setConfirmacao(null);
     }
   };
 
@@ -185,7 +163,7 @@ const Plans = () => {
                 
                 {/* Features List */}
                 <ul className="text-sm mb-6 space-y-2">
-                  {plan.features.map((feature, featureIndex) => (
+                {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-2 text-muted-foreground">
                       <Check className="w-5 h-5 text-premium-gold mt-0.5 flex-shrink-0" />
                       {feature}
@@ -193,46 +171,19 @@ const Plans = () => {
                   ))}
                 </ul>
                 
-                {/* Nome Input */}
-                <input
-                  type="text"
-                  placeholder="Digite seu nome"
-                  value={nomeCliente[plan.name] || ""}
-                  onChange={(e) => setNomeCliente({ ...nomeCliente, [plan.name]: e.target.value })}
-                  className="w-full px-4 py-2 mb-4 rounded-lg border border-subtle-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-premium-gold"
-                />
-                
                 {/* CTA Button */}
                 <Button
                   onClick={() => handlePagar(plan)}
                   disabled={loading[plan.name]}
                   variant="default"
-                  className="w-full"
+                  className="w-full text-lg font-bold"
                 >
-                  {loading[plan.name] ? "Processando..." : "📲 Pagar Agora"}
+                  {loading[plan.name] ? "Processando..." : "Assinar Agora"}
                 </Button>
               </motion.div>
             ))}
           </div>
           
-          {/* WhatsApp Support Button */}
-          <motion.div
-            className="mt-12 flex justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Ol%C3%A1%20👋%20quero%20suporte%20Mundo%20Play%20TV`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all hover:scale-105"
-            >
-              <MessageCircle className="w-5 h-5" />
-              💬 Falar com Suporte
-            </a>
-          </motion.div>
-
           {/* Bottom Note */}
           <div className="text-center mt-8">
             <p className="text-muted-foreground text-sm">
@@ -241,49 +192,6 @@ const Plans = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal de Confirmação */}
-      {confirmacao?.show && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <motion.div
-            className="bg-gradient-card border border-subtle-border p-6 rounded-xl max-w-md w-full shadow-premium"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 className="text-2xl font-bold mb-4 text-premium-gold text-center">
-              Confirme seu pagamento
-            </h2>
-            <p className="mb-6 text-center text-foreground">
-              Você está prestes a pagar o plano{" "}
-              <strong className="text-premium-gold">{confirmacao.plan.name}</strong>{" "}
-              por{" "}
-              <strong className="text-premium-gold">
-                R$ {confirmacao.plan.valor.toFixed(2)}
-              </strong>
-              .
-            </p>
-            <div className="flex gap-4">
-              <Button
-                onClick={() => setConfirmacao(null)}
-                variant="secondary"
-                className="flex-1"
-                disabled={loading[confirmacao.plan.name]}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={confirmarPagamento}
-                variant="default"
-                className="flex-1"
-                disabled={loading[confirmacao.plan.name]}
-              >
-                {loading[confirmacao.plan.name] ? "Processando..." : "Confirmar"}
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </section>
   );
 };
