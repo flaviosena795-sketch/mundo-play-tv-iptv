@@ -3,7 +3,6 @@ import About from "@/components/sections/About";
 import Features from "@/components/sections/Features";
 import FreeTrialBanner from "@/components/sections/FreeTrialBanner";
 import Plans from "@/components/sections/Plans";
-import PagamentoPix from "@/components/sections/PagamentoPix";
 import Guarantee from "@/components/sections/Guarantee";
 import PaymentMethods from "@/components/sections/PaymentMethods";
 import VODRequest from "@/components/sections/VODRequest";
@@ -19,7 +18,6 @@ const Index = () => {
       <Features />
       <FreeTrialBanner />
       <Plans />
-      <PagamentoPix />
       <Guarantee />
       <PaymentMethods />
       <VODRequest />
