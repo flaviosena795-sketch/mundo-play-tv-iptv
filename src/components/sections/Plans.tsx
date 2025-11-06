@@ -62,7 +62,7 @@ const Plans = () => {
   ];
 
   const handlePagar = async (plan: typeof plans[0]) => {
-    setLoading({ ...loading, [plan.name]: true });
+    setLoading(prev => ({ ...prev, [plan.name]: true }));
 
     try {
       const response = await fetch(
@@ -82,7 +82,8 @@ const Plans = () => {
 
       if (!response.ok) {
         console.error('Erro ao criar preferência:', data);
-        alert(`Erro ao criar pagamento: ${data.error || 'Verifique se o token do Mercado Pago está configurado corretamente.'}`);
+        alert(`Erro ao criar pagamento: ${data.error || 'Tente novamente.'}`);
+        setLoading(prev => ({ ...prev, [plan.name]: false }));
         return;
       }
 
@@ -91,12 +92,12 @@ const Plans = () => {
       } else {
         console.error('Resposta do servidor:', data);
         alert('Erro: Link de pagamento não recebido. Contate o suporte.');
+        setLoading(prev => ({ ...prev, [plan.name]: false }));
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
-    } finally {
-      setLoading({ ...loading, [plan.name]: false });
+      alert('Erro ao processar pagamento. Verifique sua conexão.');
+      setLoading(prev => ({ ...prev, [plan.name]: false }));
     }
   };
 
