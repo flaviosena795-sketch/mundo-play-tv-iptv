@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
 import { CheckCircle, MessageCircle, Clock, Tv } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { useSearchParams } from "react-router-dom";
 
 const Success = () => {
+  const [searchParams] = useSearchParams();
+  const plano = searchParams.get('plano') || 'seu plano';
+  const valor = searchParams.get('valor') || '';
+
+  const whatsappMessage = `Olá!%20Acabei%20de%20realizar%20meu%20pagamento%20do%20Plano%20${encodeURIComponent(plano)}${valor ? `%20(R$${valor})` : ''}%20no%20Mundo%20Play%20TV.%20Gostaria%20de%20receber%20minhas%20credenciais%20de%20acesso.`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 flex items-center justify-center px-4">
       <motion.div
@@ -35,9 +42,14 @@ const Success = () => {
             🎉 Pagamento Confirmado!
           </h1>
           
-          <p className="text-center text-muted-foreground mb-8 text-lg">
-            Seu plano Mundo Play TV foi ativado com sucesso!
+          <p className="text-center text-muted-foreground mb-2 text-lg">
+            Seu <span className="text-premium-gold font-semibold">Plano {plano}</span> foi ativado com sucesso!
           </p>
+          {valor && (
+            <p className="text-center text-sm text-muted-foreground mb-8">
+              Valor: R$ {valor}
+            </p>
+          )}
 
           {/* Instructions */}
           <div className="space-y-6 mb-8">
@@ -78,7 +90,7 @@ const Success = () => {
           <div className="space-y-4">
             <WhatsAppButton 
               className="w-full text-lg py-6"
-              message="Olá!%20Acabei%20de%20realizar%20meu%20pagamento%20no%20Mundo%20Play%20TV.%20Gostaria%20de%20receber%20minhas%20credenciais%20de%20acesso."
+              message={whatsappMessage}
             >
               <MessageCircle className="w-5 h-5 mr-2" />
               Receber Credenciais no WhatsApp

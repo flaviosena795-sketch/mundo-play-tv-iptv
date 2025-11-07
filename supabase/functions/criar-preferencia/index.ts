@@ -119,24 +119,27 @@ serve(async (req) => {
     // Use only the validated plan value from whitelist
     const planValor = VALID_PLANS[planNome];
 
-    const whatsappMessage = `✅+Olá!+Acabei+de+realizar+o+pagamento+do+Plano+${encodeURIComponent(planNome)}+na+Mundo+Play+TV.%0A%0APoderia+me+enviar+a+minha+lista+IPTV,+por+favor?%0A%0A📞+Agradeço+desde+já!`;
-    const whatsappUrl = `https://wa.me/5521966238378?text=${whatsappMessage}`;
-
+    // Get the site URL from environment or use origin from request
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || 'https://mundoplaytv.com.br';
+    
     const prefPayload = {
       items: [
         {
-          title: `Plano ${planNome}`,
+          title: `Plano ${planNome} - Mundo Play TV`,
           quantity: 1,
           unit_price: Number(planValor),
           currency_id: "BRL"
         }
       ],
       back_urls: {
-        success: whatsappUrl,
-        failure: "https://mundoplaytv.com.br/pagamento-falhou"
+        success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}`,
+        failure: `${origin}/?erro=pagamento`,
+        pending: `${origin}/?pendente=pagamento`
       },
       auto_return: "approved",
-      external_reference: planNome.replace(/\s+/g, '_').toUpperCase()
+      external_reference: `${planNome.replace(/\s+/g, '_').toUpperCase()}_${Date.now()}`,
+      notification_url: undefined, // Adicione webhook URL aqui quando implementar
+      statement_descriptor: "MUNDO PLAY TV"
     };
 
     console.log("[criar-preferencia] Criando preferência para plano:", planNome);
