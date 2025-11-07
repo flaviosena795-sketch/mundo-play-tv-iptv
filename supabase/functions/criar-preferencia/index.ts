@@ -133,8 +133,8 @@ serve(async (req) => {
       ],
       back_urls: {
         success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}`,
-        failure: `${origin}/?erro=pagamento`,
-        pending: `${origin}/?pendente=pagamento`
+        failure: `${origin}/falha?erro=rejeitado`,
+        pending: `${origin}/falha?erro=timeout`
       },
       auto_return: "approved",
       external_reference: `${planNome.replace(/\s+/g, '_').toUpperCase()}_${Date.now()}`,
