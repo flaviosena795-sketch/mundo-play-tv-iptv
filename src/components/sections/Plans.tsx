@@ -1,10 +1,25 @@
 import { motion } from "framer-motion";
-import { Check, Star, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { Check, Star } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
+}
 
 const Plans = () => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const [mp, setMp] = useState<any>(null);
+
+  // IDs de preferência do Mercado Pago para cada plano
+  const preferenceIds = {
+    mensal: "PREFERENCE_ID_MENSAL",
+    trimestral: "PREFERENCE_ID_TRIMESTRAL", 
+    semestral: "PREFERENCE_ID_SEMESTRAL",
+    anual: "PREFERENCE_ID_ANUAL"
+  };
 
   const plans = [
     {
@@ -12,6 +27,7 @@ const Plans = () => {
       price: "R$ 29,90",
       valor: 29.9,
       period: "/mês",
+      preferenceKey: "mensal" as keyof typeof preferenceIds,
       features: [
         "+15.000 canais",
         "Qualidade 4K Ultra HD",
@@ -25,6 +41,7 @@ const Plans = () => {
       price: "R$ 79,90",
       valor: 79.9,
       period: "/3 meses",
+      preferenceKey: "trimestral" as keyof typeof preferenceIds,
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -38,6 +55,7 @@ const Plans = () => {
       price: "R$ 149,90",
       valor: 149.9,
       period: "/6 meses",
+      preferenceKey: "semestral" as keyof typeof preferenceIds,
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -51,6 +69,7 @@ const Plans = () => {
       price: "R$ 289,90",
       valor: 289.9,
       period: "/ano",
+      preferenceKey: "anual" as keyof typeof preferenceIds,
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -61,42 +80,38 @@ const Plans = () => {
     },
   ];
 
-  const handlePagar = async (plan: typeof plans[0]) => {
+  useEffect(() => {
+    // Inicializa o Mercado Pago SDK
+    if (window.MercadoPago) {
+      const mercadopago = new window.MercadoPago("APP_USR-2d1da332-beac-4390-8931-56caa2606e5c", {
+        locale: "pt-BR"
+      });
+      setMp(mercadopago);
+    }
+  }, []);
+
+  const handlePagar = (plan: typeof plans[0]) => {
+    if (!mp) {
+      alert("Carregando sistema de pagamento...");
+      return;
+    }
+
     setLoading(prev => ({ ...prev, [plan.name]: true }));
 
+    const preferenceId = preferenceIds[plan.preferenceKey];
+    
     try {
-      const response = await fetch(
-        'https://ychdztoixsefnpurmmhi.supabase.co/functions/v1/criar-preferencia',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            plano: { nome: plan.name, valor: plan.valor }
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('Erro ao criar preferência:', data);
-        alert(`Erro ao criar pagamento: ${data.error || 'Tente novamente.'}`);
-        setLoading(prev => ({ ...prev, [plan.name]: false }));
-        return;
-      }
-
-      if (data?.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        console.error('Resposta do servidor:', data);
-        alert('Erro: Link de pagamento não recebido. Contate o suporte.');
-        setLoading(prev => ({ ...prev, [plan.name]: false }));
-      }
+      // Redireciona para o checkout do Mercado Pago
+      mp.checkout({
+        preference: {
+          id: preferenceId
+        },
+        autoOpen: true
+      });
     } catch (error) {
-      console.error('Error:', error);
-      alert('Erro ao processar pagamento. Verifique sua conexão.');
+      console.error('Erro ao abrir checkout:', error);
+      alert('Erro ao processar pagamento. Tente novamente.');
+    } finally {
       setLoading(prev => ({ ...prev, [plan.name]: false }));
     }
   };
