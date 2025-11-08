@@ -83,7 +83,7 @@ const Plans = () => {
   useEffect(() => {
     // Inicializa o Mercado Pago SDK
     if (window.MercadoPago) {
-      const mercadopago = new window.MercadoPago("APP_USR-2d1da332-beac-4390-8931-56caa2606e5c", {
+      const mercadopago = new window.MercadoPago("APP_USR-49427103-0e51-419c-ad71-234f8452afe6", {
         locale: "pt-BR"
       });
       setMp(mercadopago);
