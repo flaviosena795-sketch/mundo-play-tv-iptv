@@ -15,10 +15,10 @@ const Plans = () => {
 
   // IDs de preferência do Mercado Pago para cada plano
   const preferenceIds = {
-    mensal: "PREFERENCE_ID_MENSAL",
-    trimestral: "PREFERENCE_ID_TRIMESTRAL", 
-    semestral: "PREFERENCE_ID_SEMESTRAL",
-    anual: "PREFERENCE_ID_ANUAL"
+    mensal: "2958149440-156edd14-256f-4991-a143-e9d3695c73dc",
+    trimestral: "2958149440-83ee8536-6684-49be-b461-a92dd86874f1", 
+    semestral: "2958149440-3548c015-87b9-41b5-93cf-6c4f1407f4d0",
+    anual: "2958149440-2e8d7a4a-df45-4891-b2d9-ef1c9a7c4a1a"
   };
 
   const plans = [
