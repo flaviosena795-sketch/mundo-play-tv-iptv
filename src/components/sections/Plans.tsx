@@ -34,8 +34,8 @@ const Plans = () => {
     },
     {
       name: "Semestral",
-      price: "R$ 179,90",
-      valor: 179.9,
+      price: "R$ 149,90",
+      valor: 149.9,
       period: "/6 meses",
       preferenceId: "2958149440-83ee8536-6684-49be-b461-a92dd86874f1",
       features: [
