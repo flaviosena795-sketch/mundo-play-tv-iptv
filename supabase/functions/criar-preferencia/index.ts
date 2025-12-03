@@ -9,7 +9,7 @@ const corsHeaders = {
 const VALID_PLANS: Record<string, number> = {
   "Mensal": 29.9,
   "Trimestral": 79.9,
-  "Semestral": 149.9,
+  "Semestral": 179.9,
   "Anual": 289.9
 };
 
