@@ -45,11 +45,11 @@ const PlansComparison = () => {
     },
     {
       name: "Semestral",
-      price: 149.9,
-      pricePerMonth: 24.98,
+      price: 179.9,
+      pricePerMonth: 29.98,
       duration: "6 meses",
-      savings: "R$ 29,50",
-      badge: "Melhor Custo",
+      savings: null,
+      badge: null,
       features: {
         channels: "Todos os canais",
         quality: "4K Ultra HD",
@@ -59,8 +59,8 @@ const PlansComparison = () => {
         guarantee: "7 dias de garantia",
         vod: "Filmes e Séries",
         cancellation: "Cancelamento livre",
-        flexibility: "Ótima economia",
-        economy: "16% de desconto",
+        flexibility: "Boa flexibilidade",
+        economy: null,
       }
     },
     {

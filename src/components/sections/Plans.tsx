@@ -1,33 +1,15 @@
 import { motion } from "framer-motion";
 import { Check, Star } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-declare global {
-  interface Window {
-    MercadoPago: any;
-  }
-}
-
 const Plans = () => {
-  const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
-  const [mp, setMp] = useState<any>(null);
-
-  // IDs de preferência do Mercado Pago para cada plano
-  const preferenceIds = {
-    mensal: "2958149440-156edd14-256f-4991-a143-e9d3695c73dc",
-    trimestral: "2958149440-83ee8536-6684-49be-b461-a92dd86874f1", 
-    semestral: "2958149440-3548c015-87b9-41b5-93cf-6c4f1407f4d0",
-    anual: "2958149440-2e8d7a4a-df45-4891-b2d9-ef1c9a7c4a1a"
-  };
-
   const plans = [
     {
       name: "Mensal",
       price: "R$ 29,90",
       valor: 29.9,
       period: "/mês",
-      preferenceKey: "mensal" as keyof typeof preferenceIds,
+      link: "https://mpago.la/2gDafqQ",
       features: [
         "+15.000 canais",
         "Qualidade 4K Ultra HD",
@@ -41,7 +23,7 @@ const Plans = () => {
       price: "R$ 79,90",
       valor: 79.9,
       period: "/3 meses",
-      preferenceKey: "trimestral" as keyof typeof preferenceIds,
+      link: "https://mpago.la/1a1M2sK",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -52,10 +34,10 @@ const Plans = () => {
     },
     {
       name: "Semestral",
-      price: "R$ 149,90",
-      valor: 149.9,
+      price: "R$ 179,90",
+      valor: 179.9,
       period: "/6 meses",
-      preferenceKey: "semestral" as keyof typeof preferenceIds,
+      link: "https://mpago.la/33KS1Ac",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -69,7 +51,7 @@ const Plans = () => {
       price: "R$ 289,90",
       valor: 289.9,
       period: "/ano",
-      preferenceKey: "anual" as keyof typeof preferenceIds,
+      link: "https://mpago.la/2msunc9",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -80,40 +62,8 @@ const Plans = () => {
     },
   ];
 
-  useEffect(() => {
-    // Inicializa o Mercado Pago SDK
-    if (window.MercadoPago) {
-      const mercadopago = new window.MercadoPago("APP_USR-49427103-0e51-419c-ad71-234f8452afe6", {
-        locale: "pt-BR"
-      });
-      setMp(mercadopago);
-    }
-  }, []);
-
-  const handlePagar = (plan: typeof plans[0]) => {
-    if (!mp) {
-      alert("Carregando sistema de pagamento...");
-      return;
-    }
-
-    setLoading(prev => ({ ...prev, [plan.name]: true }));
-
-    const preferenceId = preferenceIds[plan.preferenceKey];
-    
-    try {
-      // Redireciona para o checkout do Mercado Pago
-      mp.checkout({
-        preference: {
-          id: preferenceId
-        },
-        autoOpen: true
-      });
-    } catch (error) {
-      console.error('Erro ao abrir checkout:', error);
-      alert('Erro ao processar pagamento. Tente novamente.');
-    } finally {
-      setLoading(prev => ({ ...prev, [plan.name]: false }));
-    }
+  const handlePagar = (link: string) => {
+    window.open(link, "_blank");
   };
 
   return (
@@ -189,12 +139,11 @@ const Plans = () => {
                 
                 {/* CTA Button */}
                 <Button
-                  onClick={() => handlePagar(plan)}
-                  disabled={loading[plan.name]}
+                  onClick={() => handlePagar(plan.link)}
                   variant="default"
                   className="w-full text-lg font-bold"
                 >
-                  {loading[plan.name] ? "Processando..." : "Assinar Agora"}
+                  Assinar Agora
                 </Button>
               </motion.div>
             ))}
