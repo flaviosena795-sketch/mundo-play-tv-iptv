@@ -45,8 +45,8 @@ const PlansComparison = () => {
     },
     {
       name: "Semestral",
-      price: 179.9,
-      pricePerMonth: 29.98,
+      price: 149.9,
+      pricePerMonth: 24.98,
       duration: "6 meses",
       savings: null,
       badge: null,
