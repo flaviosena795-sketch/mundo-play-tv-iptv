@@ -7,6 +7,7 @@ import Plans from "@/components/sections/Plans";
 import PlansComparison from "@/components/sections/PlansComparison";
 import Guarantee from "@/components/sections/Guarantee";
 import PaymentMethods from "@/components/sections/PaymentMethods";
+import Pagamento from "@/components/sections/Pagamento";
 import VODRequest from "@/components/sections/VODRequest";
 import Testimonials from "@/components/sections/Testimonials";
 import FAQ from "@/components/sections/FAQ";
@@ -24,6 +25,7 @@ const Index = () => {
       <PlansComparison />
       <Guarantee />
       <PaymentMethods />
+      <Pagamento />
       <VODRequest />
       <Testimonials />
       <FAQ />
