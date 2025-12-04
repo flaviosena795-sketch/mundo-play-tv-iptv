@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import Announcement from "@/components/sections/Announcement";
 import About from "@/components/sections/About";
 import Features from "@/components/sections/Features";
 import FreeTrialBanner from "@/components/sections/FreeTrialBanner";
@@ -15,6 +16,7 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       <Hero />
+      <Announcement />
       <About />
       <Features />
       <FreeTrialBanner />
