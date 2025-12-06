@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Check, Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,39 +132,32 @@ const Plans = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <motion.h2
+            <h2
               id="plans-heading"
-              className="text-4xl md:text-5xl font-bold mb-6 text-premium-gold"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              className="text-4xl md:text-5xl font-bold mb-6 text-premium-gold animate-fade-in"
             >
               🌎 MUNDO PLAY TV
-            </motion.h2>
+            </h2>
 
-            <motion.p
-              className="text-lg text-muted-foreground"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+            <p
+              className="text-lg text-muted-foreground animate-fade-in"
+              style={{ animationDelay: "0.2s" }}
             >
               Escolha seu plano e tenha acesso imediato ao melhor da TV mundial!
-            </motion.p>
+            </p>
           </div>
           
           {/* Plans Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {plans.map((plan, index) => (
-              <motion.div
+              <div
                 key={index}
                 className={`
                   relative p-6 rounded-2xl border-t-4 border-premium-gold transition-all
-                  bg-gradient-card shadow-card hover:shadow-gold
+                  bg-gradient-card shadow-card hover:shadow-gold animate-fade-in-up
                   ${plan.popular ? 'ring-2 ring-premium-gold scale-105' : ''}
                 `}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
@@ -190,7 +182,7 @@ const Plans = () => {
                 
                 {/* Features List */}
                 <ul className="text-sm mb-6 space-y-2">
-                {plan.features.map((feature, featureIndex) => (
+                  {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-2 text-muted-foreground">
                       <Check className="w-5 h-5 text-premium-gold mt-0.5 flex-shrink-0" />
                       {feature}
@@ -205,7 +197,7 @@ const Plans = () => {
                 >
                   Assinar Agora
                 </Button>
-              </motion.div>
+              </div>
             ))}
           </div>
           
