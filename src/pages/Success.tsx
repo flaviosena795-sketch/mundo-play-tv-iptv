@@ -2,13 +2,30 @@ import { motion } from "framer-motion";
 import { CheckCircle, MessageCircle, Clock, Tv } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Success = () => {
   const [searchParams] = useSearchParams();
   const plano = searchParams.get('plano') || 'seu plano';
   const valor = searchParams.get('valor') || '';
+  const nomeUrl = searchParams.get('nome') || '';
+  const collectionId = searchParams.get('collection_id') || searchParams.get('payment_id') || '';
+  
+  // Get name from URL or localStorage
+  const [fullName, setFullName] = useState('');
+  
+  useEffect(() => {
+    const storedName = localStorage.getItem('mp_full_name') || '';
+    setFullName(nomeUrl || storedName);
+  }, [nomeUrl]);
 
-  const whatsappMessage = `Olá!%20Acabei%20de%20realizar%20meu%20pagamento%20do%20Plano%20${encodeURIComponent(plano)}${valor ? `%20(R$${valor})` : ''}%20no%20Mundo%20Play%20TV.%20Gostaria%20de%20receber%20minhas%20credenciais%20de%20acesso.`;
+  const supportNumber = '5521966238378';
+  
+  const whatsappMessage = encodeURIComponent(
+    `Olá, meu nome é ${fullName}. Acabei de pagar o Plano ${plano}${valor ? ` (R$${valor})` : ''} e gostaria da ativação.${collectionId ? ` Payment ID: ${collectionId}` : ''}`
+  );
+
+  const waUrl = `https://wa.me/${supportNumber}?text=${whatsappMessage}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 flex items-center justify-center px-4">
@@ -42,12 +59,23 @@ const Success = () => {
             🎉 Pagamento Confirmado!
           </h1>
           
+          {fullName && (
+            <p className="text-center text-foreground mb-2 text-lg">
+              Obrigado, <span className="text-premium-gold font-semibold">{fullName}</span>!
+            </p>
+          )}
+          
           <p className="text-center text-muted-foreground mb-2 text-lg">
             Seu <span className="text-premium-gold font-semibold">Plano {plano}</span> foi ativado com sucesso!
           </p>
           {valor && (
-            <p className="text-center text-sm text-muted-foreground mb-8">
+            <p className="text-center text-sm text-muted-foreground mb-2">
               Valor: R$ {valor}
+            </p>
+          )}
+          {collectionId && (
+            <p className="text-center text-xs text-muted-foreground mb-8">
+              ID do Pagamento: {collectionId}
             </p>
           )}
 
@@ -58,7 +86,7 @@ const Success = () => {
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Próximos Passos</h3>
                 <p className="text-sm text-muted-foreground">
-                  Em até 5 minutos você receberá suas credenciais de acesso por WhatsApp.
+                  Clique no botão abaixo para receber suas credenciais de acesso por WhatsApp.
                 </p>
               </div>
             </div>
@@ -88,16 +116,18 @@ const Success = () => {
 
           {/* WhatsApp CTA */}
           <div className="space-y-4">
-            <WhatsAppButton 
-              className="w-full text-lg py-6"
-              message={whatsappMessage}
+            <a 
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full text-lg py-4 px-6 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-lg transition-colors"
             >
-              <MessageCircle className="w-5 h-5 mr-2" />
+              <MessageCircle className="w-5 h-5" />
               Receber Credenciais no WhatsApp
-            </WhatsAppButton>
+            </a>
 
             <p className="text-center text-xs text-muted-foreground">
-              Não recebeu a mensagem? Clique no botão acima para solicitar suas credenciais
+              Clique no botão acima para solicitar suas credenciais de acesso
             </p>
           </div>
         </motion.div>

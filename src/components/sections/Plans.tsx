@@ -1,15 +1,30 @@
 import { motion } from "framer-motion";
-import { Check, Star } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { Check, Star, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const Plans = () => {
+  const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
+  const [clientName, setClientName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const plans = [
     {
       name: "Mensal",
       price: "R$ 29,90",
       valor: 29.9,
       period: "/mês",
-      preferenceId: "2958149440-2f7a472e-cc62-40aa-8af8-76cb59afa6ae",
       features: [
         "+15.000 canais",
         "Qualidade 4K Ultra HD",
@@ -23,7 +38,6 @@ const Plans = () => {
       price: "R$ 79,90",
       valor: 79.9,
       period: "/3 meses",
-      preferenceId: "2958149440-156edd14-256f-4991-a143-e9d3695c73dc",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -37,7 +51,6 @@ const Plans = () => {
       price: "R$ 149,90",
       valor: 149.9,
       period: "/6 meses",
-      preferenceId: "2958149440-83ee8536-6684-49be-b461-a92dd86874f1",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -51,7 +64,6 @@ const Plans = () => {
       price: "R$ 289,90",
       valor: 289.9,
       period: "/ano",
-      preferenceId: "2958149440-3548c015-87b9-41b5-93cf-6c4f1407f4d0",
       features: [
         "+15.000 canais",
         "4K Ultra HD",
@@ -62,34 +74,58 @@ const Plans = () => {
     },
   ];
 
-  const containerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const handleSelectPlan = (plan: typeof plans[0]) => {
+    setSelectedPlan(plan);
+    setDialogOpen(true);
+  };
 
-  useEffect(() => {
-    // Load Mercado Pago script
-    const script = document.createElement("script");
-    script.src = "https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+  const handlePayment = async () => {
+    if (!selectedPlan) return;
+    
+    const trimmedName = clientName.trim();
+    if (!trimmedName) {
+      toast.error("Por favor, informe seu nome completo");
+      return;
+    }
 
-    script.onload = () => {
-      // Create checkout buttons for each plan
-      plans.forEach((plan, index) => {
-        const container = containerRefs.current[index];
-        if (container) {
-          container.innerHTML = "";
-          const buttonScript = document.createElement("script");
-          buttonScript.src = "https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js";
-          buttonScript.setAttribute("data-preference-id", plan.preferenceId);
-          buttonScript.setAttribute("data-source", "button");
-          container.appendChild(buttonScript);
+    // Validate name length
+    if (trimmedName.length < 3 || trimmedName.length > 100) {
+      toast.error("Nome deve ter entre 3 e 100 caracteres");
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Save name locally for success page
+    localStorage.setItem('mp_full_name', trimmedName);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('criar-preferencia', {
+        body: {
+          plano: { nome: selectedPlan.name },
+          clientName: trimmedName
         }
       });
-    };
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+      if (error) {
+        console.error("Erro ao criar preferência:", error);
+        toast.error("Erro ao processar. Tente novamente.");
+        return;
+      }
+
+      if (data?.init_point) {
+        // Redirect to Mercado Pago checkout
+        window.location.href = data.init_point;
+      } else {
+        toast.error("Erro ao iniciar pagamento. Tente novamente.");
+      }
+    } catch (err) {
+      console.error("Erro:", err);
+      toast.error("Erro ao processar pagamento. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section id="planos" className="py-20 bg-background" aria-labelledby="plans-heading">
@@ -162,11 +198,13 @@ const Plans = () => {
                   ))}
                 </ul>
                 
-                {/* Mercado Pago Checkout Button */}
-                <div 
-                  ref={(el) => { containerRefs.current[index] = el; }}
-                  className="w-full flex justify-center min-h-[48px]"
-                />
+                {/* Subscribe Button */}
+                <Button 
+                  onClick={() => handleSelectPlan(plan)}
+                  className="w-full bg-gradient-gold hover:opacity-90 text-accent-foreground font-bold"
+                >
+                  Assinar Agora
+                </Button>
               </motion.div>
             ))}
           </div>
@@ -179,6 +217,51 @@ const Plans = () => {
           </div>
         </div>
       </div>
+
+      {/* Name Input Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-premium-gold">
+              Finalizar Compra - Plano {selectedPlan?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Informe seu nome completo para prosseguir com o pagamento de {selectedPlan?.price}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="clientName" className="text-sm font-medium">
+                Nome Completo
+              </label>
+              <Input
+                id="clientName"
+                placeholder="Digite seu nome completo"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                maxLength={100}
+                disabled={isLoading}
+              />
+            </div>
+            
+            <Button 
+              onClick={handlePayment}
+              disabled={isLoading || !clientName.trim()}
+              className="w-full bg-gradient-gold hover:opacity-90 text-accent-foreground font-bold"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                "Pagar Agora"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
