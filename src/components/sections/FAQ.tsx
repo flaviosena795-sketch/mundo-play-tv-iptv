@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const faqData = [
   {
@@ -45,6 +44,49 @@ const faqData = [
   }
 ];
 
+const FAQItem = ({ 
+  item, 
+  isOpen, 
+  onToggle 
+}: { 
+  item: { question: string; answer: string }; 
+  isOpen: boolean; 
+  onToggle: () => void;
+}) => {
+  return (
+    <div className="bg-card border border-subtle-border rounded-2xl overflow-hidden shadow-card hover:shadow-premium transition-premium">
+      <button
+        onClick={onToggle}
+        className="w-full p-6 text-left flex justify-between items-center hover:bg-accent/50 transition-smooth group"
+        aria-expanded={isOpen}
+      >
+        <span className="font-semibold text-foreground group-hover:text-premium-gold transition-smooth">
+          {item.question}
+        </span>
+        {isOpen ? (
+          <Minus className="w-5 h-5 text-premium-gold transition-smooth flex-shrink-0" />
+        ) : (
+          <Plus className="w-5 h-5 text-premium-gold transition-smooth flex-shrink-0" />
+        )}
+      </button>
+      
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+          isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="p-6 pt-0 border-t border-subtle-border">
+            <p className="text-muted-foreground leading-relaxed">
+              {item.answer}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const FAQ = () => {
   const [openItems, setOpenItems] = useState<number[]>([]);
 
@@ -66,32 +108,12 @@ const FAQ = () => {
           
           <div className="space-y-4">
             {faqData.map((item, index) => (
-              <Collapsible
+              <FAQItem
                 key={index}
-                open={openItems.includes(index)}
-                onOpenChange={() => toggleItem(index)}
-              >
-                <div className="bg-card border border-subtle-border rounded-2xl overflow-hidden shadow-card hover:shadow-premium transition-premium">
-                  <CollapsibleTrigger className="w-full p-6 text-left flex justify-between items-center hover:bg-accent/50 transition-smooth group">
-                    <span className="font-semibold text-foreground group-hover:text-premium-gold transition-smooth">
-                      {item.question}
-                    </span>
-                    {openItems.includes(index) ? (
-                      <Minus className="w-5 h-5 text-premium-gold transition-smooth" />
-                    ) : (
-                      <Plus className="w-5 h-5 text-premium-gold transition-smooth" />
-                    )}
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent className="overflow-hidden">
-                    <div className="p-6 pt-0 border-t border-subtle-border">
-                      <p className="text-muted-foreground leading-relaxed">
-                        {item.answer}
-                      </p>
-                    </div>
-                  </CollapsibleContent>
-                </div>
-              </Collapsible>
+                item={item}
+                isOpen={openItems.includes(index)}
+                onToggle={() => toggleItem(index)}
+              />
             ))}
           </div>
         </div>
