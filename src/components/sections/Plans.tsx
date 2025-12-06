@@ -12,6 +12,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
+// Preload Mercado Pago SDK when user hovers on plans section
+const preloadMercadoPagoSDK = () => {
+  if (document.querySelector('script[src*="mercadopago"]')) return;
+  
+  const link = document.createElement('link');
+  link.rel = 'preconnect';
+  link.href = 'https://sdk.mercadopago.com';
+  document.head.appendChild(link);
+};
+
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
   const [clientName, setClientName] = useState("");
@@ -127,7 +137,7 @@ const Plans = () => {
   };
 
   return (
-    <section id="planos" className="py-20 bg-background" aria-labelledby="plans-heading">
+    <section id="planos" className="py-20 bg-background" aria-labelledby="plans-heading" onMouseEnter={preloadMercadoPagoSDK}>
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
