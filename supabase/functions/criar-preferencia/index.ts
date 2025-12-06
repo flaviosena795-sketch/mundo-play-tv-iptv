@@ -9,7 +9,7 @@ const corsHeaders = {
 const VALID_PLANS: Record<string, number> = {
   "Mensal": 29.9,
   "Trimestral": 79.9,
-  "Semestral": 179.9,
+  "Semestral": 149.9,
   "Anual": 289.9
 };
 
@@ -103,6 +103,7 @@ serve(async (req) => {
     }
 
     const planNome = body.plano.nome;
+    const clientName = body.clientName || '';
     
     // Input validation: Check if plan exists in whitelist
     if (!VALID_PLANS.hasOwnProperty(planNome)) {
@@ -132,7 +133,7 @@ serve(async (req) => {
         }
       ],
       back_urls: {
-        success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}`,
+        success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}`,
         failure: `${origin}/falha?erro=rejeitado`,
         pending: `${origin}/falha?erro=timeout`
       },
