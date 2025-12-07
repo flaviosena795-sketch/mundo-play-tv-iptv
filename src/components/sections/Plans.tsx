@@ -25,6 +25,7 @@ const preloadMercadoPagoSDK = () => {
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
   const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -92,8 +93,15 @@ const Plans = () => {
     if (!selectedPlan) return;
     
     const trimmedName = clientName.trim();
+    const trimmedPhone = clientPhone.trim();
+    
     if (!trimmedName) {
       toast.error("Por favor, informe seu nome completo");
+      return;
+    }
+
+    if (!trimmedPhone) {
+      toast.error("Por favor, informe seu WhatsApp");
       return;
     }
 
@@ -103,10 +111,18 @@ const Plans = () => {
       return;
     }
 
+    // Validate phone (basic check)
+    if (trimmedPhone.length < 10 || trimmedPhone.length > 20) {
+      toast.error("WhatsApp inválido");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Save name locally for success page
+    // Save data locally for success page redirect
     localStorage.setItem('mp_full_name', trimmedName);
+    localStorage.setItem('mp_phone', trimmedPhone);
+    localStorage.setItem('mp_plan', selectedPlan.name);
 
     try {
       const { data, error } = await supabase.functions.invoke('criar-preferencia', {
@@ -247,9 +263,23 @@ const Plans = () => {
               />
             </div>
             
+            <div className="space-y-2">
+              <label htmlFor="clientPhone" className="text-sm font-medium">
+                WhatsApp
+              </label>
+              <Input
+                id="clientPhone"
+                placeholder="(00) 00000-0000"
+                value={clientPhone}
+                onChange={(e) => setClientPhone(e.target.value)}
+                maxLength={20}
+                disabled={isLoading}
+              />
+            </div>
+            
             <Button 
               onClick={handlePayment}
-              disabled={isLoading || !clientName.trim()}
+              disabled={isLoading || !clientName.trim() || !clientPhone.trim()}
               className="w-full bg-gradient-gold hover:opacity-90 text-accent-foreground font-bold"
             >
               {isLoading ? (
