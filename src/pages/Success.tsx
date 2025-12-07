@@ -1,28 +1,63 @@
 import { motion } from "framer-motion";
-import { CheckCircle, MessageCircle, Clock, Tv } from "lucide-react";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import { CheckCircle, MessageCircle, Clock, Tv, Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Success = () => {
   const [searchParams] = useSearchParams();
-  const plano = searchParams.get('plano') || 'seu plano';
+  const planoUrl = searchParams.get('plano') || '';
   const valor = searchParams.get('valor') || '';
   const nomeUrl = searchParams.get('nome') || '';
   const collectionId = searchParams.get('collection_id') || searchParams.get('payment_id') || '';
   
-  // Get name from URL or localStorage
+  // Get data from URL or localStorage
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [plano, setPlano] = useState('');
+  const [redirecting, setRedirecting] = useState(true);
   
+  const supportNumber = '5521966238378';
+
   useEffect(() => {
     const storedName = localStorage.getItem('mp_full_name') || '';
-    setFullName(nomeUrl || storedName);
-  }, [nomeUrl]);
+    const storedPhone = localStorage.getItem('mp_phone') || '';
+    const storedPlan = localStorage.getItem('mp_plan') || '';
+    
+    const clientName = nomeUrl || storedName;
+    const clientPhone = storedPhone;
+    const clientPlan = planoUrl || storedPlan || 'seu plano';
+    
+    setFullName(clientName);
+    setPhone(clientPhone);
+    setPlano(clientPlan);
+    
+    // Auto redirect to WhatsApp after 2 seconds
+    const timer = setTimeout(() => {
+      const message = encodeURIComponent(
+        `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
+        `👤 Nome: ${clientName}\n` +
+        `📱 WhatsApp: ${clientPhone}\n` +
+        `📦 Plano: ${clientPlan}${valor ? ` (R$${valor})` : ''}\n` +
+        `💳 ID do Pagamento: ${collectionId}\n\n` +
+        `Solicito ativação imediata.`
+      );
+      
+      const waUrl = `https://wa.me/${supportNumber}?text=${message}`;
+      
+      setRedirecting(false);
+      window.location.href = waUrl;
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [nomeUrl, planoUrl, valor, collectionId]);
 
-  const supportNumber = '5521966238378';
-  
   const whatsappMessage = encodeURIComponent(
-    `Olá, meu nome é ${fullName}. Acabei de pagar o Plano ${plano}${valor ? ` (R$${valor})` : ''} e gostaria da ativação.${collectionId ? ` Payment ID: ${collectionId}` : ''}`
+    `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
+    `👤 Nome: ${fullName}\n` +
+    `📱 WhatsApp: ${phone}\n` +
+    `📦 Plano: ${plano}${valor ? ` (R$${valor})` : ''}\n` +
+    `💳 ID do Pagamento: ${collectionId}\n\n` +
+    `Solicito ativação imediata.`
   );
 
   const waUrl = `https://wa.me/${supportNumber}?text=${whatsappMessage}`;
@@ -58,6 +93,13 @@ const Success = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-premium-gold">
             🎉 Pagamento Confirmado!
           </h1>
+          
+          {redirecting && (
+            <div className="flex items-center justify-center gap-2 mb-4 text-premium-gold">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Redirecionando para WhatsApp...</span>
+            </div>
+          )}
           
           {fullName && (
             <p className="text-center text-foreground mb-2 text-lg">
