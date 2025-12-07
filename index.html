@@ -175,33 +175,42 @@
     }
     </script>
 
-    <!-- Google Tag Manager -->
+    <!-- Google Tag Manager & Analytics - Deferred for better LCP -->
     <script>
-      (function(w,d,s,l,i){w[l]=w[l]||[];
-      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-      var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),
-      dl=l!='dataLayer'?'&l='+l:'';
-      j.async=true;
-      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-      f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-WJNTMVSF');
-    </script>
-    <!-- End Google Tag Manager -->
+      // Defer analytics loading until after main content
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          // Google Tag Manager
+          (function(w,d,s,l,i){w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+          var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+          j.async=true;
+          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-WJNTMVSF');
 
-    <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-MF1GH610V8', {
-        'page_title': 'Mundo Play TV - IPTV Brasil',
-        'page_location': window.location.href,
-        'send_page_view': true
+          // Google Analytics (GA4)
+          var gaScript = document.createElement('script');
+          gaScript.async = true;
+          gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8';
+          document.head.appendChild(gaScript);
+          
+          gaScript.onload = function() {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-MF1GH610V8', {
+              'page_title': 'Mundo Play TV - IPTV Brasil',
+              'page_location': window.location.href,
+              'send_page_view': true
+            });
+          };
+        }, 100); // Small delay after load to prioritize LCP
       });
     </script>
-    <!-- End Google Analytics -->
+    <!-- End Google Tag Manager & Analytics -->
 
     <!-- Mercado Pago SDK loaded dynamically when needed -->
     <!-- Meta Pixel Code - Desabilitado temporariamente -->
