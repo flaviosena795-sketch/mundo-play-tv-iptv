@@ -22,6 +22,16 @@ const preloadMercadoPagoSDK = () => {
   document.head.appendChild(link);
 };
 
+// Format phone number as (00) 00000-0000
+const formatPhone = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  
+  if (digits.length === 0) return '';
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
 const Plans = () => {
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[0] | null>(null);
   const [clientName, setClientName] = useState("");
@@ -271,8 +281,8 @@ const Plans = () => {
                 id="clientPhone"
                 placeholder="(00) 00000-0000"
                 value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
-                maxLength={20}
+                onChange={(e) => setClientPhone(formatPhone(e.target.value))}
+                maxLength={16}
                 disabled={isLoading}
               />
             </div>
