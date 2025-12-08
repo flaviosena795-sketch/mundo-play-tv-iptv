@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.181.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// WhatsApp support number
+const WHATSAPP_SUPPORT = "5521966238378";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,6 +16,9 @@ serve(async (req) => {
 
   try {
     const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
     if (!mpToken) {
       console.error("[mercadopago-webhook] MERCADO_PAGO_ACCESS_TOKEN ausente");
       return new Response(
@@ -19,6 +26,17 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("[mercadopago-webhook] Supabase credentials ausentes");
+      return new Response(
+        JSON.stringify({ error: "Configuração de banco inválida" }), 
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Initialize Supabase client with service role
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse webhook notification
     const body = await req.json().catch(() => null);
@@ -71,18 +89,64 @@ serve(async (req) => {
         external_reference: payment.external_reference,
         transaction_amount: payment.transaction_amount,
         payer_email: payment.payer?.email,
+        payer_name: payment.payer?.first_name,
         date_approved: payment.date_approved
       }));
+
+      // Extract plan name from external_reference (format: "plano_nome_telefone")
+      const externalRef = payment.external_reference || "";
+      const refParts = externalRef.split("_");
+      const planName = refParts[0] || null;
+      const payerName = refParts.length > 1 ? refParts.slice(1, -1).join(" ") : payment.payer?.first_name;
+      const payerPhone = refParts.length > 1 ? refParts[refParts.length - 1] : null;
+
+      // Prepare payment data for database
+      const paymentData = {
+        payment_id: String(payment.id),
+        external_reference: payment.external_reference,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        transaction_amount: payment.transaction_amount,
+        payer_email: payment.payer?.email,
+        payer_name: payerName || payment.payer?.first_name,
+        payer_phone: payerPhone || payment.payer?.phone?.number,
+        plan_name: planName,
+        date_approved: payment.date_approved,
+        date_created: payment.date_created,
+        payment_method: payment.payment_method_id,
+        payment_type: payment.payment_type_id,
+        raw_data: payment
+      };
+
+      // Save or update payment in database
+      const { error: dbError } = await supabase
+        .from('payments')
+        .upsert(paymentData, { 
+          onConflict: 'payment_id',
+          ignoreDuplicates: false 
+        });
+
+      if (dbError) {
+        console.error("[mercadopago-webhook] Erro ao salvar no banco:", dbError);
+      } else {
+        console.log("[mercadopago-webhook] Pagamento salvo no banco com sucesso");
+      }
 
       // Process based on payment status
       switch (payment.status) {
         case 'approved':
           console.log(`[mercadopago-webhook] ✅ PAGAMENTO APROVADO - ID: ${payment.id}, Ref: ${payment.external_reference}, Valor: R$${payment.transaction_amount}`);
-          // Here you could:
-          // - Save to database
-          // - Send confirmation email
-          // - Trigger activation process
-          // - Send WhatsApp notification
+          
+          // Send WhatsApp notification for approved payments
+          await sendWhatsAppNotification({
+            paymentId: payment.id,
+            payerName: payerName || payment.payer?.first_name || "Cliente",
+            payerPhone: payerPhone,
+            payerEmail: payment.payer?.email,
+            planName: planName,
+            amount: payment.transaction_amount,
+            dateApproved: payment.date_approved
+          });
           break;
           
         case 'pending':
@@ -107,7 +171,8 @@ serve(async (req) => {
         JSON.stringify({ 
           status: "processed",
           payment_id: payment.id,
-          payment_status: payment.status
+          payment_status: payment.status,
+          saved_to_db: !dbError
         }), 
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -137,3 +202,70 @@ serve(async (req) => {
     );
   }
 });
+
+// Function to send WhatsApp notification via Evolution API or similar
+async function sendWhatsAppNotification(data: {
+  paymentId: number;
+  payerName: string;
+  payerPhone: string | null;
+  payerEmail: string | null;
+  planName: string | null;
+  amount: number;
+  dateApproved: string | null;
+}) {
+  const evolutionApiUrl = Deno.env.get("EVOLUTION_API_URL");
+  const evolutionApiKey = Deno.env.get("EVOLUTION_API_KEY");
+  const evolutionInstance = Deno.env.get("EVOLUTION_INSTANCE");
+
+  // Format date
+  const dateFormatted = data.dateApproved 
+    ? new Date(data.dateApproved).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+    : new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+  // Build notification message for support
+  const supportMessage = `🎉 *NOVO PAGAMENTO APROVADO!*
+
+📋 *Detalhes do Pedido:*
+• ID Pagamento: ${data.paymentId}
+• Cliente: ${data.payerName}
+• WhatsApp: ${data.payerPhone || "Não informado"}
+• Email: ${data.payerEmail || "Não informado"}
+• Plano: ${data.planName || "Não identificado"}
+• Valor: R$ ${data.amount?.toFixed(2) || "0.00"}
+• Data: ${dateFormatted}
+
+✅ *Ação necessária:* Ativar acesso do cliente`;
+
+  // If Evolution API is configured, send via API
+  if (evolutionApiUrl && evolutionApiKey && evolutionInstance) {
+    try {
+      const response = await fetch(`${evolutionApiUrl}/message/sendText/${evolutionInstance}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': evolutionApiKey
+        },
+        body: JSON.stringify({
+          number: WHATSAPP_SUPPORT,
+          text: supportMessage
+        })
+      });
+
+      if (response.ok) {
+        console.log("[mercadopago-webhook] ✅ Notificação WhatsApp enviada com sucesso via Evolution API");
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error("[mercadopago-webhook] Erro ao enviar WhatsApp via Evolution:", errorText);
+      }
+    } catch (error) {
+      console.error("[mercadopago-webhook] Erro ao conectar com Evolution API:", error);
+    }
+  } else {
+    console.log("[mercadopago-webhook] Evolution API não configurada. Notificação registrada apenas em log:");
+    console.log("[mercadopago-webhook] 📱 NOTIFICAÇÃO WHATSAPP:", supportMessage);
+    console.log("[mercadopago-webhook] 💡 Para envio automático, configure EVOLUTION_API_URL, EVOLUTION_API_KEY e EVOLUTION_INSTANCE");
+  }
+
+  return false;
+}
