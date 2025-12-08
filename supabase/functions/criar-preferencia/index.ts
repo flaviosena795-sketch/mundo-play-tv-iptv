@@ -123,6 +123,9 @@ serve(async (req) => {
     // Get the site URL from environment or use origin from request
     const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || 'https://mundoplaytv.com.br';
     
+    // Webhook URL for automatic notifications
+    const webhookUrl = `https://ychdztoixsefnpurmmhi.supabase.co/functions/v1/mercadopago-webhook`;
+    
     const prefPayload = {
       items: [
         {
@@ -139,7 +142,7 @@ serve(async (req) => {
       },
       auto_return: "approved",
       external_reference: `${planNome.replace(/\s+/g, '_').toUpperCase()}_${Date.now()}`,
-      notification_url: undefined, // Adicione webhook URL aqui quando implementar
+      notification_url: webhookUrl,
       statement_descriptor: "MUNDO PLAY TV"
     };
 
