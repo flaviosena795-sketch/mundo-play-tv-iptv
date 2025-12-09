@@ -5,7 +5,6 @@ import Features from "@/components/sections/Features";
 import FreeTrialBanner from "@/components/sections/FreeTrialBanner";
 import Plans from "@/components/sections/Plans";
 import PlansComparison from "@/components/sections/PlansComparison";
-import Guarantee from "@/components/sections/Guarantee";
 import PaymentMethods from "@/components/sections/PaymentMethods";
 import VODRequest from "@/components/sections/VODRequest";
 import Testimonials from "@/components/sections/Testimonials";
@@ -22,7 +21,6 @@ const Index = () => {
       <FreeTrialBanner />
       <Plans />
       <PlansComparison />
-      <Guarantee />
       <PaymentMethods />
       <VODRequest />
       <Testimonials />
