@@ -9,12 +9,110 @@ const corsHeaders = {
 // WhatsApp support number
 const WHATSAPP_SUPPORT = "5521966238378";
 
+// Verify Mercado Pago webhook signature using HMAC-SHA256
+async function verifySignature(req: Request, bodyText: string): Promise<boolean> {
+  const webhookSecret = Deno.env.get('MP_WEBHOOK_SECRET');
+  
+  if (!webhookSecret) {
+    console.warn("[mercadopago-webhook] MP_WEBHOOK_SECRET não configurado - verificação de assinatura ignorada");
+    return true; // Allow requests if secret not configured (for backward compatibility)
+  }
+
+  const xSignature = req.headers.get('x-signature');
+  const xRequestId = req.headers.get('x-request-id');
+
+  if (!xSignature || !xRequestId) {
+    console.error("[mercadopago-webhook] Headers x-signature ou x-request-id ausentes");
+    return false;
+  }
+
+  // Parse the x-signature header (format: "ts=timestamp,v1=hash")
+  const signatureParts: Record<string, string> = {};
+  xSignature.split(',').forEach(part => {
+    const [key, value] = part.split('=');
+    if (key && value) {
+      signatureParts[key.trim()] = value.trim();
+    }
+  });
+
+  const ts = signatureParts['ts'];
+  const v1 = signatureParts['v1'];
+
+  if (!ts || !v1) {
+    console.error("[mercadopago-webhook] Formato de x-signature inválido:", xSignature);
+    return false;
+  }
+
+  // Parse body to get data.id for the manifest
+  let dataId = '';
+  try {
+    const payload = JSON.parse(bodyText);
+    dataId = payload.data?.id?.toString() || '';
+  } catch {
+    console.error("[mercadopago-webhook] Falha ao fazer parse do body para verificação");
+    return false;
+  }
+
+  // Build the manifest string as per Mercado Pago docs
+  // manifest = "id:{data.id};request-id:{x-request-id};ts:{ts};"
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  // Generate HMAC-SHA256
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(webhookSecret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(manifest)
+  );
+
+  // Convert to hex
+  const hashArray = Array.from(new Uint8Array(signature));
+  const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  // Compare signatures (constant-time comparison would be better but this is acceptable)
+  const isValid = computedHash === v1;
+  
+  if (!isValid) {
+    console.error("[mercadopago-webhook] Verificação de assinatura falhou", { 
+      expected: v1.substring(0, 10) + '...', 
+      computed: computedHash.substring(0, 10) + '...',
+      manifest 
+    });
+  } else {
+    console.log("[mercadopago-webhook] ✅ Assinatura verificada com sucesso");
+  }
+
+  return isValid;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Read body as text first for signature verification
+    const bodyText = await req.text();
+    
+    // Verify webhook signature BEFORE processing
+    const isValidSignature = await verifySignature(req, bodyText);
+    
+    if (!isValidSignature) {
+      console.error("[mercadopago-webhook] ❌ Assinatura inválida - requisição rejeitada");
+      return new Response(
+        JSON.stringify({ error: "Assinatura inválida" }), 
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -38,8 +136,13 @@ serve(async (req) => {
     // Initialize Supabase client with service role
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse webhook notification
-    const body = await req.json().catch(() => null);
+    // Parse webhook notification from the already-read body
+    let body;
+    try {
+      body = JSON.parse(bodyText);
+    } catch {
+      body = null;
+    }
     
     console.log("[mercadopago-webhook] Notificação recebida:", JSON.stringify(body));
 
