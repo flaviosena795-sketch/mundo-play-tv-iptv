@@ -9,21 +9,47 @@ const corsHeaders = {
 // WhatsApp support number
 const WHATSAPP_SUPPORT = "5521966238378";
 
+// Security monitoring - track invalid signature attempts
+interface SecurityEvent {
+  timestamp: string;
+  ip: string | null;
+  userAgent: string | null;
+  reason: string;
+  xSignature: string | null;
+  xRequestId: string | null;
+}
+
+function logSecurityEvent(req: Request, reason: string, xSignature?: string | null, xRequestId?: string | null) {
+  const event: SecurityEvent = {
+    timestamp: new Date().toISOString(),
+    ip: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown',
+    userAgent: req.headers.get('user-agent'),
+    reason,
+    xSignature: xSignature ? xSignature.substring(0, 30) + '...' : null,
+    xRequestId: xRequestId || null
+  };
+  
+  console.error(`[SECURITY ALERT] ⚠️ Invalid webhook attempt:`, JSON.stringify(event));
+  
+  // You can extend this to store in database or send alerts
+  return event;
+}
+
 // Verify Mercado Pago webhook signature using HMAC-SHA256
-async function verifySignature(req: Request, bodyText: string): Promise<boolean> {
+async function verifySignature(req: Request, bodyText: string): Promise<{ valid: boolean; reason?: string }> {
   const webhookSecret = Deno.env.get('MP_WEBHOOK_SECRET');
   
   if (!webhookSecret) {
     console.warn("[mercadopago-webhook] MP_WEBHOOK_SECRET não configurado - verificação de assinatura ignorada");
-    return true; // Allow requests if secret not configured (for backward compatibility)
+    return { valid: true }; // Allow requests if secret not configured (for backward compatibility)
   }
 
   const xSignature = req.headers.get('x-signature');
   const xRequestId = req.headers.get('x-request-id');
 
   if (!xSignature || !xRequestId) {
-    console.error("[mercadopago-webhook] Headers x-signature ou x-request-id ausentes");
-    return false;
+    logSecurityEvent(req, 'missing_headers', xSignature, xRequestId);
+    return { valid: false, reason: 'missing_headers' };
   }
 
   // Parse the x-signature header (format: "ts=timestamp,v1=hash")
@@ -39,8 +65,18 @@ async function verifySignature(req: Request, bodyText: string): Promise<boolean>
   const v1 = signatureParts['v1'];
 
   if (!ts || !v1) {
-    console.error("[mercadopago-webhook] Formato de x-signature inválido:", xSignature);
-    return false;
+    logSecurityEvent(req, 'invalid_signature_format', xSignature, xRequestId);
+    return { valid: false, reason: 'invalid_signature_format' };
+  }
+
+  // Check timestamp to prevent replay attacks (allow 5 minute window)
+  const signatureTimestamp = parseInt(ts, 10) * 1000; // Convert to milliseconds
+  const now = Date.now();
+  const fiveMinutes = 5 * 60 * 1000;
+  
+  if (isNaN(signatureTimestamp) || Math.abs(now - signatureTimestamp) > fiveMinutes) {
+    logSecurityEvent(req, 'timestamp_expired_or_invalid', xSignature, xRequestId);
+    return { valid: false, reason: 'timestamp_expired' };
   }
 
   // Parse body to get data.id for the manifest
@@ -49,8 +85,8 @@ async function verifySignature(req: Request, bodyText: string): Promise<boolean>
     const payload = JSON.parse(bodyText);
     dataId = payload.data?.id?.toString() || '';
   } catch {
-    console.error("[mercadopago-webhook] Falha ao fazer parse do body para verificação");
-    return false;
+    logSecurityEvent(req, 'invalid_body_json', xSignature, xRequestId);
+    return { valid: false, reason: 'invalid_body' };
   }
 
   // Build the manifest string as per Mercado Pago docs
@@ -81,16 +117,17 @@ async function verifySignature(req: Request, bodyText: string): Promise<boolean>
   const isValid = computedHash === v1;
   
   if (!isValid) {
+    logSecurityEvent(req, 'signature_mismatch', xSignature, xRequestId);
     console.error("[mercadopago-webhook] Verificação de assinatura falhou", { 
       expected: v1.substring(0, 10) + '...', 
       computed: computedHash.substring(0, 10) + '...',
       manifest 
     });
-  } else {
-    console.log("[mercadopago-webhook] ✅ Assinatura verificada com sucesso");
+    return { valid: false, reason: 'signature_mismatch' };
   }
-
-  return isValid;
+  
+  console.log("[mercadopago-webhook] ✅ Assinatura verificada com sucesso");
+  return { valid: true };
 }
 
 serve(async (req) => {
@@ -103,10 +140,10 @@ serve(async (req) => {
     const bodyText = await req.text();
     
     // Verify webhook signature BEFORE processing
-    const isValidSignature = await verifySignature(req, bodyText);
+    const signatureResult = await verifySignature(req, bodyText);
     
-    if (!isValidSignature) {
-      console.error("[mercadopago-webhook] ❌ Assinatura inválida - requisição rejeitada");
+    if (!signatureResult.valid) {
+      console.error(`[mercadopago-webhook] ❌ Assinatura inválida - requisição rejeitada (reason: ${signatureResult.reason})`);
       return new Response(
         JSON.stringify({ error: "Assinatura inválida" }), 
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
