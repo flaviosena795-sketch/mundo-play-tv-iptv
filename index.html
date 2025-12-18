@@ -175,40 +175,57 @@
     }
     </script>
 
-    <!-- Google Tag Manager & Analytics - Deferred for better LCP -->
+    <!-- Google Tag Manager & Analytics - Optimized to prevent forced reflow -->
     <script>
-      // Defer analytics loading until after main content
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          // Google Tag Manager
-          (function(w,d,s,l,i){w[l]=w[l]||[];
-          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-          var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),
-          dl=l!='dataLayer'?'&l='+l:'';
-          j.async=true;
-          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      // Use requestIdleCallback to load analytics when browser is idle
+      // This prevents forced reflow by deferring execution until the main thread is free
+      function loadAnalytics() {
+        // Google Tag Manager - loaded async to prevent blocking
+        (function(w,d,s,l,i){w[l]=w[l]||[];
+        w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),
+        dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;
+        j.defer=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+        // Use requestAnimationFrame to batch DOM reads/writes and prevent forced reflow
+        requestAnimationFrame(function(){
           f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-WJNTMVSF');
+        });
+        })(window,document,'script','dataLayer','GTM-WJNTMVSF');
 
-          // Google Analytics (GA4)
-          var gaScript = document.createElement('script');
-          gaScript.async = true;
-          gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8';
+        // Google Analytics (GA4) - loaded with lower priority
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.defer = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-MF1GH610V8';
+        
+        gaScript.onload = function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-MF1GH610V8', {
+            'page_title': 'Mundo Play TV - IPTV Brasil',
+            'page_location': window.location.href,
+            'send_page_view': true
+          });
+        };
+        
+        requestAnimationFrame(function(){
           document.head.appendChild(gaScript);
-          
-          gaScript.onload = function() {
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-MF1GH610V8', {
-              'page_title': 'Mundo Play TV - IPTV Brasil',
-              'page_location': window.location.href,
-              'send_page_view': true
-            });
-          };
-        }, 100); // Small delay after load to prioritize LCP
-      });
+        });
+      }
+
+      // Schedule analytics loading when browser is idle (prevents forced reflow)
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      } else {
+        // Fallback for browsers without requestIdleCallback
+        window.addEventListener('load', function() {
+          setTimeout(loadAnalytics, 2000);
+        });
+      }
     </script>
     <!-- End Google Tag Manager & Analytics -->
 
