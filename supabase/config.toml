@@ -1,5 +1,8 @@
 project_id = "ychdztoixsefnpurmmhi"
 
+[functions.chat]
+verify_jwt = false
+
 [functions.criar-preferencia]
 verify_jwt = false
 
