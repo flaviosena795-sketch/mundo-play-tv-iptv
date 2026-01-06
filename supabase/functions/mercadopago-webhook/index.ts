@@ -285,7 +285,9 @@ serve(async (req) => {
             payerEmail: payment.payer?.email,
             planName: planName,
             amount: payment.transaction_amount,
-            dateApproved: payment.date_approved
+            dateApproved: payment.date_approved,
+            paymentMethod: payment.payment_method_id,
+            paymentType: payment.payment_type_id
           });
           break;
           
@@ -352,6 +354,8 @@ async function sendWhatsAppNotification(data: {
   planName: string | null;
   amount: number;
   dateApproved: string | null;
+  paymentMethod: string | null;
+  paymentType: string | null;
 }) {
   const evolutionApiUrl = Deno.env.get("EVOLUTION_API_URL");
   const evolutionApiKey = Deno.env.get("EVOLUTION_API_KEY");
@@ -362,19 +366,62 @@ async function sendWhatsAppNotification(data: {
     ? new Date(data.dateApproved).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
     : new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
+  // Format payment method for display
+  const formatPaymentMethod = (method: string | null, type: string | null): string => {
+    if (!method && !type) return "Não identificado";
+    
+    const methodMap: Record<string, string> = {
+      'pix': '💠 PIX',
+      'credit_card': '💳 Cartão de Crédito',
+      'debit_card': '💳 Cartão de Débito',
+      'account_money': '💰 Dinheiro em Conta',
+      'bolbradesco': '📄 Boleto Bradesco',
+      'ticket': '📄 Boleto',
+      'master': '💳 Mastercard',
+      'visa': '💳 Visa',
+      'elo': '💳 Elo',
+      'amex': '💳 American Express',
+      'hipercard': '💳 Hipercard'
+    };
+
+    const typeMap: Record<string, string> = {
+      'credit_card': 'Crédito',
+      'debit_card': 'Débito',
+      'bank_transfer': 'Transferência',
+      'ticket': 'Boleto',
+      'account_money': 'Saldo MP'
+    };
+
+    // Check method first
+    if (method && methodMap[method.toLowerCase()]) {
+      return methodMap[method.toLowerCase()];
+    }
+
+    // If it's a card brand, add the type
+    if (method && type && (type === 'credit_card' || type === 'debit_card')) {
+      const brand = method.charAt(0).toUpperCase() + method.slice(1);
+      const cardType = typeMap[type] || type;
+      return `💳 ${brand} (${cardType})`;
+    }
+
+    // Fallback
+    return method || type || "Não identificado";
+  };
+
+  const paymentMethodFormatted = formatPaymentMethod(data.paymentMethod, data.paymentType);
+
   // Build notification message for support
-  const supportMessage = `🎉 *NOVO PAGAMENTO APROVADO!*
+  const supportMessage = `✅ *PAGAMENTO APROVADO*
 
-📋 *Detalhes do Pedido:*
-• ID Pagamento: ${data.paymentId}
-• Cliente: ${data.payerName}
-• WhatsApp: ${data.payerPhone || "Não informado"}
-• Email: ${data.payerEmail || "Não informado"}
-• Plano: ${data.planName || "Não identificado"}
-• Valor: R$ ${data.amount?.toFixed(2) || "0.00"}
-• Data: ${dateFormatted}
+👤 *Cliente:* ${data.payerName}
+📱 *WhatsApp:* ${data.payerPhone || "Não informado"}
+📦 *Plano:* ${data.planName || "Não identificado"}
+💳 *Meio:* ${paymentMethodFormatted}
+💰 *Valor:* R$ ${data.amount?.toFixed(2) || "0.00"}
+🆔 *Pagamento:* ${data.paymentId}
+📅 *Data:* ${dateFormatted}
 
-✅ *Ação necessária:* Ativar acesso do cliente`;
+✅ *Ação:* Ativar acesso do cliente`;
 
   // If Evolution API is configured, send via API
   if (evolutionApiUrl && evolutionApiKey && evolutionInstance) {
