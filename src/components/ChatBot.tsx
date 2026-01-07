@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { MessageCircle, X, Send, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import anaAvatar from "@/assets/ana-avatar.jpg";
 
 type Message = {
   role: "user" | "assistant";
@@ -15,7 +16,7 @@ export function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Olá! 👋 Sou o assistente virtual da Mega IPTV. Como posso ajudar você hoje?",
+      content: "Olá! 👋 Sou a Ana, sua atendente virtual da Mega IPTV Brasil. Como posso ajudar você hoje?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -168,12 +169,14 @@ export function ChatBot() {
             {/* Header */}
             <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot className="h-5 w-5" />
-                </div>
+                <img 
+                  src={anaAvatar} 
+                  alt="Ana - Atendente Virtual" 
+                  className="h-10 w-10 rounded-full object-cover border-2 border-white/30"
+                />
                 <div>
-                  <h3 className="font-semibold">Assistente Virtual</h3>
-                  <p className="text-xs opacity-80">Online agora</p>
+                  <h3 className="font-semibold">Ana</h3>
+                  <p className="text-xs opacity-80">🟢 Online agora</p>
                 </div>
               </div>
               <Button
@@ -196,9 +199,11 @@ export function ChatBot() {
                   className={`flex gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {message.role === "assistant" && (
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-4 w-4 text-primary" />
-                    </div>
+                    <img 
+                      src={anaAvatar} 
+                      alt="Ana" 
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0 border border-primary/20"
+                    />
                   )}
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2 ${
@@ -218,9 +223,11 @@ export function ChatBot() {
               ))}
               {isLoading && messages[messages.length - 1]?.content === "" && (
                 <div className="flex gap-2 justify-start">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Bot className="h-4 w-4 text-primary" />
-                  </div>
+                  <img 
+                    src={anaAvatar} 
+                    alt="Ana" 
+                    className="h-8 w-8 rounded-full object-cover border border-primary/20"
+                  />
                   <div className="bg-background border border-border rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex gap-1">
                       <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
