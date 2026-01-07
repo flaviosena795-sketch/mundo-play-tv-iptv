@@ -16,7 +16,7 @@ export function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Olá! 👋 Sou a Ana, sua atendente virtual da Mega IPTV Brasil. Como posso ajudar você hoje?",
+      content: "Olá! 👋 Sou a Ana, assistente oficial da Mundo Play TV.\n\nTrabalhamos com mais de 15.000 canais, filmes, séries e PPV em 4K Ultra HD, com ativação imediata.\n\nComo posso te ajudar hoje?",
     },
   ]);
   const [input, setInput] = useState("");
