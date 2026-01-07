@@ -45,6 +45,17 @@ SOBRE A MUNDO PLAY TV:
 - Aceita Pix, cartão de débito e crédito
 - Teste grátis disponível (sujeito à disponibilidade)
 
+DIFERENCIAL TÉCNICO - 3 LISTAS DE SERVIDORES:
+🔥 Trabalhamos com 3 listas de servidores IPTV diferentes no mesmo aplicativo
+🔥 Isso reduz em até 99% os travamentos e interrupções
+🔥 Nosso objetivo é proporcionar a melhor experiência de uso, com transmissão estável e sem travamentos
+
+SOBRE APLICATIVOS:
+📱 Recomendamos sempre o uso de aplicativos PRO (pagos) - possuem melhor desempenho e compatibilidade com nossos servidores
+📱 A instalação continua gratuita
+📱 O custo do aplicativo PRO é coberto por nós quando usado em um único aparelho
+⚠️ ATENÇÃO: Caso o cliente deseje utilizar 1 lista em cada aparelho, será necessário arcar com o custo dos aplicativos adicionais ou optar por um aplicativo gratuito (sujeito a menor qualidade)
+
 PLANOS DISPONÍVEIS:
 📺 Mensal: R$ 29,90
 📺 Trimestral (mais popular): R$ 79,90
@@ -56,6 +67,7 @@ Todos os planos incluem:
 ✅ Filmes, séries e PPV
 ✅ Qualidade 4K Ultra HD
 ✅ Suporte 24/7
+✅ 3 listas de servidores para máxima estabilidade
 
 DISPOSITIVOS COMPATÍVEIS:
 - TV Box
