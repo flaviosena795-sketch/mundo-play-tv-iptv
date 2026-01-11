@@ -104,6 +104,7 @@ serve(async (req) => {
 
     const planNome = body.plano.nome;
     const clientName = body.clientName || '';
+    const clientPhone = body.clientPhone || '';
     
     // Input validation: Check if plan exists in whitelist
     if (!VALID_PLANS.hasOwnProperty(planNome)) {
@@ -135,10 +136,17 @@ serve(async (req) => {
           currency_id: "BRL"
         }
       ],
+      payer: {
+        name: clientName || undefined,
+        phone: clientPhone ? {
+          area_code: clientPhone.replace(/\D/g, '').slice(0, 2),
+          number: clientPhone.replace(/\D/g, '').slice(2)
+        } : undefined
+      },
       back_urls: {
-        success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}`,
+        success: `${origin}/sucesso?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}&telefone=${encodeURIComponent(clientPhone)}`,
         failure: `${origin}/falha?erro=rejeitado`,
-        pending: `${origin}/pendente?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}`
+        pending: `${origin}/pendente?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}&telefone=${encodeURIComponent(clientPhone)}`
       },
       auto_return: "approved",
       external_reference: `${planNome.replace(/\s+/g, '_').toUpperCase()}_${Date.now()}`,
