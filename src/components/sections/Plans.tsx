@@ -138,7 +138,8 @@ const Plans = () => {
       const { data, error } = await supabase.functions.invoke('criar-preferencia', {
         body: {
           plano: { nome: selectedPlan.name },
-          clientName: trimmedName
+          clientName: trimmedName,
+          clientPhone: trimmedPhone
         }
       });
 
@@ -261,7 +262,7 @@ const Plans = () => {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label htmlFor="clientName" className="text-sm font-medium">
-                Nome Completo
+                Nome Completo <span className="text-red-500">*</span>
               </label>
               <Input
                 id="clientName"
@@ -270,12 +271,13 @@ const Plans = () => {
                 onChange={(e) => setClientName(e.target.value)}
                 maxLength={100}
                 disabled={isLoading}
+                required
               />
             </div>
             
             <div className="space-y-2">
               <label htmlFor="clientPhone" className="text-sm font-medium">
-                WhatsApp
+                WhatsApp <span className="text-red-500">*</span>
               </label>
               <Input
                 id="clientPhone"
@@ -284,6 +286,7 @@ const Plans = () => {
                 onChange={(e) => setClientPhone(formatPhone(e.target.value))}
                 maxLength={16}
                 disabled={isLoading}
+                required
               />
             </div>
             
