@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { customerName, customerPhone, planName, amount, paymentId }: PaymentEmailRequest = await req.json();
 
-    const ownerEmail = Deno.env.get("OWNER_EMAIL") || "mundoplaytv01@gmail.com";
+    const ownerEmail = "mundoplaytv82@gmail.com";
     
     console.log("Sending payment notification to owner:", ownerEmail);
     console.log("Customer:", customerName);
