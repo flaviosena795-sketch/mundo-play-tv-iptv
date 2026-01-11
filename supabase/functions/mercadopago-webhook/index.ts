@@ -479,7 +479,7 @@ async function sendPaymentNotificationToOwner(data: {
   paymentId: string;
 }) {
   try {
-    const ownerEmail = Deno.env.get("OWNER_EMAIL") || "mundoplaytv01@gmail.com";
+    const ownerEmail = "mundoplaytv82@gmail.com";
     
     const formattedAmount = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
