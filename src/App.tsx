@@ -28,12 +28,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <FloatingWhatsApp />
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/sucesso" element={<Suspense fallback={<PageLoader />}><Success /></Suspense>} />

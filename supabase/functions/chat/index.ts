@@ -5,13 +5,78 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Validation constants
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 2000;
+const VALID_ROLES = ["user", "assistant", "system"];
+
+// Validate message structure and content
+function validateMessages(messages: unknown): { valid: boolean; error?: string } {
+  if (!Array.isArray(messages)) {
+    return { valid: false, error: "messages deve ser um array" };
+  }
+
+  if (messages.length === 0) {
+    return { valid: false, error: "messages não pode estar vazio" };
+  }
+
+  if (messages.length > MAX_MESSAGES) {
+    return { valid: false, error: `Limite de ${MAX_MESSAGES} mensagens excedido` };
+  }
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    
+    if (!msg || typeof msg !== "object") {
+      return { valid: false, error: `Mensagem ${i + 1} inválida` };
+    }
+
+    if (!msg.role || typeof msg.role !== "string") {
+      return { valid: false, error: `Mensagem ${i + 1}: role inválida` };
+    }
+
+    if (!VALID_ROLES.includes(msg.role)) {
+      return { valid: false, error: `Mensagem ${i + 1}: role deve ser user, assistant ou system` };
+    }
+
+    if (typeof msg.content !== "string") {
+      return { valid: false, error: `Mensagem ${i + 1}: content deve ser string` };
+    }
+
+    if (msg.content.length > MAX_MESSAGE_LENGTH) {
+      return { valid: false, error: `Mensagem ${i + 1}: excede ${MAX_MESSAGE_LENGTH} caracteres` };
+    }
+  }
+
+  return { valid: true };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    let body: { messages?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "JSON inválido" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages } = body;
+
+    // Validate messages
+    const validation = validateMessages(messages);
+    if (!validation.valid) {
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {

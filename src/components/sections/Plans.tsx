@@ -22,6 +22,33 @@ const preloadMercadoPagoSDK = () => {
   document.head.appendChild(link);
 };
 
+// Whitelist of allowed MercadoPago redirect domains
+const ALLOWED_PAYMENT_DOMAINS = [
+  'mercadopago.com',
+  'mercadopago.com.br',
+  'mercadopago.com.ar',
+  'mercadopago.com.mx',
+  'mercadopago.cl',
+  'mercadopago.co',
+  'mercadopago.pe',
+  'mercadolibre.com',
+];
+
+// Validate that URL is from a trusted MercadoPago domain
+const isValidPaymentUrl = (url: string): boolean => {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+    
+    // Check if hostname ends with any of the allowed domains
+    return ALLOWED_PAYMENT_DOMAINS.some(domain => 
+      hostname === domain || hostname.endsWith(`.${domain}`)
+    );
+  } catch {
+    return false;
+  }
+};
+
 // Format phone number as (00) 00000-0000
 const formatPhone = (value: string): string => {
   const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -150,6 +177,12 @@ const Plans = () => {
       }
 
       if (data?.init_point) {
+        // Validate the URL is from a trusted MercadoPago domain
+        if (!isValidPaymentUrl(data.init_point)) {
+          console.error("URL de pagamento não confiável:", data.init_point);
+          toast.error("Erro de segurança. Tente novamente.");
+          return;
+        }
         // Redirect to Mercado Pago checkout
         window.location.href = data.init_point;
       } else {
