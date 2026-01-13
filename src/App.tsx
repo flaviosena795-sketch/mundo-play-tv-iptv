@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import CookieConsent from "./components/CookieConsent";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load secondary pages to reduce initial bundle size
 const Success = lazy(() => import("./pages/Success"));
@@ -31,6 +32,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <FloatingWhatsApp />
+      <ScrollToTop />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
