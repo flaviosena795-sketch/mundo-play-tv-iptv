@@ -1,110 +1,176 @@
-import { Calendar, Clock, Tv } from "lucide-react";
+import { Calendar, Clock, Tv, Loader2, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface GameData {
+  id: number;
+  sport: string;
+  league: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeLogo: string;
+  awayLogo: string;
+  date: string;
+  time: string;
+  isLive: boolean;
+  status: string;
+  homeScore: number | null;
+  awayScore: number | null;
+}
+
+// Fallback games when API is unavailable
+const fallbackGames: GameData[] = [
+  {
+    id: 1,
+    sport: "Futebol",
+    league: "Brasileirão Série A",
+    homeTeam: "Flamengo",
+    awayTeam: "Palmeiras",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Hoje",
+    time: "21:30",
+    isLive: true,
+    status: "Em andamento",
+    homeScore: 1,
+    awayScore: 0,
+  },
+  {
+    id: 2,
+    sport: "Futebol",
+    league: "Champions League",
+    homeTeam: "Real Madrid",
+    awayTeam: "Man City",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Amanhã",
+    time: "16:00",
+    isLive: false,
+    status: "Agendado",
+    homeScore: null,
+    awayScore: null,
+  },
+  {
+    id: 3,
+    sport: "Futebol",
+    league: "Premier League",
+    homeTeam: "Liverpool",
+    awayTeam: "Arsenal",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Domingo",
+    time: "13:30",
+    isLive: false,
+    status: "Agendado",
+    homeScore: null,
+    awayScore: null,
+  },
+  {
+    id: 4,
+    sport: "Futebol",
+    league: "La Liga",
+    homeTeam: "Barcelona",
+    awayTeam: "Atlético",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Sábado",
+    time: "17:00",
+    isLive: false,
+    status: "Agendado",
+    homeScore: null,
+    awayScore: null,
+  },
+  {
+    id: 5,
+    sport: "Futebol",
+    league: "Libertadores",
+    homeTeam: "Boca Juniors",
+    awayTeam: "River Plate",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Quinta",
+    time: "21:00",
+    isLive: false,
+    status: "Agendado",
+    homeScore: null,
+    awayScore: null,
+  },
+  {
+    id: 6,
+    sport: "Futebol",
+    league: "Brasileirão Série A",
+    homeTeam: "Corinthians",
+    awayTeam: "São Paulo",
+    homeLogo: "",
+    awayLogo: "",
+    date: "Domingo",
+    time: "18:30",
+    isLive: false,
+    status: "Agendado",
+    homeScore: null,
+    awayScore: null,
+  },
+];
 
 const LiveSchedule = () => {
-  const games = [
-    {
-      id: 1,
-      sport: "Futebol",
-      league: "Brasileirão Série A",
-      homeTeam: "Flamengo",
-      awayTeam: "Palmeiras",
-      homeFlag: "🔴⚫",
-      awayFlag: "🟢⚪",
-      date: "Hoje",
-      time: "21:30",
-      isLive: true,
-    },
-    {
-      id: 2,
-      sport: "Futebol",
-      league: "Champions League",
-      homeTeam: "Real Madrid",
-      awayTeam: "Manchester City",
-      homeFlag: "⚪🟣",
-      awayFlag: "🔵⚪",
-      date: "Amanhã",
-      time: "16:00",
-      isLive: false,
-    },
-    {
-      id: 3,
-      sport: "UFC",
-      league: "UFC 310",
-      homeTeam: "Jon Jones",
-      awayTeam: "Stipe Miocic",
-      homeFlag: "🇺🇸",
-      awayFlag: "🇺🇸",
-      date: "Sábado",
-      time: "23:00",
-      isLive: false,
-    },
-    {
-      id: 4,
-      sport: "NBA",
-      league: "NBA Regular Season",
-      homeTeam: "Lakers",
-      awayTeam: "Celtics",
-      homeFlag: "💜💛",
-      awayFlag: "🍀⚪",
-      date: "Domingo",
-      time: "18:00",
-      isLive: false,
-    },
-    {
-      id: 5,
-      sport: "Futebol",
-      league: "Premier League",
-      homeTeam: "Liverpool",
-      awayTeam: "Arsenal",
-      homeFlag: "🔴",
-      awayFlag: "🔴⚪",
-      date: "Domingo",
-      time: "13:30",
-      isLive: false,
-    },
-    {
-      id: 6,
-      sport: "F1",
-      league: "Grande Prêmio do Brasil",
-      homeTeam: "Corrida Principal",
-      awayTeam: "Interlagos",
-      homeFlag: "🏎️",
-      awayFlag: "🇧🇷",
-      date: "Domingo",
-      time: "14:00",
-      isLive: false,
-    },
-  ];
+  const [games, setGames] = useState<GameData[]>(fallbackGames);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const getSportIcon = (sport: string) => {
-    switch (sport) {
-      case "Futebol":
-        return "⚽";
-      case "UFC":
-        return "🥊";
-      case "NBA":
-        return "🏀";
-      case "F1":
-        return "🏎️";
-      default:
-        return "🏆";
+  const fetchGames = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('get-live-games');
+      
+      if (fnError) {
+        console.error('Error fetching games:', fnError);
+        setError('Usando dados de exemplo');
+        setGames(fallbackGames);
+      } else if (data?.games && data.games.length > 0) {
+        setGames(data.games);
+        setLastUpdated(new Date());
+      } else {
+        setGames(fallbackGames);
+        setError('Nenhum jogo encontrado');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Usando dados de exemplo');
+      setGames(fallbackGames);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getSportColor = (sport: string) => {
-    switch (sport) {
-      case "Futebol":
-        return "from-green-500/20 to-green-600/10 border-green-500/30";
-      case "UFC":
-        return "from-red-500/20 to-red-600/10 border-red-500/30";
-      case "NBA":
-        return "from-orange-500/20 to-orange-600/10 border-orange-500/30";
-      case "F1":
-        return "from-red-600/20 to-black/10 border-red-600/30";
-      default:
-        return "from-premium-gold/20 to-premium-gold/10 border-premium-gold/30";
+  useEffect(() => {
+    fetchGames();
+    
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchGames, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getLeagueColor = (league: string) => {
+    if (league.includes('Brasileirão') || league.includes('Serie A')) {
+      return "from-green-500/20 to-yellow-600/10 border-green-500/30";
     }
+    if (league.includes('Champions')) {
+      return "from-blue-500/20 to-blue-600/10 border-blue-500/30";
+    }
+    if (league.includes('Premier')) {
+      return "from-purple-500/20 to-purple-600/10 border-purple-500/30";
+    }
+    if (league.includes('La Liga') || league.includes('LaLiga')) {
+      return "from-orange-500/20 to-red-600/10 border-orange-500/30";
+    }
+    if (league.includes('Libertadores')) {
+      return "from-yellow-500/20 to-yellow-600/10 border-yellow-500/30";
+    }
+    return "from-premium-gold/20 to-premium-gold/10 border-premium-gold/30";
   };
 
   return (
@@ -126,7 +192,7 @@ const LiveSchedule = () => {
             <div className="inline-flex items-center gap-2 bg-premium-gold/10 px-4 py-2 rounded-full mb-6">
               <Calendar className="w-4 h-4 text-premium-gold" />
               <span className="text-premium-gold font-semibold text-sm uppercase tracking-wide">
-                Programação
+                Programação ao Vivo
               </span>
             </div>
             <h2 id="schedule-heading" className="text-4xl md:text-5xl font-bold mb-4">
@@ -136,7 +202,31 @@ const LiveSchedule = () => {
               Confira a programação dos principais eventos esportivos. 
               Assista tudo em qualidade 4K, sem travamentos!
             </p>
+            
+            {/* Last Updated & Refresh */}
+            <div className="flex items-center justify-center gap-4 mt-4">
+              {lastUpdated && (
+                <span className="text-xs text-muted-foreground">
+                  Atualizado: {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+              <button
+                onClick={fetchGames}
+                disabled={loading}
+                className="inline-flex items-center gap-1 text-xs text-premium-gold hover:text-premium-gold-hover transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                Atualizar
+              </button>
+            </div>
           </motion.div>
+
+          {/* Loading State */}
+          {loading && games === fallbackGames && (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 text-premium-gold animate-spin" />
+            </div>
+          )}
 
           {/* Games Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -147,42 +237,78 @@ const LiveSchedule = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getSportColor(
-                  game.sport
+                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getLeagueColor(
+                  game.league
                 )} border backdrop-blur-sm hover:scale-[1.02] transition-all duration-300`}
               >
                 {/* Live Indicator */}
                 {game.isLive && (
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-red-500/90 px-3 py-1 rounded-full">
+                  <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-red-500/90 px-3 py-1 rounded-full z-10">
                     <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                     <span className="text-white text-xs font-bold uppercase">Ao Vivo</span>
                   </div>
                 )}
 
                 <div className="p-6">
-                  {/* Sport & League */}
+                  {/* League */}
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-2xl">{getSportIcon(game.sport)}</span>
+                    <span className="text-2xl">⚽</span>
                     <div>
                       <p className="text-xs text-muted-foreground uppercase tracking-wide">
                         {game.sport}
                       </p>
-                      <p className="text-sm font-semibold text-foreground/90">{game.league}</p>
+                      <p className="text-sm font-semibold text-foreground/90 truncate max-w-[200px]">
+                        {game.league}
+                      </p>
                     </div>
                   </div>
 
                   {/* Teams */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="text-center flex-1">
-                      <p className="text-2xl mb-1">{game.homeFlag}</p>
-                      <p className="font-bold text-foreground text-sm">{game.homeTeam}</p>
+                      {game.homeLogo ? (
+                        <img 
+                          src={game.homeLogo} 
+                          alt={game.homeTeam}
+                          className="w-12 h-12 mx-auto mb-1 object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <p className="text-3xl mb-1">🏠</p>
+                      )}
+                      <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
+                        {game.homeTeam}
+                      </p>
+                      {game.isLive && game.homeScore !== null && (
+                        <p className="text-xl font-bold text-premium-gold mt-1">{game.homeScore}</p>
+                      )}
                     </div>
-                    <div className="px-4">
-                      <span className="text-2xl font-bold text-premium-gold">VS</span>
+                    
+                    <div className="px-3">
+                      {game.isLive && game.homeScore !== null ? (
+                        <span className="text-lg font-bold text-muted-foreground">-</span>
+                      ) : (
+                        <span className="text-xl font-bold text-premium-gold">VS</span>
+                      )}
                     </div>
+                    
                     <div className="text-center flex-1">
-                      <p className="text-2xl mb-1">{game.awayFlag}</p>
-                      <p className="font-bold text-foreground text-sm">{game.awayTeam}</p>
+                      {game.awayLogo ? (
+                        <img 
+                          src={game.awayLogo} 
+                          alt={game.awayTeam}
+                          className="w-12 h-12 mx-auto mb-1 object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <p className="text-3xl mb-1">✈️</p>
+                      )}
+                      <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
+                        {game.awayTeam}
+                      </p>
+                      {game.isLive && game.awayScore !== null && (
+                        <p className="text-xl font-bold text-premium-gold mt-1">{game.awayScore}</p>
+                      )}
                     </div>
                   </div>
 
@@ -201,6 +327,13 @@ const LiveSchedule = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              ⚠️ {error}
+            </p>
+          )}
 
           {/* CTA */}
           <motion.div
