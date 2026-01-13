@@ -10,7 +10,6 @@ import VODRequest from "@/components/sections/VODRequest";
 import Testimonials from "@/components/sections/Testimonials";
 import FAQ from "@/components/sections/FAQ";
 import FinalCTA from "@/components/sections/FinalCTA";
-import { ChatBot } from "@/components/ChatBot";
 
 const Index = () => {
   return (
@@ -27,7 +26,6 @@ const Index = () => {
       <Testimonials />
       <FAQ />
       <FinalCTA />
-      <ChatBot />
     </main>
   );
 };
