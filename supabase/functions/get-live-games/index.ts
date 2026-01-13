@@ -5,37 +5,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface Fixture {
-  fixture: {
-    id: number;
-    date: string;
-    status: {
-      short: string;
-      long: string;
-    };
-  };
-  league: {
-    id: number;
-    name: string;
-    country: string;
-    logo: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
+interface SportsDBEvent {
+  idEvent: string;
+  strEvent: string;
+  strLeague: string;
+  strHomeTeam: string;
+  strAwayTeam: string;
+  strHomeTeamBadge: string | null;
+  strAwayTeamBadge: string | null;
+  dateEvent: string;
+  strTime: string;
+  strStatus: string | null;
+  intHomeScore: string | null;
+  intAwayScore: string | null;
 }
 
 interface GameData {
@@ -60,94 +42,47 @@ serve(async (req) => {
   }
 
   try {
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
-    
-    if (!rapidApiKey) {
-      console.error('RAPIDAPI_KEY not configured');
-      throw new Error('RAPIDAPI_KEY not configured');
-    }
-
-    console.log('Starting to fetch games with API key...');
-
-    const headers = new Headers();
-    headers.append("x-rapidapi-key", rapidApiKey);
-    headers.append("x-rapidapi-host", "api-football-v1.p.rapidapi.com");
-
-    // Get today's date and next 3 days
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    
-    // Fetch live and upcoming games from major leagues
-    // Brasileirão (71), Premier League (39), La Liga (140), Champions League (2), Libertadores (13)
-    const leagues = [71, 39, 140, 2, 13];
-    const season = today.getFullYear();
-    
-    console.log(`Fetching games for date: ${todayStr}, season: ${season}`);
+    console.log('Fetching games from TheSportsDB...');
     
     const allGames: GameData[] = [];
+    const today = new Date();
 
-    // Fetch live games first
-    console.log('Fetching live games...');
-    const liveResponse = await fetch(
-      `https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all`,
-      { method: 'GET', headers }
-    );
-    
-    console.log(`Live games response status: ${liveResponse.status}`);
-    
-    if (liveResponse.ok) {
-      const liveData = await liveResponse.json();
-      console.log(`Live games found: ${liveData.response?.length || 0}`);
-      if (liveData.response && Array.isArray(liveData.response)) {
-        liveData.response.forEach((fixture: Fixture) => {
-          allGames.push(formatGame(fixture, true));
-        });
-      }
-    } else {
-      const errorText = await liveResponse.text();
-      console.error(`Live games error: ${errorText}`);
-    }
-
-    // Fetch upcoming/scheduled games for each league (NS = Not Started)
-    for (const leagueId of leagues) {
-      try {
-        const url = `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=${leagueId}&season=${season}&from=${todayStr}&to=${getDatePlusDays(3)}`;
-        console.log(`Fetching league ${leagueId}: ${url}`);
+    // Fetch games for today and next 2 days
+    for (let i = 0; i <= 2; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const url = `https://www.thesportsdb.com/api/v1/json/1/eventsday.php?d=${dateStr}&s=Soccer`;
+      console.log(`Fetching: ${url}`);
+      
+      const response = await fetch(url);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`Day ${dateStr}: ${data.events?.length || 0} events`);
         
-        const response = await fetch(url, { method: 'GET', headers });
-        
-        console.log(`League ${leagueId} response status: ${response.status}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`League ${leagueId} games found: ${data.response?.length || 0}`);
-          if (data.response && Array.isArray(data.response)) {
-            data.response.forEach((fixture: Fixture) => {
-              // Avoid duplicates
-              if (!allGames.find(g => g.id === fixture.fixture.id)) {
-                allGames.push(formatGame(fixture, false));
-              }
-            });
-          }
-        } else {
-          const errorText = await response.text();
-          console.error(`League ${leagueId} error: ${errorText}`);
+        if (data.events && Array.isArray(data.events)) {
+          data.events.forEach((event: SportsDBEvent) => {
+            const game = formatGame(event, today);
+            if (game) {
+              allGames.push(game);
+            }
+          });
         }
-        
-        // Small delay between requests to respect rate limits
-        await new Promise(resolve => setTimeout(resolve, 300));
-      } catch (err) {
-        console.error(`Error fetching league ${leagueId}:`, err);
       }
+      
+      // Small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
-    
+
     console.log(`Total games collected: ${allGames.length}`);
 
-    // Sort: live games first, then by date
+    // Sort: live games first, then by date/time
     allGames.sort((a, b) => {
       if (a.isLive && !b.isLive) return -1;
       if (!a.isLive && b.isLive) return 1;
-      return new Date(a.date + ' ' + a.time).getTime() - new Date(b.date + ' ' + b.time).getTime();
+      return 0;
     });
 
     // Limit to 12 games
@@ -168,44 +103,47 @@ serve(async (req) => {
   }
 });
 
-function formatGame(fixture: Fixture, isLive: boolean): GameData {
-  const fixtureDate = new Date(fixture.fixture.date);
-  const today = new Date();
+function formatGame(event: SportsDBEvent, today: Date): GameData | null {
+  if (!event.strHomeTeam || !event.strAwayTeam) return null;
+
+  const eventDate = new Date(event.dateEvent);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
   let dateStr: string;
-  if (fixtureDate.toDateString() === today.toDateString()) {
+  if (eventDate.toDateString() === today.toDateString()) {
     dateStr = 'Hoje';
-  } else if (fixtureDate.toDateString() === tomorrow.toDateString()) {
+  } else if (eventDate.toDateString() === tomorrow.toDateString()) {
     dateStr = 'Amanhã';
   } else {
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    dateStr = days[fixtureDate.getDay()] + ', ' + fixtureDate.getDate() + '/' + (fixtureDate.getMonth() + 1);
+    dateStr = days[eventDate.getDay()] + ', ' + eventDate.getDate() + '/' + (eventDate.getMonth() + 1);
   }
 
-  const liveStatuses = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'];
-  const isCurrentlyLive = isLive || liveStatuses.includes(fixture.fixture.status.short);
+  // Check if game is live
+  const liveStatuses = ['1H', '2H', 'HT', 'ET', 'P', 'Live', 'In Progress'];
+  const isLive = event.strStatus ? liveStatuses.some(s => event.strStatus?.includes(s)) : false;
+
+  // Format time (strTime is in HH:MM:SS format)
+  let time = '00:00';
+  if (event.strTime) {
+    const timeParts = event.strTime.split(':');
+    time = `${timeParts[0]}:${timeParts[1]}`;
+  }
 
   return {
-    id: fixture.fixture.id,
+    id: parseInt(event.idEvent) || Math.random() * 100000,
     sport: 'Futebol',
-    league: fixture.league.name,
-    homeTeam: fixture.teams.home.name,
-    awayTeam: fixture.teams.away.name,
-    homeLogo: fixture.teams.home.logo,
-    awayLogo: fixture.teams.away.logo,
+    league: event.strLeague || 'Liga',
+    homeTeam: event.strHomeTeam,
+    awayTeam: event.strAwayTeam,
+    homeLogo: event.strHomeTeamBadge || '',
+    awayLogo: event.strAwayTeamBadge || '',
     date: dateStr,
-    time: fixtureDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }),
-    isLive: isCurrentlyLive,
-    status: fixture.fixture.status.long,
-    homeScore: fixture.goals.home,
-    awayScore: fixture.goals.away,
+    time: time,
+    isLive: isLive,
+    status: event.strStatus || 'Scheduled',
+    homeScore: event.intHomeScore ? parseInt(event.intHomeScore) : null,
+    awayScore: event.intAwayScore ? parseInt(event.intAwayScore) : null,
   };
-}
-
-function getDatePlusDays(days: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0];
 }
