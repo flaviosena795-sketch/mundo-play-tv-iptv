@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import CookieConsent from "./components/CookieConsent";
 import ScrollToTop from "./components/ScrollToTop";
+import { SimplePageSkeleton } from "./components/PageSkeleton";
 
 // Lazy load secondary pages to reduce initial bundle size
 const Success = lazy(() => import("./pages/Success"));
@@ -17,12 +18,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
-// Simple loading fallback
-const PageLoader = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+// Use skeleton loader for better UX
+const PageLoader = () => <SimplePageSkeleton />;
 
 const queryClient = new QueryClient();
 
