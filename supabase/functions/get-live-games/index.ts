@@ -63,8 +63,11 @@ serve(async (req) => {
     const rapidApiKey = Deno.env.get('RAPIDAPI_KEY');
     
     if (!rapidApiKey) {
+      console.error('RAPIDAPI_KEY not configured');
       throw new Error('RAPIDAPI_KEY not configured');
     }
+
+    console.log('Starting to fetch games with API key...');
 
     const headers = new Headers();
     headers.append("x-rapidapi-key", rapidApiKey);
@@ -79,33 +82,45 @@ serve(async (req) => {
     const leagues = [71, 39, 140, 2, 13];
     const season = today.getFullYear();
     
+    console.log(`Fetching games for date: ${todayStr}, season: ${season}`);
+    
     const allGames: GameData[] = [];
 
     // Fetch live games first
+    console.log('Fetching live games...');
     const liveResponse = await fetch(
       `https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all`,
       { method: 'GET', headers }
     );
     
+    console.log(`Live games response status: ${liveResponse.status}`);
+    
     if (liveResponse.ok) {
       const liveData = await liveResponse.json();
+      console.log(`Live games found: ${liveData.response?.length || 0}`);
       if (liveData.response && Array.isArray(liveData.response)) {
         liveData.response.forEach((fixture: Fixture) => {
           allGames.push(formatGame(fixture, true));
         });
       }
+    } else {
+      const errorText = await liveResponse.text();
+      console.error(`Live games error: ${errorText}`);
     }
 
-    // Fetch upcoming games for each league
+    // Fetch upcoming/scheduled games for each league (NS = Not Started)
     for (const leagueId of leagues) {
       try {
-        const response = await fetch(
-          `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=${leagueId}&season=${season}&from=${todayStr}&to=${getDatePlusDays(3)}&status=NS-1H-2H-HT`,
-          { method: 'GET', headers }
-        );
+        const url = `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=${leagueId}&season=${season}&from=${todayStr}&to=${getDatePlusDays(3)}`;
+        console.log(`Fetching league ${leagueId}: ${url}`);
+        
+        const response = await fetch(url, { method: 'GET', headers });
+        
+        console.log(`League ${leagueId} response status: ${response.status}`);
         
         if (response.ok) {
           const data = await response.json();
+          console.log(`League ${leagueId} games found: ${data.response?.length || 0}`);
           if (data.response && Array.isArray(data.response)) {
             data.response.forEach((fixture: Fixture) => {
               // Avoid duplicates
@@ -114,14 +129,19 @@ serve(async (req) => {
               }
             });
           }
+        } else {
+          const errorText = await response.text();
+          console.error(`League ${leagueId} error: ${errorText}`);
         }
         
         // Small delay between requests to respect rate limits
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
       } catch (err) {
         console.error(`Error fetching league ${leagueId}:`, err);
       }
     }
+    
+    console.log(`Total games collected: ${allGames.length}`);
 
     // Sort: live games first, then by date
     allGames.sort((a, b) => {
