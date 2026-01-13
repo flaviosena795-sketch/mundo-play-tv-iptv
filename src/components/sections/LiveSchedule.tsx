@@ -1,6 +1,6 @@
-import { Calendar, Clock, Tv, Loader2, RefreshCw } from "lucide-react";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface GameData {
@@ -113,11 +113,21 @@ const fallbackGames: GameData[] = [
   },
 ];
 
+const leagueFilters = [
+  { id: "all", label: "Todos", icon: "🏆" },
+  { id: "brasileirao", label: "Brasileirão", icon: "🇧🇷", keywords: ["Brasileirão", "Serie A", "Série A"] },
+  { id: "champions", label: "Champions", icon: "⭐", keywords: ["Champions", "UEFA Champions"] },
+  { id: "premier", label: "Premier", icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", keywords: ["Premier League", "Premier"] },
+  { id: "laliga", label: "La Liga", icon: "🇪🇸", keywords: ["La Liga", "LaLiga"] },
+  { id: "libertadores", label: "Libertadores", icon: "🏆", keywords: ["Libertadores", "Copa Libertadores"] },
+];
+
 const LiveSchedule = () => {
   const [games, setGames] = useState<GameData[]>(fallbackGames);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const fetchGames = async () => {
     setLoading(true);
@@ -154,6 +164,20 @@ const LiveSchedule = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Filter games based on active filter
+  const filteredGames = useMemo(() => {
+    if (activeFilter === "all") return games;
+    
+    const filter = leagueFilters.find(f => f.id === activeFilter);
+    if (!filter || !filter.keywords) return games;
+    
+    return games.filter(game => 
+      filter.keywords!.some(keyword => 
+        game.league.toLowerCase().includes(keyword.toLowerCase())
+      )
+    );
+  }, [games, activeFilter]);
+
   const getLeagueColor = (league: string) => {
     if (league.includes('Brasileirão') || league.includes('Serie A')) {
       return "from-green-500/20 to-yellow-600/10 border-green-500/30";
@@ -187,7 +211,7 @@ const LiveSchedule = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
             <div className="inline-flex items-center gap-2 bg-premium-gold/10 px-4 py-2 rounded-full mb-6">
               <Calendar className="w-4 h-4 text-premium-gold" />
@@ -221,6 +245,40 @@ const LiveSchedule = () => {
             </div>
           </motion.div>
 
+          {/* League Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <Filter className="w-4 h-4 text-muted-foreground mr-2" />
+              {leagueFilters.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeFilter === filter.id
+                      ? "bg-premium-gold text-black shadow-lg shadow-premium-gold/25"
+                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  }`}
+                >
+                  <span>{filter.icon}</span>
+                  <span className="hidden sm:inline">{filter.label}</span>
+                </button>
+              ))}
+            </div>
+            
+            {/* Active filter count */}
+            {activeFilter !== "all" && (
+              <p className="text-center text-sm text-muted-foreground mt-3">
+                {filteredGames.length} jogo{filteredGames.length !== 1 ? 's' : ''} encontrado{filteredGames.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </motion.div>
+
           {/* Loading State */}
           {loading && games === fallbackGames && (
             <div className="flex justify-center py-12">
@@ -228,9 +286,37 @@ const LiveSchedule = () => {
             </div>
           )}
 
+          {/* No games message */}
+          {!loading && filteredGames.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <p className="text-xl text-muted-foreground mb-2">😔 Nenhum jogo encontrado</p>
+              <p className="text-sm text-muted-foreground">
+                Não há jogos agendados para esta liga no momento.
+              </p>
+              <button
+                onClick={() => setActiveFilter("all")}
+                className="mt-4 text-premium-gold hover:text-premium-gold-hover transition-colors text-sm"
+              >
+                Ver todos os jogos →
+              </button>
+            </motion.div>
+          )}
+
           {/* Games Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {games.map((game, index) => (
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={activeFilter}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {filteredGames.map((game, index) => (
               <motion.div
                 key={game.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -326,7 +412,8 @@ const LiveSchedule = () => {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
+          </AnimatePresence>
 
           {/* Error message */}
           {error && (
