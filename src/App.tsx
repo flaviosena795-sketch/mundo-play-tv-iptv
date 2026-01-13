@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import CookieConsent from "./components/CookieConsent";
 import ScrollToTop from "./components/ScrollToTop";
+import SkipLinks from "./components/SkipLinks";
 import { SimplePageSkeleton } from "./components/PageSkeleton";
 
 // Lazy load secondary pages to reduce initial bundle size
@@ -26,6 +27,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <SkipLinks />
       <Toaster />
       <Sonner />
       <FloatingWhatsApp />

@@ -42,7 +42,7 @@ const Index = () => {
   }, [trackSectionView]);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main id="conteudo-principal" className="min-h-screen bg-background" role="main" aria-label="Conteúdo principal do Mundo Play TV">
       <Hero />
       <Announcement />
       <About />
