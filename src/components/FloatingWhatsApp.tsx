@@ -23,24 +23,37 @@ const FloatingWhatsApp = () => {
   };
 
   return (
-    <a
-      href={whatsappLink}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={handleClick}
-      className="
-        fixed bottom-6 right-6 z-50
-        bg-[#25D366] text-white
-        w-16 h-16 rounded-full
-        flex items-center justify-center
-        shadow-lg hover:shadow-xl
-        hover:scale-110 transition-all duration-300
-        hover:bg-[#128C7E]
-      "
-      aria-label="Contato via WhatsApp"
-    >
-      <WhatsAppIcon className="w-8 h-8" />
-    </a>
+    <>
+      <style>{`
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          }
+          50% {
+            box-shadow: 0 0 0 12px rgba(37, 211, 102, 0), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          }
+        }
+      `}</style>
+      <a
+        href={whatsappLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleClick}
+        className="
+          fixed bottom-6 right-6 z-50
+          bg-[#25D366] text-white
+          w-16 h-16 rounded-full
+          flex items-center justify-center
+          hover:shadow-xl
+          hover:scale-110 transition-all duration-300
+          hover:bg-[#128C7E]
+        "
+        style={{ animation: 'pulse-glow 2s ease-in-out infinite' }}
+        aria-label="Contato via WhatsApp"
+      >
+        <WhatsAppIcon className="w-8 h-8" />
+      </a>
+    </>
   );
 };
 
