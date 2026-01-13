@@ -124,6 +124,18 @@ const Plans = () => {
   const handleSelectPlan = (plan: typeof plans[0]) => {
     setSelectedPlan(plan);
     setDialogOpen(true);
+    
+    // GA4 event tracking - plan selection
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'select_plan', {
+        event_category: 'conversion',
+        event_label: plan.name,
+        value: plan.valor,
+        currency: 'BRL',
+        plan_name: plan.name,
+        plan_price: plan.valor
+      });
+    }
   };
 
   const handlePayment = async () => {
@@ -183,6 +195,24 @@ const Plans = () => {
           toast.error("Erro de segurança. Tente novamente.");
           return;
         }
+        
+        // GA4 event tracking - begin checkout
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'begin_checkout', {
+            event_category: 'conversion',
+            event_label: selectedPlan.name,
+            value: selectedPlan.valor,
+            currency: 'BRL',
+            plan_name: selectedPlan.name,
+            items: [{
+              item_id: selectedPlan.name.toLowerCase().replace(' ', '_'),
+              item_name: `Plano ${selectedPlan.name}`,
+              price: selectedPlan.valor,
+              quantity: 1
+            }]
+          });
+        }
+        
         // Redirect to Mercado Pago checkout
         window.location.href = data.init_point;
       } else {
@@ -340,8 +370,15 @@ const Plans = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </section>
+  </section>
   );
 };
+
+// Declare global gtag type
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
 
 export default Plans;
