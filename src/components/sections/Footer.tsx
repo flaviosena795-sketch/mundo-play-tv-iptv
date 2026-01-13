@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-darker-bg border-t border-subtle-border" role="contentinfo">
+    <footer id="contato" className="bg-darker-bg border-t border-subtle-border" role="contentinfo" aria-label="Rodapé e informações de contato">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* About Column */}
@@ -29,32 +29,32 @@ const Footer = () => {
             <nav aria-label="Links do rodapé">
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#sobre" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#sobre" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Sobre Nós
                   </a>
                 </li>
                 <li>
-                  <a href="#recursos" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#recursos" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Recursos
                   </a>
                 </li>
                 <li>
-                  <a href="#planos" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#planos" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Planos e Preços
                   </a>
                 </li>
                 <li>
-                  <a href="#teste-gratis" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#teste-gratis" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Teste Grátis
                   </a>
                 </li>
                 <li>
-                  <a href="#depoimentos" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#depoimentos" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Depoimentos
                   </a>
                 </li>
                 <li>
-                  <a href="#faq" className="text-muted-foreground hover:text-premium-gold transition-smooth">
+                  <a href="#faq" className="text-muted-foreground hover:text-premium-gold transition-smooth focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background rounded">
                     Perguntas Frequentes
                   </a>
                 </li>
