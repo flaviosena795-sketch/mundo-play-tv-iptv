@@ -1,7 +1,6 @@
 import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface GameData {
   id: number;
@@ -233,22 +232,65 @@ const LiveSchedule = () => {
     setError(null);
     
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('get-live-games');
+      const today = new Date().toISOString().split("T")[0];
+      const response = await fetch(
+        `https://www.thesportsdb.com/api/v1/json/1/eventsday.php?d=${today}&s=Soccer`
+      );
       
-      if (fnError) {
-        console.error('Error fetching games:', fnError);
-        setError('Usando dados de exemplo');
-        setGames(fallbackGames);
-      } else if (data?.games && data.games.length > 0) {
-        setGames(data.games);
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+      
+      const data = await response.json();
+      
+      if (data.events && data.events.length > 0) {
+        const formattedGames: GameData[] = data.events.slice(0, 12).map((event: any) => {
+          const eventDate = new Date(event.dateEvent);
+          const now = new Date();
+          const tomorrow = new Date(now);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          
+          let dateStr = "Hoje";
+          if (eventDate.toDateString() !== now.toDateString()) {
+            if (eventDate.toDateString() === tomorrow.toDateString()) {
+              dateStr = "Amanhã";
+            } else {
+              const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+              dateStr = `${days[eventDate.getDay()]}, ${eventDate.getDate()}/${eventDate.getMonth() + 1}`;
+            }
+          }
+          
+          const time = event.strTime ? event.strTime.substring(0, 5) : "00:00";
+          const liveStatuses = ["1H", "2H", "HT", "Live", "In Progress"];
+          const isLive = event.strStatus ? liveStatuses.some((s: string) => event.strStatus?.includes(s)) : false;
+          
+          return {
+            id: parseInt(event.idEvent) || Math.random() * 100000,
+            sport: "Futebol",
+            league: event.strLeague || "Liga",
+            homeTeam: event.strHomeTeam || "Time A",
+            awayTeam: event.strAwayTeam || "Time B",
+            homeLogo: event.strHomeTeamBadge || "",
+            awayLogo: event.strAwayTeamBadge || "",
+            date: dateStr,
+            time: time,
+            isLive: isLive,
+            status: event.strStatus || "Agendado",
+            homeScore: event.intHomeScore ? parseInt(event.intHomeScore) : null,
+            awayScore: event.intAwayScore ? parseInt(event.intAwayScore) : null,
+          };
+        });
+        
+        setGames(formattedGames);
         setLastUpdated(new Date());
       } else {
+        console.log('No events found, using fallback');
         setGames(fallbackGames);
-        setError('Nenhum jogo encontrado');
+        setError('Jogos de demonstração');
       }
     } catch (err) {
-      console.error('Error:', err);
-      setError('Usando dados de exemplo');
+      console.error('Error fetching games:', err);
+      setError('Jogos de demonstração');
       setGames(fallbackGames);
     } finally {
       setLoading(false);
