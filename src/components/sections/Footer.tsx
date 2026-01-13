@@ -1,4 +1,5 @@
-import { MessageCircle, Instagram, Facebook, Mail, Phone, MapPin, Shield, Clock } from "lucide-react";
+import { MessageCircle, Instagram, Facebook, Mail, MapPin, Shield, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -146,13 +147,17 @@ const Footer = () => {
               © {currentYear} Mundo Play TV. Todos os direitos reservados.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+              <Link to="/termos" className="hover:text-premium-gold transition-smooth">
+                Termos de Serviço
+              </Link>
+              <span>•</span>
+              <Link to="/privacidade" className="hover:text-premium-gold transition-smooth">
+                Política de Privacidade
+              </Link>
+              <span>•</span>
               <span>IPTV Brasil</span>
               <span>•</span>
               <span>Canais 4K</span>
-              <span>•</span>
-              <span>Filmes e Séries</span>
-              <span>•</span>
-              <span>Esportes ao Vivo</span>
             </div>
           </div>
         </div>
