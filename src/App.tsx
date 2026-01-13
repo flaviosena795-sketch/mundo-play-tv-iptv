@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import CookieConsent from "./components/CookieConsent";
 
 // Lazy load secondary pages to reduce initial bundle size
 const Success = lazy(() => import("./pages/Success"));
@@ -30,6 +31,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <FloatingWhatsApp />
+      <CookieConsent />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
