@@ -73,11 +73,12 @@ const FloatingWhatsApp = () => {
             >
               <WhatsAppIcon className="w-8 h-8" />
               {/* Badge de suporte online */}
-              <span className="absolute -top-1 -right-1 flex h-5 w-5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-5 w-5 bg-green-500 border-2 border-white items-center justify-center">
-                  <span className="sr-only">Online</span>
+              <span className="absolute -top-2 -left-12 flex items-center gap-1.5 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg border-2 border-white">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
+                Online
               </span>
             </motion.a>
           </TooltipTrigger>
