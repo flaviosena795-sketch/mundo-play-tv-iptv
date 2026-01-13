@@ -19,99 +19,198 @@ interface GameData {
   awayScore: number | null;
 }
 
-// Fallback games when API is unavailable
-const fallbackGames: GameData[] = [
-  {
-    id: 1,
-    sport: "Futebol",
-    league: "Brasileirão Série A",
-    homeTeam: "Flamengo",
-    awayTeam: "Palmeiras",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Hoje",
-    time: "21:30",
-    isLive: true,
-    status: "Em andamento",
-    homeScore: 1,
-    awayScore: 0,
-  },
-  {
-    id: 2,
-    sport: "Futebol",
-    league: "Champions League",
-    homeTeam: "Real Madrid",
-    awayTeam: "Man City",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Amanhã",
-    time: "16:00",
-    isLive: false,
-    status: "Agendado",
-    homeScore: null,
-    awayScore: null,
-  },
-  {
-    id: 3,
-    sport: "Futebol",
-    league: "Premier League",
-    homeTeam: "Liverpool",
-    awayTeam: "Arsenal",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Domingo",
-    time: "13:30",
-    isLive: false,
-    status: "Agendado",
-    homeScore: null,
-    awayScore: null,
-  },
-  {
-    id: 4,
-    sport: "Futebol",
-    league: "La Liga",
-    homeTeam: "Barcelona",
-    awayTeam: "Atlético",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Sábado",
-    time: "17:00",
-    isLive: false,
-    status: "Agendado",
-    homeScore: null,
-    awayScore: null,
-  },
-  {
-    id: 5,
-    sport: "Futebol",
-    league: "Libertadores",
-    homeTeam: "Boca Juniors",
-    awayTeam: "River Plate",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Quinta",
-    time: "21:00",
-    isLive: false,
-    status: "Agendado",
-    homeScore: null,
-    awayScore: null,
-  },
-  {
-    id: 6,
-    sport: "Futebol",
-    league: "Brasileirão Série A",
-    homeTeam: "Corinthians",
-    awayTeam: "São Paulo",
-    homeLogo: "",
-    awayLogo: "",
-    date: "Domingo",
-    time: "18:30",
-    isLive: false,
-    status: "Agendado",
-    homeScore: null,
-    awayScore: null,
-  },
-];
+// Team logos/icons mapping for fallback display
+const teamIcons: Record<string, string> = {
+  // Brasileirão
+  "Flamengo": "🔴⚫",
+  "Palmeiras": "💚",
+  "Corinthians": "⚫⚪",
+  "São Paulo": "🔴⚪⚫",
+  "Fluminense": "🟢🟣🔴",
+  "Botafogo": "⭐⚫",
+  "Santos": "⚪⚫",
+  "Grêmio": "🔵⚫⚪",
+  "Internacional": "🔴⚪",
+  "Atlético-MG": "⚫⚪",
+  // European
+  "Real Madrid": "👑⚪",
+  "Barcelona": "🔵🔴",
+  "Man City": "🔵⚪",
+  "Liverpool": "🔴",
+  "Arsenal": "🔴⚪",
+  "Chelsea": "🔵",
+  "PSG": "🔵🔴",
+  "Bayern": "🔴⚪",
+  "Juventus": "⚫⚪",
+  "Milan": "🔴⚫",
+  "Atlético": "🔴⚪",
+  // Libertadores
+  "Boca Juniors": "💛💙",
+  "River Plate": "🔴⚪",
+};
+
+// Generate dynamic dates based on current date
+const generateFallbackGames = (): GameData[] => {
+  const now = new Date();
+  const today = new Date(now);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const getDayLabel = (date: Date): string => {
+    const dayDiff = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    if (dayDiff === 0) return "Hoje";
+    if (dayDiff === 1) return "Amanhã";
+    const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    return `${days[date.getDay()]}, ${date.getDate()}/${date.getMonth() + 1}`;
+  };
+
+  const addDays = (days: number): Date => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + days);
+    return d;
+  };
+
+  return [
+    {
+      id: 1,
+      sport: "Futebol",
+      league: "Brasileirão Série A",
+      homeTeam: "Flamengo",
+      awayTeam: "Palmeiras",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(today),
+      time: "21:30",
+      isLive: now.getHours() >= 21 && now.getHours() < 24,
+      status: now.getHours() >= 21 ? "Em andamento" : "Agendado",
+      homeScore: now.getHours() >= 21 ? 2 : null,
+      awayScore: now.getHours() >= 21 ? 1 : null,
+    },
+    {
+      id: 2,
+      sport: "Futebol",
+      league: "Champions League",
+      homeTeam: "Real Madrid",
+      awayTeam: "Man City",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(tomorrow),
+      time: "16:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 3,
+      sport: "Futebol",
+      league: "Premier League",
+      homeTeam: "Liverpool",
+      awayTeam: "Arsenal",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(2)),
+      time: "13:30",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 4,
+      sport: "Futebol",
+      league: "La Liga",
+      homeTeam: "Barcelona",
+      awayTeam: "Atlético",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(2)),
+      time: "17:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 5,
+      sport: "Futebol",
+      league: "Libertadores",
+      homeTeam: "Boca Juniors",
+      awayTeam: "River Plate",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(3)),
+      time: "21:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 6,
+      sport: "Futebol",
+      league: "Brasileirão Série A",
+      homeTeam: "Corinthians",
+      awayTeam: "São Paulo",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(3)),
+      time: "18:30",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 7,
+      sport: "Futebol",
+      league: "Brasileirão Série A",
+      homeTeam: "Fluminense",
+      awayTeam: "Botafogo",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(4)),
+      time: "20:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 8,
+      sport: "Futebol",
+      league: "Champions League",
+      homeTeam: "PSG",
+      awayTeam: "Bayern",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(4)),
+      time: "16:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 9,
+      sport: "Futebol",
+      league: "Premier League",
+      homeTeam: "Chelsea",
+      awayTeam: "Man City",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(5)),
+      time: "12:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+  ];
+};
+
+// Initialize fallback games
+const fallbackGames = generateFallbackGames();
 
 const leagueFilters = [
   { id: "all", label: "Todos", icon: "🏆" },
@@ -360,7 +459,7 @@ const LiveSchedule = () => {
                           loading="lazy"
                         />
                       ) : (
-                        <p className="text-3xl mb-1">🏠</p>
+                        <p className="text-2xl mb-1">{teamIcons[game.homeTeam] || "🏠"}</p>
                       )}
                       <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
                         {game.homeTeam}
@@ -387,7 +486,7 @@ const LiveSchedule = () => {
                           loading="lazy"
                         />
                       ) : (
-                        <p className="text-3xl mb-1">✈️</p>
+                        <p className="text-2xl mb-1">{teamIcons[game.awayTeam] || "✈️"}</p>
                       )}
                       <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
                         {game.awayTeam}
