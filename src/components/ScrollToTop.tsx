@@ -48,16 +48,17 @@ const ScrollToTop = () => {
           onClick={scrollToTop}
           className="
             fixed bottom-6 left-6 z-50
-            bg-gradient-gold text-accent-foreground
-            w-12 h-12 rounded-full
+            bg-[#FFD700] hover:bg-[#FFC000] text-black
+            w-14 h-14 rounded-full
             flex items-center justify-center
-            shadow-gold hover:shadow-premium
-            transition-shadow duration-300
-            focus:outline-none focus:ring-2 focus:ring-premium-gold focus:ring-offset-2 focus:ring-offset-background
+            shadow-[0_0_20px_rgba(255,215,0,0.6)] hover:shadow-[0_0_30px_rgba(255,215,0,0.8)]
+            transition-all duration-300
+            focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background
+            border-2 border-[#FFC000]
           "
           aria-label="Voltar ao topo da página"
         >
-          <ArrowUp className="w-5 h-5" />
+          <ArrowUp className="w-6 h-6 stroke-[3]" />
         </motion.button>
       )}
     </AnimatePresence>
