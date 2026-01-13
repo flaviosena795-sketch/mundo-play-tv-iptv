@@ -1,9 +1,12 @@
+import { memo } from "react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import MenuButton from "@/components/MenuButton";
-import heroImage from "@/assets/hero-iptv.jpg";
 import { Play, Shield, Clock } from "lucide-react";
 
-const Hero = () => {
+// Use public path for preloaded image to match the preload in index.html
+const heroImagePath = "/assets/hero-iptv.jpg";
+
+const Hero = memo(() => {
   return (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero">
       {/* Menu Button */}
@@ -11,14 +14,17 @@ const Hero = () => {
         <MenuButton />
       </div>
 
-      {/* Background Image with Overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
-        role="img"
-        aria-label="Mundo Play TV - IPTV Premium com qualidade 4K"
-      >
-        <div className="absolute inset-0 bg-black/70"></div>
+      {/* Background Image with Overlay - Using img tag for better LCP */}
+      <div className="absolute inset-0">
+        <img
+          src={heroImagePath}
+          alt="Mundo Play TV - IPTV Premium com qualidade 4K"
+          className="absolute inset-0 w-full h-full object-cover"
+          fetchPriority="high"
+          decoding="async"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-black/70" aria-hidden="true"></div>
       </div>
       
       {/* Content */}
@@ -73,6 +79,8 @@ const Hero = () => {
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent"></div>
     </header>
   );
-};
+});
+
+Hero.displayName = "Hero";
 
 export default Hero;
