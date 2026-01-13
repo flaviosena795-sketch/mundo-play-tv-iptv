@@ -12,6 +12,8 @@ const Success = lazy(() => import("./pages/Success"));
 const Failure = lazy(() => import("./pages/Failure"));
 const Pending = lazy(() => import("./pages/Pending"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 // Simple loading fallback
 const PageLoader = () => (
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/sucesso" element={<Suspense fallback={<PageLoader />}><Success /></Suspense>} />
           <Route path="/pendente" element={<Suspense fallback={<PageLoader />}><Pending /></Suspense>} />
           <Route path="/falha" element={<Suspense fallback={<PageLoader />}><Failure /></Suspense>} />
+          <Route path="/termos" element={<Suspense fallback={<PageLoader />}><TermsOfService /></Suspense>} />
+          <Route path="/privacidade" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
         </Routes>

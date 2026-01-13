@@ -70,4 +70,19 @@
     <priority>0.3</priority>
   </url>
 
+  <!-- Legal pages -->
+  <url>
+    <loc>https://mundoplaytv.com.br/termos</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <url>
+    <loc>https://mundoplaytv.com.br/privacidade</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
 </urlset>
