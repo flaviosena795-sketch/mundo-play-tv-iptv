@@ -1,3 +1,10 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg 
     viewBox="0 0 24 24" 
@@ -34,25 +41,34 @@ const FloatingWhatsApp = () => {
           }
         }
       `}</style>
-      <a
-        href={whatsappLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        className="
-          fixed bottom-6 right-6 z-50
-          bg-[#25D366] text-white
-          w-16 h-16 rounded-full
-          flex items-center justify-center
-          hover:shadow-xl
-          hover:scale-110 transition-all duration-300
-          hover:bg-[#128C7E]
-        "
-        style={{ animation: 'pulse-glow 2s ease-in-out infinite' }}
-        aria-label="Contato via WhatsApp"
-      >
-        <WhatsAppIcon className="w-8 h-8" />
-      </a>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleClick}
+              className="
+                fixed bottom-6 right-6 z-50
+                bg-[#25D366] text-white
+                w-16 h-16 rounded-full
+                flex items-center justify-center
+                hover:shadow-xl
+                hover:scale-110 transition-all duration-300
+                hover:bg-[#128C7E]
+              "
+              style={{ animation: 'pulse-glow 2s ease-in-out infinite' }}
+              aria-label="Contato via WhatsApp"
+            >
+              <WhatsAppIcon className="w-8 h-8" />
+            </a>
+          </TooltipTrigger>
+          <TooltipContent side="left" className="bg-[#25D366] text-white border-none">
+            <p>Fale conosco pelo WhatsApp</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </>
   );
 };
