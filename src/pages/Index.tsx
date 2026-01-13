@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Navbar from "@/components/Navbar";
 import Hero from "@/components/sections/Hero";
 import Announcement from "@/components/sections/Announcement";
 import About from "@/components/sections/About";
@@ -42,22 +43,25 @@ const Index = () => {
   }, [trackSectionView]);
 
   return (
-    <main id="conteudo-principal" className="min-h-screen bg-background" role="main" aria-label="Conteúdo principal do Mundo Play TV">
-      <Hero />
-      <Announcement />
-      <About />
-      <Features />
-      <FreeTrialBanner />
-      <Plans />
-      <PlansComparison />
-      <PaymentMethods />
-      <VODRequest />
-      <Testimonials />
-      <FAQ />
-      <FinalCTA />
-      <Footer />
-      <FloatingWhatsApp />
-    </main>
+    <>
+      <Navbar />
+      <main id="conteudo-principal" className="min-h-screen bg-background" role="main" aria-label="Conteúdo principal do Mundo Play TV">
+        <Hero />
+        <Announcement />
+        <About />
+        <Features />
+        <FreeTrialBanner />
+        <Plans />
+        <PlansComparison />
+        <PaymentMethods />
+        <VODRequest />
+        <Testimonials />
+        <FAQ />
+        <FinalCTA />
+        <Footer />
+        <FloatingWhatsApp />
+      </main>
+    </>
   );
 };
 
