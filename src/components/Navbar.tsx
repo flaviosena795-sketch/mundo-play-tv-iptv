@@ -13,6 +13,7 @@ const navLinks = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,9 +24,40 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLinkClick = () => {
+  // Track active section using Intersection Observer
+  useEffect(() => {
+    const sectionIds = navLinks.map(link => link.href.replace("#", ""));
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      {
+        rootMargin: "-20% 0px -70% 0px",
+        threshold: 0
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleLinkClick = (href: string) => {
     setIsMobileMenuOpen(false);
+    setActiveSection(href);
   };
+
+  const isActive = (href: string) => activeSection === href;
 
   return (
     <>
@@ -62,16 +94,26 @@ const Navbar = () => {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="
+                    onClick={() => handleLinkClick(link.href)}
+                    className={`
                       px-4 py-2 rounded-md
-                      text-muted-foreground hover:text-foreground
-                      hover:bg-muted/50
                       transition-all duration-200
                       focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-offset-2 focus:ring-offset-background
-                      font-medium text-sm
-                    "
+                      font-medium text-sm relative
+                      ${isActive(link.href) 
+                        ? "text-[#FFD700]" 
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      }
+                    `}
                   >
                     {link.label}
+                    {isActive(link.href) && (
+                      <motion.span
+                        layoutId="activeSection"
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#FFD700] rounded-full"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
                   </a>
                 </li>
               ))}
@@ -133,14 +175,17 @@ const Navbar = () => {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    onClick={handleLinkClick}
-                    className="
+                    onClick={() => handleLinkClick(link.href)}
+                    className={`
                       block px-4 py-3 rounded-md
-                      text-foreground hover:bg-muted/50
                       transition-colors duration-200
                       focus:outline-none focus:ring-2 focus:ring-[#FFD700]
                       font-medium
-                    "
+                      ${isActive(link.href) 
+                        ? "text-[#FFD700] bg-muted/30" 
+                        : "text-foreground hover:bg-muted/50"
+                      }
+                    `}
                     role="menuitem"
                   >
                     {link.label}
@@ -152,7 +197,7 @@ const Navbar = () => {
                   href="https://wa.me/5521966238378?text=Olá!%20Quero%20testar%20o%20IPTV%20gratuitamente."
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={handleLinkClick}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="
                     block text-center px-4 py-3 rounded-md
                     bg-[#FFD700] text-black font-semibold
