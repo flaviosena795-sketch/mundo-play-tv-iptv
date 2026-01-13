@@ -31,7 +31,6 @@ const App = () => (
       <Toaster />
       <Sonner />
       <FloatingWhatsApp />
-      <CookieConsent />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -43,6 +42,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
         </Routes>
+        <CookieConsent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
