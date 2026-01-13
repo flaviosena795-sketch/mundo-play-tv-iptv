@@ -10,6 +10,7 @@ import VODRequest from "@/components/sections/VODRequest";
 import Testimonials from "@/components/sections/Testimonials";
 import FAQ from "@/components/sections/FAQ";
 import FinalCTA from "@/components/sections/FinalCTA";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 const Index = () => {
   return (
@@ -26,6 +27,7 @@ const Index = () => {
       <Testimonials />
       <FAQ />
       <FinalCTA />
+      <FloatingWhatsApp />
     </main>
   );
 };
