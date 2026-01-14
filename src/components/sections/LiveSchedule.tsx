@@ -2,7 +2,7 @@ import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap, CalendarD
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { isToday, isTomorrow, addDays, parseISO, isAfter, isBefore, startOfDay, endOfDay, format } from "date-fns";
+import { addDays, startOfDay, endOfDay } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 interface GameData {
@@ -84,214 +84,6 @@ const getTeamData = (teamName: string) => {
   return key ? teamData[key] : { icon: "⚽", primaryColor: "#FFB800", secondaryColor: "#1a1a1a" };
 };
 
-// Generate dynamic dates based on current date
-const generateFallbackGames = (): GameData[] => {
-  const now = new Date();
-  const today = new Date(now);
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const getDayLabel = (date: Date): string => {
-    const dayDiff = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (dayDiff === 0) return "Hoje";
-    if (dayDiff === 1) return "Amanhã";
-    const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-    return `${days[date.getDay()]}, ${date.getDate()}/${date.getMonth() + 1}`;
-  };
-
-  const addDays = (days: number): Date => {
-    const d = new Date(now);
-    d.setDate(d.getDate() + days);
-    return d;
-  };
-
-  return [
-    {
-      id: 1,
-      sport: "Futebol",
-      league: "Brasileirão Série A",
-      homeTeam: "Flamengo",
-      awayTeam: "Palmeiras",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(today),
-      time: "21:30",
-      isLive: now.getHours() >= 21 && now.getHours() < 24,
-      status: now.getHours() >= 21 ? "Em andamento" : "Agendado",
-      homeScore: now.getHours() >= 21 ? 2 : null,
-      awayScore: now.getHours() >= 21 ? 1 : null,
-    },
-    {
-      id: 2,
-      sport: "Futebol",
-      league: "Champions League",
-      homeTeam: "Real Madrid",
-      awayTeam: "Man City",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(tomorrow),
-      time: "16:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 3,
-      sport: "Futebol",
-      league: "English Premier League",
-      homeTeam: "Liverpool",
-      awayTeam: "Arsenal",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(2)),
-      time: "13:30",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 4,
-      sport: "Futebol",
-      league: "German Bundesliga",
-      homeTeam: "Bayern Munich",
-      awayTeam: "Borussia Dortmund",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(2)),
-      time: "15:30",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 5,
-      sport: "Futebol",
-      league: "Italian Serie A",
-      homeTeam: "Juventus",
-      awayTeam: "Inter Milan",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(2)),
-      time: "17:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 6,
-      sport: "Futebol",
-      league: "French Ligue 1",
-      homeTeam: "PSG",
-      awayTeam: "Marseille",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(3)),
-      time: "20:45",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 7,
-      sport: "Futebol",
-      league: "Spanish La Liga",
-      homeTeam: "Barcelona",
-      awayTeam: "Atlético Madrid",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(3)),
-      time: "21:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 8,
-      sport: "Futebol",
-      league: "Copa Libertadores",
-      homeTeam: "Boca Juniors",
-      awayTeam: "River Plate",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(4)),
-      time: "21:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 9,
-      sport: "Futebol",
-      league: "German Bundesliga",
-      homeTeam: "RB Leipzig",
-      awayTeam: "Bayer Leverkusen",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(4)),
-      time: "16:30",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 10,
-      sport: "Futebol",
-      league: "Italian Serie A",
-      homeTeam: "AC Milan",
-      awayTeam: "Napoli",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(5)),
-      time: "14:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 11,
-      sport: "Futebol",
-      league: "French Ligue 1",
-      homeTeam: "Lyon",
-      awayTeam: "Monaco",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(5)),
-      time: "20:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 12,
-      sport: "Futebol",
-      league: "English Premier League",
-      homeTeam: "Chelsea",
-      awayTeam: "Man United",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(6)),
-      time: "12:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-  ];
-};
-
-// Initialize fallback games
-const fallbackGames = generateFallbackGames();
-
 // Date filter options
 const BRASILIA_TZ = "America/Sao_Paulo";
 
@@ -315,7 +107,7 @@ const leagueFilters = [
 ];
 
 const LiveSchedule = () => {
-  const [games, setGames] = useState<GameData[]>(fallbackGames);
+  const [games, setGames] = useState<GameData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -327,44 +119,42 @@ const LiveSchedule = () => {
     setError(null);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('get-live-games');
+      const { data, error: fnError } = await supabase.functions.invoke("get-live-games");
 
       if (fnError) {
-        console.error('Error fetching games:', fnError);
-        setError('Jogos de demonstração');
-        setGames(fallbackGames);
+        console.error("Error fetching games:", fnError);
+        setGames([]);
+        setError("Não foi possível carregar os jogos agora.");
         return;
       }
 
       const rawGames: GameData[] = Array.isArray(data?.games) ? data.games : [];
 
-      // A API que alimenta a função pode retornar itens duplicados e/ou jogos já encerrados.
-      // Aqui fazemos deduplicação e filtramos partidas finalizadas para evitar “desatualizado”.
+      // Deduplicação defensiva
       const seen = new Set<number>();
-      const cleaned = rawGames
-        .filter((g) => {
-          if (seen.has(g.id)) return false;
-          seen.add(g.id);
-          return true;
-        })
-        .filter((g) => g.isLive || !/encerrado|finalizado/i.test(g.status ?? ""));
+      const cleaned = rawGames.filter((g) => {
+        if (seen.has(g.id)) return false;
+        seen.add(g.id);
+        return true;
+      });
 
-      if (cleaned.length > 0) {
-        setGames(cleaned);
-        setLastUpdated(new Date());
-        if (data?.source === 'fallback') setError('Jogos de demonstração');
-      } else {
-        setGames(fallbackGames);
-        setError('Jogos de demonstração');
+      setGames(cleaned);
+      setLastUpdated(new Date());
+
+      if (data?.source === "fallback") {
+        // Se a função do backend devolveu fallback, NÃO exibimos (para não aparecer jogo “inventado”)
+        setGames([]);
+        setError("Dados indisponíveis no momento (sem fallback). Tente atualizar em instantes.");
       }
     } catch (err) {
-      console.error('Error:', err);
-      setError('Jogos de demonstração');
-      setGames(fallbackGames);
+      console.error("Error:", err);
+      setGames([]);
+      setError("Não foi possível carregar os jogos agora.");
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchGames();
@@ -586,7 +376,7 @@ const LiveSchedule = () => {
           </motion.div>
 
           {/* Loading State */}
-          {loading && games === fallbackGames && (
+          {loading && (
             <div className="flex justify-center py-12">
               <Loader2 className="w-8 h-8 text-premium-gold animate-spin" />
             </div>
