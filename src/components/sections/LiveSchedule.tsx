@@ -1,7 +1,9 @@
-import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap } from "lucide-react";
+import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap, CalendarDays } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { isToday, isTomorrow, addDays, parseISO, isAfter, isBefore, startOfDay, endOfDay, format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
 interface GameData {
   id: number;
@@ -290,6 +292,16 @@ const generateFallbackGames = (): GameData[] => {
 // Initialize fallback games
 const fallbackGames = generateFallbackGames();
 
+// Date filter options
+const BRASILIA_TZ = "America/Sao_Paulo";
+
+const dateFilters = [
+  { id: "all", label: "Todos" },
+  { id: "today", label: "Hoje" },
+  { id: "tomorrow", label: "Amanhã" },
+  { id: "week", label: "Esta Semana" },
+];
+
 const leagueFilters = [
   { id: "all", label: "Todos", icon: "🏆" },
   { id: "brasileirao", label: "Brasileirão", icon: "🇧🇷", keywords: ["Brasileirão", "Serie A Brazil", "Série A"] },
@@ -308,6 +320,7 @@ const LiveSchedule = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [activeDateFilter, setActiveDateFilter] = useState("all");
 
   const fetchGames = async () => {
     setLoading(true);
@@ -361,19 +374,78 @@ const LiveSchedule = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Filter games based on active filter
+  // Helper to parse game date string ("Hoje", "Amanhã", "Dom, 15/1", etc.) to a Date
+  const parseGameDate = (dateStr: string): Date => {
+    const nowInBrasilia = toZonedTime(new Date(), BRASILIA_TZ);
+    const todayBrasilia = startOfDay(nowInBrasilia);
+    
+    if (dateStr.toLowerCase() === "hoje") {
+      return todayBrasilia;
+    }
+    if (dateStr.toLowerCase() === "amanhã") {
+      return addDays(todayBrasilia, 1);
+    }
+    
+    // Try to parse "Sex, 10/10" or "15/1" format
+    const match = dateStr.match(/(\d{1,2})\/(\d{1,2})/);
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1; // 0-indexed
+      const year = todayBrasilia.getFullYear();
+      const parsedDate = new Date(year, month, day);
+      // If the date is in the past (e.g. January when we're in December), assume next year
+      if (parsedDate < todayBrasilia && month < todayBrasilia.getMonth()) {
+        parsedDate.setFullYear(year + 1);
+      }
+      return parsedDate;
+    }
+    
+    return todayBrasilia;
+  };
+
+  // Filter games based on active league and date filter
   const filteredGames = useMemo(() => {
-    if (activeFilter === "all") return games;
+    const nowInBrasilia = toZonedTime(new Date(), BRASILIA_TZ);
+    const todayStart = startOfDay(nowInBrasilia);
+    const todayEnd = endOfDay(nowInBrasilia);
+    const tomorrowStart = startOfDay(addDays(nowInBrasilia, 1));
+    const tomorrowEnd = endOfDay(addDays(nowInBrasilia, 1));
+    const weekEnd = endOfDay(addDays(nowInBrasilia, 7));
     
-    const filter = leagueFilters.find(f => f.id === activeFilter);
-    if (!filter || !filter.keywords) return games;
+    let result = games;
     
-    return games.filter(game => 
-      filter.keywords!.some(keyword => 
-        game.league.toLowerCase().includes(keyword.toLowerCase())
-      )
-    );
-  }, [games, activeFilter]);
+    // Apply league filter
+    if (activeFilter !== "all") {
+      const filter = leagueFilters.find(f => f.id === activeFilter);
+      if (filter?.keywords) {
+        result = result.filter(game =>
+          filter.keywords!.some(keyword =>
+            game.league.toLowerCase().includes(keyword.toLowerCase())
+          )
+        );
+      }
+    }
+    
+    // Apply date filter
+    if (activeDateFilter !== "all") {
+      result = result.filter(game => {
+        const gameDate = parseGameDate(game.date);
+        
+        switch (activeDateFilter) {
+          case "today":
+            return gameDate >= todayStart && gameDate <= todayEnd;
+          case "tomorrow":
+            return gameDate >= tomorrowStart && gameDate <= tomorrowEnd;
+          case "week":
+            return gameDate >= todayStart && gameDate <= weekEnd;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    return result;
+  }, [games, activeFilter, activeDateFilter]);
 
   const getLeagueColor = (league: string) => {
     const leagueLower = league.toLowerCase();
@@ -452,6 +524,32 @@ const LiveSchedule = () => {
             </div>
           </motion.div>
 
+          {/* Date Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="mb-6"
+          >
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <CalendarDays className="w-4 h-4 text-muted-foreground mr-2" />
+              {dateFilters.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveDateFilter(filter.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeDateFilter === filter.id
+                      ? "bg-green-600 text-white shadow-lg shadow-green-600/25"
+                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
           {/* League Filters */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -479,9 +577,10 @@ const LiveSchedule = () => {
             </div>
             
             {/* Active filter count */}
-            {activeFilter !== "all" && (
+            {(activeFilter !== "all" || activeDateFilter !== "all") && (
               <p className="text-center text-sm text-muted-foreground mt-3">
                 {filteredGames.length} jogo{filteredGames.length !== 1 ? 's' : ''} encontrado{filteredGames.length !== 1 ? 's' : ''}
+                {activeDateFilter !== "all" && ` para ${dateFilters.find(f => f.id === activeDateFilter)?.label.toLowerCase()}`}
               </p>
             )}
           </motion.div>
@@ -502,13 +601,16 @@ const LiveSchedule = () => {
             >
               <p className="text-xl text-muted-foreground mb-2">😔 Nenhum jogo encontrado</p>
               <p className="text-sm text-muted-foreground">
-                Não há jogos agendados para esta liga no momento.
+                Não há jogos agendados para os filtros selecionados.
               </p>
               <button
-                onClick={() => setActiveFilter("all")}
+                onClick={() => {
+                  setActiveFilter("all");
+                  setActiveDateFilter("all");
+                }}
                 className="mt-4 text-premium-gold hover:text-premium-gold-hover transition-colors text-sm"
               >
-                Ver todos os jogos →
+                Limpar filtros →
               </button>
             </motion.div>
           )}
@@ -516,7 +618,7 @@ const LiveSchedule = () => {
           {/* Games Grid */}
           <AnimatePresence mode="wait">
             <motion.div 
-              key={activeFilter}
+              key={`${activeFilter}-${activeDateFilter}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
