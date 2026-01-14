@@ -2,7 +2,7 @@ import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap, ArrowLeft
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+
 
 interface GameData {
   id: number;
@@ -144,16 +144,66 @@ const LiveGames = () => {
     setError(null);
     
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('get-live-games');
+      // Fetch from TheSportsDB season endpoint for Brazilian Serie A
+      const response = await fetch('https://www.thesportsdb.com/api/v1/json/1/eventsseason.php?id=4351&s=2025');
+      const data = await response.json();
       
-      if (fnError) {
-        console.error('Error fetching games:', fnError);
-        setError('Jogos de demonstração');
-        setGames(fallbackGames);
-      } else if (data?.games && data.games.length > 0) {
-        setGames(data.games);
-        setLastUpdated(new Date());
-        if (data.source === 'fallback') {
+      if (data?.events && data.events.length > 0) {
+        const now = new Date();
+        const processedGames: GameData[] = data.events
+          .filter((event: any) => {
+            const eventDate = new Date(event.dateEvent);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return eventDate >= today;
+          })
+          .slice(0, 24)
+          .map((event: any, index: number) => {
+            const eventDateTime = new Date(`${event.dateEvent}T${event.strTime || '00:00'}:00`);
+            const isLive = event.strStatus === 'Live' || 
+              (now >= eventDateTime && now <= new Date(eventDateTime.getTime() + 2 * 60 * 60 * 1000));
+            
+            const eventDate = new Date(event.dateEvent);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffDays = Math.floor((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            
+            let dateLabel: string;
+            if (diffDays === 0) dateLabel = 'Hoje';
+            else if (diffDays === 1) dateLabel = 'Amanhã';
+            else {
+              const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+              dateLabel = `${days[eventDate.getDay()]}, ${eventDate.getDate()}/${eventDate.getMonth() + 1}`;
+            }
+            
+            return {
+              id: parseInt(event.idEvent) || index,
+              sport: 'Futebol',
+              league: event.strLeague || 'Brasileirão Série A',
+              homeTeam: event.strHomeTeam || 'Time Casa',
+              awayTeam: event.strAwayTeam || 'Time Fora',
+              homeLogo: event.strHomeTeamBadge || '',
+              awayLogo: event.strAwayTeamBadge || '',
+              date: dateLabel,
+              time: event.strTime ? event.strTime.substring(0, 5) : '20:00',
+              isLive,
+              status: isLive ? 'Em andamento' : 'Agendado',
+              homeScore: event.intHomeScore ? parseInt(event.intHomeScore) : null,
+              awayScore: event.intAwayScore ? parseInt(event.intAwayScore) : null,
+            };
+          });
+        
+        if (processedGames.length > 0) {
+          // Sort: live games first, then by date
+          processedGames.sort((a, b) => {
+            if (a.isLive && !b.isLive) return -1;
+            if (!a.isLive && b.isLive) return 1;
+            return 0;
+          });
+          setGames(processedGames);
+          setLastUpdated(new Date());
+        } else {
+          setGames(fallbackGames);
           setError('Jogos de demonstração');
         }
       } else {
@@ -161,7 +211,7 @@ const LiveGames = () => {
         setError('Jogos de demonstração');
       }
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error fetching games:', err);
       setError('Jogos de demonstração');
       setGames(fallbackGames);
     } finally {
