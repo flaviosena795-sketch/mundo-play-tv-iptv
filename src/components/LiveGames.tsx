@@ -30,13 +30,17 @@ export default function LiveGames() {
     fetch(`https://www.thesportsdb.com/api/v1/json/1/eventsseason.php?id=${LEAGUE_ID}&s=2026`)
       .then(res => res.json())
       .then(data => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // Data atual em Brasília (UTC-3)
+        const now = new Date();
+        const brasiliaOffset = -3 * 60; // UTC-3 em minutos
+        const localOffset = now.getTimezoneOffset();
+        const brasiliaTime = new Date(now.getTime() + (localOffset + brasiliaOffset) * 60000);
         
-        const futureGames = (data?.events || []).filter((game: Game) => {
-          const gameDate = new Date(game.dateEvent);
-          return gameDate >= today;
-        });
+        const todayStr = brasiliaTime.toISOString().split('T')[0]; // "2026-01-13"
+        
+        const futureGames = (data?.events || [])
+          .filter((game: Game) => game.dateEvent >= todayStr)
+          .sort((a: Game, b: Game) => a.dateEvent.localeCompare(b.dateEvent));
         
         setGames(futureGames);
         setLoading(false);
