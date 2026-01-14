@@ -16,7 +16,7 @@ export default function LiveGames() {
   const LEAGUE_ID = "4351";
 
   useEffect(() => {
-    fetch(`https://www.thesportsdb.com/api/v1/json/1/eventsnextleague.php?id=${LEAGUE_ID}`)
+    fetch(`https://www.thesportsdb.com/api/v1/json/1/eventsseason.php?id=${LEAGUE_ID}&s=2026`)
       .then(res => res.json())
       .then(data => {
         setGames(data?.events || []);
