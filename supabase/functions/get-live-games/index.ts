@@ -120,57 +120,74 @@ serve(async (req) => {
     // Fetch games for today and next 7 days
     for (let i = 0; i < 7; i++) {
       if (allGames.length >= 15) break;
-      
+
       const targetDate = new Date(today);
       targetDate.setDate(targetDate.getDate() + i);
       const dateStr = formatDateForApi(targetDate);
-      
+
       try {
         // TheSportsDB free API - events by day for soccer
         const url = `https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${dateStr}&s=Soccer`;
         console.log(`Fetching: ${url}`);
-        
+
         const response = await fetch(url);
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log(`Day ${dateStr}: ${data.events?.length || 0} events`);
-          
+
           if (data.events && Array.isArray(data.events)) {
-            // Filter for major leagues and add to list
+            // IMPORTANT: only show major leagues to avoid "random" games (e.g. A-League)
             const majorLeagues = [
-              'Brazilian Serie A',
-              'English Premier League', 
-              'Spanish La Liga',
-              'UEFA Champions League',
-              'Copa Libertadores',
-              'Italian Serie A',
-              'German Bundesliga',
-              'French Ligue 1',
-              'Portuguese Primeira Liga',
-              'Argentine Primera Division'
+              "Brazilian Serie A",
+              "Brasileirão",
+              "English Premier League",
+              "Premier League",
+              "Spanish La Liga",
+              "La Liga",
+              "UEFA Champions League",
+              "Champions League",
+              "Copa Libertadores",
+              "Libertadores",
+              "Italian Serie A",
+              "German Bundesliga",
+              "French Ligue 1",
+              "Portuguese Primeira Liga",
+              "Argentine Primera Division",
             ];
-            
+
             for (const event of data.events) {
               if (allGames.length >= 15) break;
-              
-              // Check if it's from a major league or just add first available
-              const isMajorLeague = majorLeagues.some(league => 
-                event.strLeague?.toLowerCase().includes(league.toLowerCase())
+
+              const leagueName = (event.strLeague || "").toLowerCase();
+              const isMajorLeague = majorLeagues.some((league) =>
+                leagueName.includes(league.toLowerCase())
               );
-              
-              // Prioritize major leagues but include others if we don't have enough
-              if (isMajorLeague || allGames.length < 9) {
-                allGames.push(formatSportsDBEvent(event, today));
-              }
+
+              // If it isn't a major league, skip it (no "fill with anything" behavior)
+              if (!isMajorLeague) continue;
+
+              const formatted = formatSportsDBEvent(event, today);
+
+              // Filter out finished games: keep only live OR games without scores yet
+              const isFinished =
+                formatted.status.toLowerCase().includes("encerrado") ||
+                (formatted.homeScore !== null && formatted.awayScore !== null && !formatted.isLive);
+
+              if (isFinished) continue;
+
+              // Defensive dedupe by id
+              if (allGames.some((g) => g.id === formatted.id)) continue;
+
+              allGames.push(formatted);
             }
           }
         } else {
           console.error(`API error for ${dateStr}: ${response.status}`);
         }
-        
+
         // Small delay between requests
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (e) {
         console.error(`Error fetching day ${dateStr}:`, e);
       }
