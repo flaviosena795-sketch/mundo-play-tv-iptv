@@ -312,20 +312,34 @@ const LiveSchedule = () => {
   const fetchGames = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const { data, error: fnError } = await supabase.functions.invoke('get-live-games');
-      
+
       if (fnError) {
         console.error('Error fetching games:', fnError);
         setError('Jogos de demonstração');
         setGames(fallbackGames);
-      } else if (data?.games && data.games.length > 0) {
-        setGames(data.games);
+        return;
+      }
+
+      const rawGames: GameData[] = Array.isArray(data?.games) ? data.games : [];
+
+      // A API que alimenta a função pode retornar itens duplicados e/ou jogos já encerrados.
+      // Aqui fazemos deduplicação e filtramos partidas finalizadas para evitar “desatualizado”.
+      const seen = new Set<number>();
+      const cleaned = rawGames
+        .filter((g) => {
+          if (seen.has(g.id)) return false;
+          seen.add(g.id);
+          return true;
+        })
+        .filter((g) => g.isLive || !/encerrado|finalizado/i.test(g.status ?? ""));
+
+      if (cleaned.length > 0) {
+        setGames(cleaned);
         setLastUpdated(new Date());
-        if (data.source === 'fallback') {
-          setError('Jogos de demonstração');
-        }
+        if (data?.source === 'fallback') setError('Jogos de demonstração');
       } else {
         setGames(fallbackGames);
         setError('Jogos de demonstração');
@@ -515,7 +529,7 @@ const LiveSchedule = () => {
                 
                 return (
                   <motion.div
-                    key={game.id}
+                    key={`${game.id}-${index}`}
                     initial={{ opacity: 0, y: 30, scale: 0.95 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true }}
