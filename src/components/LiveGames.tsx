@@ -19,7 +19,15 @@ export default function LiveGames() {
     fetch(`https://www.thesportsdb.com/api/v1/json/1/eventsseason.php?id=${LEAGUE_ID}&s=2026`)
       .then(res => res.json())
       .then(data => {
-        setGames(data?.events || []);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const futureGames = (data?.events || []).filter((game: Game) => {
+          const gameDate = new Date(game.dateEvent);
+          return gameDate >= today;
+        });
+        
+        setGames(futureGames);
         setLoading(false);
       })
       .catch(() => setLoading(false));
