@@ -1,4 +1,4 @@
-import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter } from "lucide-react";
+import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,34 +19,45 @@ interface GameData {
   awayScore: number | null;
 }
 
-// Team logos/icons mapping for fallback display
-const teamIcons: Record<string, string> = {
+// Team logos/icons mapping for fallback display with team colors
+const teamData: Record<string, { icon: string; primaryColor: string; secondaryColor: string }> = {
   // Brasileirão
-  "Flamengo": "🔴⚫",
-  "Palmeiras": "💚",
-  "Corinthians": "⚫⚪",
-  "São Paulo": "🔴⚪⚫",
-  "Fluminense": "🟢🟣🔴",
-  "Botafogo": "⭐⚫",
-  "Santos": "⚪⚫",
-  "Grêmio": "🔵⚫⚪",
-  "Internacional": "🔴⚪",
-  "Atlético-MG": "⚫⚪",
+  "Flamengo": { icon: "🔴", primaryColor: "#E4002B", secondaryColor: "#000000" },
+  "Palmeiras": { icon: "💚", primaryColor: "#006437", secondaryColor: "#FFFFFF" },
+  "Corinthians": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
+  "São Paulo": { icon: "🔴", primaryColor: "#FF0000", secondaryColor: "#000000" },
+  "Fluminense": { icon: "🟣", primaryColor: "#7B2D26", secondaryColor: "#006847" },
+  "Botafogo": { icon: "⭐", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
+  "Santos": { icon: "⚪", primaryColor: "#FFFFFF", secondaryColor: "#000000" },
+  "Grêmio": { icon: "🔵", primaryColor: "#0066B3", secondaryColor: "#000000" },
+  "Internacional": { icon: "🔴", primaryColor: "#E4002B", secondaryColor: "#FFFFFF" },
+  "Atlético-MG": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
   // European
-  "Real Madrid": "👑⚪",
-  "Barcelona": "🔵🔴",
-  "Man City": "🔵⚪",
-  "Liverpool": "🔴",
-  "Arsenal": "🔴⚪",
-  "Chelsea": "🔵",
-  "PSG": "🔵🔴",
-  "Bayern": "🔴⚪",
-  "Juventus": "⚫⚪",
-  "Milan": "🔴⚫",
-  "Atlético": "🔴⚪",
+  "Real Madrid": { icon: "👑", primaryColor: "#FEBE10", secondaryColor: "#FFFFFF" },
+  "Barcelona": { icon: "🔵", primaryColor: "#A50044", secondaryColor: "#004D98" },
+  "Man City": { icon: "🔵", primaryColor: "#6CABDD", secondaryColor: "#1C2C5B" },
+  "Manchester City": { icon: "🔵", primaryColor: "#6CABDD", secondaryColor: "#1C2C5B" },
+  "Liverpool": { icon: "🔴", primaryColor: "#C8102E", secondaryColor: "#00B2A9" },
+  "Arsenal": { icon: "🔴", primaryColor: "#EF0107", secondaryColor: "#063672" },
+  "Chelsea": { icon: "🔵", primaryColor: "#034694", secondaryColor: "#DBA111" },
+  "PSG": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
+  "Bayern": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
+  "Bayern Munich": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
+  "Juventus": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
+  "Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
+  "Atlético": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
+  "Atlético Madrid": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
   // Libertadores
-  "Boca Juniors": "💛💙",
-  "River Plate": "🔴⚪",
+  "Boca Juniors": { icon: "💛", primaryColor: "#FFD700", secondaryColor: "#00008B" },
+  "River Plate": { icon: "🔴", primaryColor: "#FF0000", secondaryColor: "#FFFFFF" },
+};
+
+const getTeamData = (teamName: string) => {
+  // Try exact match first
+  if (teamData[teamName]) return teamData[teamName];
+  // Try partial match
+  const key = Object.keys(teamData).find(k => teamName.toLowerCase().includes(k.toLowerCase()));
+  return key ? teamData[key] : { icon: "⚽", primaryColor: "#FFB800", secondaryColor: "#1a1a1a" };
 };
 
 // Generate dynamic dates based on current date
@@ -418,103 +429,213 @@ const LiveSchedule = () => {
               transition={{ duration: 0.3 }}
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {filteredGames.map((game, index) => (
-              <motion.div
-                key={game.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${getLeagueColor(
-                  game.league
-                )} border backdrop-blur-sm hover:scale-[1.02] transition-all duration-300`}
-              >
-                {/* Live Indicator */}
-                {game.isLive && (
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-red-500/90 px-3 py-1 rounded-full z-10">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                    <span className="text-white text-xs font-bold uppercase">Ao Vivo</span>
-                  </div>
-                )}
-
-                <div className="p-6">
-                  {/* League */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-2xl">⚽</span>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        {game.sport}
-                      </p>
-                      <p className="text-sm font-semibold text-foreground/90 truncate max-w-[200px]">
-                        {game.league}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Teams */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="text-center flex-1">
-                      {game.homeLogo ? (
-                        <img 
-                          src={game.homeLogo} 
-                          alt={game.homeTeam}
-                          className="w-12 h-12 mx-auto mb-1 object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <p className="text-2xl mb-1">{teamIcons[game.homeTeam] || "🏠"}</p>
-                      )}
-                      <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
-                        {game.homeTeam}
-                      </p>
-                      {game.isLive && game.homeScore !== null && (
-                        <p className="text-xl font-bold text-premium-gold mt-1">{game.homeScore}</p>
-                      )}
-                    </div>
+              {filteredGames.map((game, index) => {
+                const homeTeamData = getTeamData(game.homeTeam);
+                const awayTeamData = getTeamData(game.awayTeam);
+                
+                return (
+                  <motion.div
+                    key={game.id}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.08 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${getLeagueColor(
+                      game.league
+                    )} border backdrop-blur-sm transition-all duration-500 cursor-pointer`}
+                  >
+                    {/* Animated background glow on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-premium-gold/0 to-premium-gold/0 group-hover:from-premium-gold/5 group-hover:to-transparent transition-all duration-500" />
                     
-                    <div className="px-3">
-                      {game.isLive && game.homeScore !== null ? (
-                        <span className="text-lg font-bold text-muted-foreground">-</span>
-                      ) : (
-                        <span className="text-xl font-bold text-premium-gold">VS</span>
-                      )}
-                    </div>
+                    {/* Decorative corner accent */}
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-premium-gold/10 rounded-full blur-2xl group-hover:bg-premium-gold/20 transition-all duration-500" />
                     
-                    <div className="text-center flex-1">
-                      {game.awayLogo ? (
-                        <img 
-                          src={game.awayLogo} 
-                          alt={game.awayTeam}
-                          className="w-12 h-12 mx-auto mb-1 object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <p className="text-2xl mb-1">{teamIcons[game.awayTeam] || "✈️"}</p>
-                      )}
-                      <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
-                        {game.awayTeam}
-                      </p>
-                      {game.isLive && game.awayScore !== null && (
-                        <p className="text-xl font-bold text-premium-gold mt-1">{game.awayScore}</p>
-                      )}
-                    </div>
-                  </div>
+                    {/* Live Indicator with pulse animation */}
+                    {game.isLive && (
+                      <motion.div 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="absolute top-4 right-4 z-10"
+                      >
+                        <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-red-500 px-3 py-1.5 rounded-full shadow-lg shadow-red-500/40">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                          </span>
+                          <span className="text-white text-xs font-bold uppercase tracking-wider">Ao Vivo</span>
+                          <Zap className="w-3 h-3 text-yellow-300 animate-pulse" />
+                        </div>
+                      </motion.div>
+                    )}
 
-                  {/* Date & Time */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-sm">{game.date}</span>
+                    <div className="relative p-6">
+                      {/* League Header */}
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-premium-gold/20 to-premium-gold/5 flex items-center justify-center border border-premium-gold/20">
+                            <Trophy className="w-5 h-5 text-premium-gold" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-premium-gold uppercase tracking-widest font-semibold">
+                            {game.sport}
+                          </p>
+                          <p className="text-sm font-bold text-foreground truncate">
+                            {game.league}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Teams Section - Enhanced */}
+                      <div className="flex items-center justify-between mb-6 relative">
+                        {/* Home Team */}
+                        <motion.div 
+                          className="text-center flex-1 group/team"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          <div className="relative mx-auto mb-3">
+                            {game.homeLogo ? (
+                              <div className="relative">
+                                <div 
+                                  className="absolute inset-0 rounded-full blur-lg opacity-40 transition-opacity group-hover/team:opacity-60"
+                                  style={{ backgroundColor: homeTeamData.primaryColor }}
+                                />
+                                <img 
+                                  src={game.homeLogo} 
+                                  alt={game.homeTeam}
+                                  className="relative w-16 h-16 mx-auto object-contain drop-shadow-lg"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ) : (
+                              <div 
+                                className="relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg transition-transform group-hover/team:scale-110"
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${homeTeamData.primaryColor} 0%, ${homeTeamData.secondaryColor} 100%)`,
+                                  boxShadow: `0 8px 20px ${homeTeamData.primaryColor}40`
+                                }}
+                              >
+                                <span className="text-2xl filter drop-shadow">{homeTeamData.icon}</span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="font-bold text-foreground text-sm truncate max-w-[90px] mx-auto">
+                            {game.homeTeam}
+                          </p>
+                          {game.isLive && game.homeScore !== null && (
+                            <motion.p 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="text-3xl font-black text-premium-gold mt-2 drop-shadow-lg"
+                            >
+                              {game.homeScore}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                        
+                        {/* VS Divider */}
+                        <div className="px-4 flex flex-col items-center">
+                          {game.isLive && game.homeScore !== null ? (
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="text-2xl font-black text-muted-foreground">-</span>
+                              <span className="text-[10px] text-red-400 font-semibold uppercase tracking-wider animate-pulse">
+                                {game.status}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-premium-gold/20 rounded-full blur-md" />
+                              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-premium-gold/30 to-premium-gold/10 flex items-center justify-center border border-premium-gold/30">
+                                <span className="text-sm font-black text-premium-gold">VS</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Away Team */}
+                        <motion.div 
+                          className="text-center flex-1 group/team"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          <div className="relative mx-auto mb-3">
+                            {game.awayLogo ? (
+                              <div className="relative">
+                                <div 
+                                  className="absolute inset-0 rounded-full blur-lg opacity-40 transition-opacity group-hover/team:opacity-60"
+                                  style={{ backgroundColor: awayTeamData.primaryColor }}
+                                />
+                                <img 
+                                  src={game.awayLogo} 
+                                  alt={game.awayTeam}
+                                  className="relative w-16 h-16 mx-auto object-contain drop-shadow-lg"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ) : (
+                              <div 
+                                className="relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg transition-transform group-hover/team:scale-110"
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${awayTeamData.primaryColor} 0%, ${awayTeamData.secondaryColor} 100%)`,
+                                  boxShadow: `0 8px 20px ${awayTeamData.primaryColor}40`
+                                }}
+                              >
+                                <span className="text-2xl filter drop-shadow">{awayTeamData.icon}</span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="font-bold text-foreground text-sm truncate max-w-[90px] mx-auto">
+                            {game.awayTeam}
+                          </p>
+                          {game.isLive && game.awayScore !== null && (
+                            <motion.p 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="text-3xl font-black text-premium-gold mt-2 drop-shadow-lg"
+                            >
+                              {game.awayScore}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                      </div>
+
+                      {/* Date & Time - Enhanced */}
+                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+                            <Calendar className="w-4 h-4 text-premium-gold" />
+                          </div>
+                          <span className="text-sm font-medium text-foreground/80">{game.date}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-premium-gold/10 flex items-center justify-center">
+                            <Clock className="w-4 h-4 text-premium-gold" />
+                          </div>
+                          <span className="text-sm font-bold text-premium-gold">{game.time}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Hover CTA */}
+                      <motion.div 
+                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                      >
+                        <a
+                          href="https://wa.me/5521966238378?text=Olá!%20Quero%20assistir%20esportes%20ao%20vivo!"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full bg-premium-gold text-black font-bold py-2.5 rounded-lg hover:bg-premium-gold-hover transition-colors text-sm"
+                        >
+                          <Tv className="w-4 h-4" />
+                          Assistir Agora
+                        </a>
+                      </motion.div>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-sm font-semibold">{game.time}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </AnimatePresence>
 
           {/* Error message */}
