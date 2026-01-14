@@ -32,7 +32,7 @@ const teamData: Record<string, { icon: string; primaryColor: string; secondaryCo
   "Grêmio": { icon: "🔵", primaryColor: "#0066B3", secondaryColor: "#000000" },
   "Internacional": { icon: "🔴", primaryColor: "#E4002B", secondaryColor: "#FFFFFF" },
   "Atlético-MG": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
-  // European
+  // Premier League
   "Real Madrid": { icon: "👑", primaryColor: "#FEBE10", secondaryColor: "#FFFFFF" },
   "Barcelona": { icon: "🔵", primaryColor: "#A50044", secondaryColor: "#004D98" },
   "Man City": { icon: "🔵", primaryColor: "#6CABDD", secondaryColor: "#1C2C5B" },
@@ -40,13 +40,35 @@ const teamData: Record<string, { icon: string; primaryColor: string; secondaryCo
   "Liverpool": { icon: "🔴", primaryColor: "#C8102E", secondaryColor: "#00B2A9" },
   "Arsenal": { icon: "🔴", primaryColor: "#EF0107", secondaryColor: "#063672" },
   "Chelsea": { icon: "🔵", primaryColor: "#034694", secondaryColor: "#DBA111" },
-  "PSG": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
-  "Bayern": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
-  "Bayern Munich": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
-  "Juventus": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
-  "Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
+  "Man United": { icon: "🔴", primaryColor: "#DA291C", secondaryColor: "#FBE122" },
+  "Manchester United": { icon: "🔴", primaryColor: "#DA291C", secondaryColor: "#FBE122" },
+  "Tottenham": { icon: "⚪", primaryColor: "#132257", secondaryColor: "#FFFFFF" },
+  // La Liga
   "Atlético": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
   "Atlético Madrid": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
+  // Bundesliga
+  "Bayern": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
+  "Bayern Munich": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
+  "Borussia Dortmund": { icon: "💛", primaryColor: "#FDE100", secondaryColor: "#000000" },
+  "Dortmund": { icon: "💛", primaryColor: "#FDE100", secondaryColor: "#000000" },
+  "RB Leipzig": { icon: "🔴", primaryColor: "#DD0741", secondaryColor: "#FFFFFF" },
+  "Bayer Leverkusen": { icon: "🔴", primaryColor: "#E32221", secondaryColor: "#000000" },
+  "Leverkusen": { icon: "🔴", primaryColor: "#E32221", secondaryColor: "#000000" },
+  // Serie A (Italy)
+  "Juventus": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
+  "Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
+  "AC Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
+  "Inter": { icon: "🔵", primaryColor: "#010E80", secondaryColor: "#000000" },
+  "Inter Milan": { icon: "🔵", primaryColor: "#010E80", secondaryColor: "#000000" },
+  "Napoli": { icon: "🔵", primaryColor: "#12A0D7", secondaryColor: "#FFFFFF" },
+  "Roma": { icon: "🟡", primaryColor: "#8E1F2F", secondaryColor: "#F0BC42" },
+  "AS Roma": { icon: "🟡", primaryColor: "#8E1F2F", secondaryColor: "#F0BC42" },
+  // Ligue 1
+  "PSG": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
+  "Paris Saint-Germain": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
+  "Marseille": { icon: "🔵", primaryColor: "#2FAEE0", secondaryColor: "#FFFFFF" },
+  "Lyon": { icon: "🔵", primaryColor: "#1B4F9B", secondaryColor: "#ED1C24" },
+  "Monaco": { icon: "🔴", primaryColor: "#E2001A", secondaryColor: "#FFFFFF" },
   // Libertadores
   "Boca Juniors": { icon: "💛", primaryColor: "#FFD700", secondaryColor: "#00008B" },
   "River Plate": { icon: "🔴", primaryColor: "#FF0000", secondaryColor: "#FFFFFF" },
@@ -115,7 +137,7 @@ const generateFallbackGames = (): GameData[] => {
     {
       id: 3,
       sport: "Futebol",
-      league: "Premier League",
+      league: "English Premier League",
       homeTeam: "Liverpool",
       awayTeam: "Arsenal",
       homeLogo: "",
@@ -130,9 +152,24 @@ const generateFallbackGames = (): GameData[] => {
     {
       id: 4,
       sport: "Futebol",
-      league: "La Liga",
-      homeTeam: "Barcelona",
-      awayTeam: "Atlético",
+      league: "German Bundesliga",
+      homeTeam: "Bayern Munich",
+      awayTeam: "Borussia Dortmund",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(2)),
+      time: "15:30",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 5,
+      sport: "Futebol",
+      league: "Italian Serie A",
+      homeTeam: "Juventus",
+      awayTeam: "Inter Milan",
       homeLogo: "",
       awayLogo: "",
       date: getDayLabel(addDays(2)),
@@ -143,11 +180,26 @@ const generateFallbackGames = (): GameData[] => {
       awayScore: null,
     },
     {
-      id: 5,
+      id: 6,
       sport: "Futebol",
-      league: "Libertadores",
-      homeTeam: "Boca Juniors",
-      awayTeam: "River Plate",
+      league: "French Ligue 1",
+      homeTeam: "PSG",
+      awayTeam: "Marseille",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(3)),
+      time: "20:45",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 7,
+      sport: "Futebol",
+      league: "Spanish La Liga",
+      homeTeam: "Barcelona",
+      awayTeam: "Atlético Madrid",
       homeLogo: "",
       awayLogo: "",
       date: getDayLabel(addDays(3)),
@@ -158,45 +210,15 @@ const generateFallbackGames = (): GameData[] => {
       awayScore: null,
     },
     {
-      id: 6,
-      sport: "Futebol",
-      league: "Brasileirão Série A",
-      homeTeam: "Corinthians",
-      awayTeam: "São Paulo",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(3)),
-      time: "18:30",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
-      id: 7,
-      sport: "Futebol",
-      league: "Brasileirão Série A",
-      homeTeam: "Fluminense",
-      awayTeam: "Botafogo",
-      homeLogo: "",
-      awayLogo: "",
-      date: getDayLabel(addDays(4)),
-      time: "20:00",
-      isLive: false,
-      status: "Agendado",
-      homeScore: null,
-      awayScore: null,
-    },
-    {
       id: 8,
       sport: "Futebol",
-      league: "Champions League",
-      homeTeam: "PSG",
-      awayTeam: "Bayern",
+      league: "Copa Libertadores",
+      homeTeam: "Boca Juniors",
+      awayTeam: "River Plate",
       homeLogo: "",
       awayLogo: "",
       date: getDayLabel(addDays(4)),
-      time: "16:00",
+      time: "21:00",
       isLive: false,
       status: "Agendado",
       homeScore: null,
@@ -205,12 +227,57 @@ const generateFallbackGames = (): GameData[] => {
     {
       id: 9,
       sport: "Futebol",
-      league: "Premier League",
-      homeTeam: "Chelsea",
-      awayTeam: "Man City",
+      league: "German Bundesliga",
+      homeTeam: "RB Leipzig",
+      awayTeam: "Bayer Leverkusen",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(4)),
+      time: "16:30",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 10,
+      sport: "Futebol",
+      league: "Italian Serie A",
+      homeTeam: "AC Milan",
+      awayTeam: "Napoli",
       homeLogo: "",
       awayLogo: "",
       date: getDayLabel(addDays(5)),
+      time: "14:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 11,
+      sport: "Futebol",
+      league: "French Ligue 1",
+      homeTeam: "Lyon",
+      awayTeam: "Monaco",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(5)),
+      time: "20:00",
+      isLive: false,
+      status: "Agendado",
+      homeScore: null,
+      awayScore: null,
+    },
+    {
+      id: 12,
+      sport: "Futebol",
+      league: "English Premier League",
+      homeTeam: "Chelsea",
+      awayTeam: "Man United",
+      homeLogo: "",
+      awayLogo: "",
+      date: getDayLabel(addDays(6)),
       time: "12:00",
       isLive: false,
       status: "Agendado",
@@ -225,10 +292,13 @@ const fallbackGames = generateFallbackGames();
 
 const leagueFilters = [
   { id: "all", label: "Todos", icon: "🏆" },
-  { id: "brasileirao", label: "Brasileirão", icon: "🇧🇷", keywords: ["Brasileirão", "Serie A", "Série A"] },
+  { id: "brasileirao", label: "Brasileirão", icon: "🇧🇷", keywords: ["Brasileirão", "Serie A Brazil", "Série A"] },
   { id: "champions", label: "Champions", icon: "⭐", keywords: ["Champions", "UEFA Champions"] },
-  { id: "premier", label: "Premier", icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", keywords: ["Premier League", "Premier"] },
-  { id: "laliga", label: "La Liga", icon: "🇪🇸", keywords: ["La Liga", "LaLiga"] },
+  { id: "premier", label: "Premier", icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", keywords: ["Premier League", "English Premier"] },
+  { id: "laliga", label: "La Liga", icon: "🇪🇸", keywords: ["La Liga", "LaLiga", "Spanish"] },
+  { id: "bundesliga", label: "Bundesliga", icon: "🇩🇪", keywords: ["Bundesliga", "German"] },
+  { id: "seriea", label: "Serie A", icon: "🇮🇹", keywords: ["Serie A Italy", "Italian Serie A", "Serie A TIM"] },
+  { id: "ligue1", label: "Ligue 1", icon: "🇫🇷", keywords: ["Ligue 1", "French Ligue", "Ligue 1 Uber"] },
   { id: "libertadores", label: "Libertadores", icon: "🏆", keywords: ["Libertadores", "Copa Libertadores"] },
 ];
 
@@ -292,19 +362,29 @@ const LiveSchedule = () => {
   }, [games, activeFilter]);
 
   const getLeagueColor = (league: string) => {
-    if (league.includes('Brasileirão') || league.includes('Serie A')) {
+    const leagueLower = league.toLowerCase();
+    if (leagueLower.includes('brasileirão') || leagueLower.includes('série a')) {
       return "from-green-500/20 to-yellow-600/10 border-green-500/30";
     }
-    if (league.includes('Champions')) {
+    if (leagueLower.includes('champions')) {
       return "from-blue-500/20 to-blue-600/10 border-blue-500/30";
     }
-    if (league.includes('Premier')) {
+    if (leagueLower.includes('premier')) {
       return "from-purple-500/20 to-purple-600/10 border-purple-500/30";
     }
-    if (league.includes('La Liga') || league.includes('LaLiga')) {
+    if (leagueLower.includes('la liga') || leagueLower.includes('laliga') || leagueLower.includes('spanish')) {
       return "from-orange-500/20 to-red-600/10 border-orange-500/30";
     }
-    if (league.includes('Libertadores')) {
+    if (leagueLower.includes('bundesliga') || leagueLower.includes('german')) {
+      return "from-red-500/20 to-yellow-600/10 border-red-500/30";
+    }
+    if (leagueLower.includes('serie a') || leagueLower.includes('italian')) {
+      return "from-green-600/20 to-white/10 border-green-600/30";
+    }
+    if (leagueLower.includes('ligue 1') || leagueLower.includes('french')) {
+      return "from-blue-600/20 to-red-600/10 border-blue-600/30";
+    }
+    if (leagueLower.includes('libertadores')) {
       return "from-yellow-500/20 to-yellow-600/10 border-yellow-500/30";
     }
     return "from-premium-gold/20 to-premium-gold/10 border-premium-gold/30";
