@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { format, isToday, isTomorrow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Game {
   idEvent: string;
@@ -7,6 +9,15 @@ interface Game {
   strTime: string;
   strLeague: string;
 }
+
+const formatGameDate = (dateStr: string): string => {
+  const date = new Date(dateStr + "T00:00:00");
+  
+  if (isToday(date)) return "Hoje";
+  if (isTomorrow(date)) return "Amanhã";
+  
+  return format(date, "d 'de' MMMM", { locale: ptBR });
+};
 
 export default function LiveGames() {
   const [games, setGames] = useState<Game[]>([]);
@@ -58,7 +69,7 @@ export default function LiveGames() {
             <h2 className="text-lg font-bold">{game.strEvent}</h2>
             <p className="text-gray-600">{game.strLeague}</p>
             <p className="mt-2">
-              📅 {game.dateEvent} — 🕓 {game.strTime || "Horário a definir"}
+              📅 {formatGameDate(game.dateEvent)} — 🕓 {game.strTime || "Horário a definir"}
             </p>
 
             <a
