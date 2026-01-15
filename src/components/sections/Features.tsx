@@ -65,11 +65,11 @@ const Features = () => {
                   <span className="text-premium-gold">sem perder nenhum detalhe.</span>
                 </h3>
                 
-                <p className="text-lg text-muted-foreground mb-6 max-w-lg">
+                <p className="text-lg text-red-400 mb-6 max-w-lg">
                   Acompanhe futebol e uma ampla variedade de esportes, incluindo basquete, vôlei, tênis, Fórmula 1, UFC e muito mais.
                 </p>
                 
-                <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+                <p className="text-lg text-red-400 mb-8 max-w-lg">
                   Assista aos principais jogos e campeonatos ao vivo, com qualidade 4K, alta estabilidade e experiência sem travamentos.
                 </p>
                 
@@ -85,7 +85,7 @@ const Features = () => {
                   </a>
                 </div>
                 
-                <p className="text-sm text-muted-foreground mt-4 max-w-md">
+                <p className="text-sm text-red-400 mt-4 max-w-md">
                   Clique no botão e informe que deseja ver o status para receber a programação completa e a agenda atualizada de todos os esportes, disponibilizadas diariamente.
                 </p>
               </div>
