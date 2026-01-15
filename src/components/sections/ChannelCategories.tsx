@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Tv, Film, Clapperboard, Baby, Trophy, Music, Newspaper, Gamepad2 } from "lucide-react";
+import channelsBg from "@/assets/channels-bg.jpg";
 
 const categories = [
   {
@@ -81,8 +82,22 @@ const itemVariants = {
 
 const ChannelCategories = () => {
   return (
-    <section id="canais" className="py-20 bg-background" aria-labelledby="channels-heading">
-      <div className="container mx-auto px-4">
+    <section 
+      id="canais" 
+      className="py-20 relative overflow-hidden" 
+      aria-labelledby="channels-heading"
+    >
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img 
+          src={channelsBg} 
+          alt="" 
+          className="w-full h-full object-cover"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+      </div>
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
