@@ -61,31 +61,33 @@ const Features = () => {
                 </div>
                 
                 <h3 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                  ⚽ Não perca seu time jogar e{" "}
-                  <span className="text-premium-gold">nem uma outra partida!</span>
+                  ⚽ Viva a emoção do esporte{" "}
+                  <span className="text-premium-gold">sem perder nenhum detalhe.</span>
                 </h3>
                 
-                <p className="text-lg text-muted-foreground mb-8 max-w-md">
-                  Assista a todos os jogos do seu time e campeonatos ao vivo, em qualidade 4K, 
-                  sem travamentos. Futebol, UFC, NBA, F1 e muito mais!
+                <p className="text-lg text-muted-foreground mb-6 max-w-lg">
+                  Acompanhe futebol e uma ampla variedade de esportes, incluindo basquete, vôlei, tênis, Fórmula 1, UFC e muito mais.
                 </p>
                 
-                <div className="flex flex-wrap gap-4">
+                <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+                  Assista aos principais jogos e campeonatos ao vivo, com qualidade 4K, alta estabilidade e experiência sem travamentos.
+                </p>
+                
+                <div className="flex flex-wrap gap-4 items-start">
                   <a
-                    href="https://wa.me/5521966238378?text=Olá!%20Quero%20assistir%20esportes%20ao%20vivo!"
+                    href="https://wa.me/5521966238378?text=Olá!%20Gostaria%20de%20ver%20o%20status%20da%20Mundo%20Play%20TV%20para%20receber%20a%20programação%20completa."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-premium-gold text-black font-bold px-6 py-3 rounded-full hover:bg-premium-gold-hover transition-premium shadow-lg shadow-premium-gold/25"
                   >
                     <Play className="w-5 h-5" fill="currentColor" />
-                    Assista Agora
+                    📲 Ver Programação
                   </a>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span className="px-3 py-1.5 bg-muted/50 rounded-full">🏆 Brasileirão</span>
-                    <span className="px-3 py-1.5 bg-muted/50 rounded-full">⚽ Champions</span>
-                    <span className="px-3 py-1.5 bg-muted/50 rounded-full">🥊 UFC</span>
-                  </div>
                 </div>
+                
+                <p className="text-sm text-muted-foreground mt-4 max-w-md">
+                  Clique no botão e informe que deseja ver o status para receber a programação completa e a agenda atualizada de todos os esportes, disponibilizadas diariamente.
+                </p>
               </div>
               
               {/* Image */}
