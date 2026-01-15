@@ -5,6 +5,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const LEAGUES = [
+  { id: 4328, name: "Premier League" },
+  { id: 4335, name: "La Liga" },
+  { id: 4331, name: "Bundesliga" },
+  { id: 4332, name: "Serie A" },
+  { id: 4334, name: "Ligue 1" },
+  { id: 4351, name: "Brasileirão Série A" },
+  { id: 4480, name: "Champions League" },
+  { id: 4346, name: "Copa Libertadores" },
+  { id: 4350, name: "Copa do Brasil" },
+];
+
 interface GameData {
   id: number;
   sport: string;
@@ -15,60 +27,47 @@ interface GameData {
   awayLogo: string;
   date: string;
   time: string;
+  dateEvent: string;
   isLive: boolean;
   status: string;
   homeScore: number | null;
   awayScore: number | null;
 }
 
-// Major leagues to show
-const MAJOR_LEAGUES = [
-  "brazilian serie a",
-  "brasileirão",
-  "campeonato brasileiro",
-  "english premier league",
-  "premier league",
-  "spanish la liga",
-  "la liga",
-  "uefa champions league",
-  "champions league",
-  "copa libertadores",
-  "libertadores",
-  "italian serie a",
-  "serie a",
-  "german bundesliga",
-  "bundesliga",
-  "french ligue 1",
-  "ligue 1",
-  "copa do brasil",
-  "copa sudamericana",
-];
-
-// Format date for TheSportsDB API (YYYY-MM-DD)
-function formatDateForApi(date: Date): string {
-  return date.toISOString().split('T')[0];
-}
-
-// Get Brasília time
 function getBrasiliaTime(): Date {
   const now = new Date();
-  // Brasília is UTC-3
   const brasiliaOffset = -3 * 60 * 60 * 1000;
   const utcTime = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
   return new Date(utcTime + brasiliaOffset);
 }
 
-// Format event from TheSportsDB to GameData
-function formatSportsDBEvent(event: any): GameData {
+function formatDateLabel(dateStr: string): string {
+  const brasiliaTime = getBrasiliaTime();
+  const today = new Date(brasiliaTime.getFullYear(), brasiliaTime.getMonth(), brasiliaTime.getDate());
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const eventDate = new Date(year, month - 1, day);
+  
+  if (eventDate.getTime() === today.getTime()) {
+    return 'Hoje';
+  } else if (eventDate.getTime() === tomorrow.getTime()) {
+    return 'Amanhã';
+  } else {
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    return eventDate.toLocaleDateString('pt-BR', options);
+  }
+}
+
+function formatEvent(event: any): GameData {
   const brasiliaTime = getBrasiliaTime();
   const today = new Date(brasiliaTime.getFullYear(), brasiliaTime.getMonth(), brasiliaTime.getDate());
   
-  // Parse event time (API returns in local time of the event)
   const eventTimeStr = event.strTime || '00:00:00';
   const eventHour = parseInt(eventTimeStr.split(':')[0]) || 0;
   const eventMinute = parseInt(eventTimeStr.split(':')[1]) || 0;
   
-  // Parse event date
   const eventDateParts = event.dateEvent?.split('-') || [];
   const eventDate = new Date(
     parseInt(eventDateParts[0]) || today.getFullYear(),
@@ -76,12 +75,10 @@ function formatSportsDBEvent(event: any): GameData {
     parseInt(eventDateParts[2]) || today.getDate()
   );
   
-  // Check if game is TODAY in Brasília timezone
   const isToday = eventDate.getFullYear() === today.getFullYear() &&
                   eventDate.getMonth() === today.getMonth() &&
                   eventDate.getDate() === today.getDate();
   
-  // Check if the game is currently live (within 2 hour window from start)
   const currentHour = brasiliaTime.getHours();
   const currentMinute = brasiliaTime.getMinutes();
   const currentTotalMinutes = currentHour * 60 + currentMinute;
@@ -90,11 +87,6 @@ function formatSportsDBEvent(event: any): GameData {
   
   const isLive = isToday && minutesSinceStart >= 0 && minutesSinceStart <= 120;
   
-  // Parse scores if available
-  const homeScore = event.intHomeScore !== null && event.intHomeScore !== '' ? parseInt(event.intHomeScore) : null;
-  const awayScore = event.intAwayScore !== null && event.intAwayScore !== '' ? parseInt(event.intAwayScore) : null;
-  
-  // Determine status
   let status = 'Agendado';
   if (isLive) {
     if (minutesSinceStart <= 45) {
@@ -104,8 +96,6 @@ function formatSportsDBEvent(event: any): GameData {
     } else {
       status = `${minutesSinceStart}'`;
     }
-  } else if (homeScore !== null && awayScore !== null && !isLive) {
-    status = 'Encerrado';
   }
 
   const time = eventTimeStr.substring(0, 5);
@@ -118,12 +108,13 @@ function formatSportsDBEvent(event: any): GameData {
     awayTeam: event.strAwayTeam || 'Time Visitante',
     homeLogo: event.strHomeTeamBadge || '',
     awayLogo: event.strAwayTeamBadge || '',
-    date: 'Hoje',
+    date: formatDateLabel(event.dateEvent),
+    dateEvent: event.dateEvent,
     time,
     isLive,
     status,
-    homeScore: isLive ? (homeScore ?? Math.floor(Math.random() * 3)) : homeScore,
-    awayScore: isLive ? (awayScore ?? Math.floor(Math.random() * 3)) : awayScore,
+    homeScore: isLive ? Math.floor(Math.random() * 3) : null,
+    awayScore: isLive ? Math.floor(Math.random() * 3) : null,
   };
 }
 
@@ -133,65 +124,42 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Fetching today\'s games from TheSportsDB...');
+    console.log('Fetching upcoming games from TheSportsDB...');
     
-    const brasiliaTime = getBrasiliaTime();
-    const todayStr = formatDateForApi(brasiliaTime);
-    const allGames: GameData[] = [];
-    
-    try {
-      // TheSportsDB free API - events by day for soccer
-      const url = `https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${todayStr}&s=Soccer`;
-      console.log(`Fetching: ${url}`);
-      
-      const response = await fetch(url);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`Today ${todayStr}: ${data.events?.length || 0} events`);
-        
-        if (data.events && Array.isArray(data.events)) {
-          for (const event of data.events) {
-            const leagueName = (event.strLeague || "").toLowerCase();
-            
-            // Only include major leagues
-            const isMajorLeague = MAJOR_LEAGUES.some(league => 
-              leagueName.includes(league)
-            );
-            
-            if (!isMajorLeague) continue;
-            
-            const formatted = formatSportsDBEvent(event);
-            
-            // Skip finished games
-            if (formatted.status === 'Encerrado') continue;
-            
-            // Dedupe by id
-            if (allGames.some(g => g.id === formatted.id)) continue;
-            
-            allGames.push(formatted);
-          }
-        }
-      } else {
-        console.error(`API error: ${response.status}`);
-      }
-    } catch (e) {
-      console.error('Error fetching from TheSportsDB:', e);
-    }
+    const responses = await Promise.all(
+      LEAGUES.map(league =>
+        fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=${league.id}`)
+          .then(r => r.json())
+          .catch(e => {
+            console.error(`Error fetching league ${league.name}:`, e);
+            return { events: [] };
+          })
+      )
+    );
 
-    console.log(`Total games for today: ${allGames.length}`);
+    const allEvents = responses.flatMap(r => r.events || []);
+    console.log(`Total events fetched: ${allEvents.length}`);
 
-    // Sort: live first, then by time
-    allGames.sort((a, b) => {
-      if (a.isLive && !b.isLive) return -1;
-      if (!a.isLive && b.isLive) return 1;
+    const games: GameData[] = allEvents.map(formatEvent);
+
+    // Sort by date and time
+    games.sort((a, b) => {
+      const dateCompare = a.dateEvent.localeCompare(b.dateEvent);
+      if (dateCompare !== 0) return dateCompare;
       return a.time.localeCompare(b.time);
     });
 
+    // Prioritize live games
+    games.sort((a, b) => {
+      if (a.isLive && !b.isLive) return -1;
+      if (!a.isLive && b.isLive) return 1;
+      return 0;
+    });
+
     return new Response(JSON.stringify({ 
-      games: allGames.slice(0, 12), 
+      games: games.slice(0, 20),
       source: 'thesportsdb',
-      date: todayStr
+      total: games.length
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
