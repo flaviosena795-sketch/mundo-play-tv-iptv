@@ -128,7 +128,7 @@ serve(async (req) => {
     
     const responses = await Promise.all(
       LEAGUES.map(league =>
-        fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=${league.id}`)
+        fetch(`https://www.thesportsdb.com/api/v1/json/1/eventsnextleague.php?id=${league.id}`)
           .then(r => r.json())
           .catch(e => {
             console.error(`Error fetching league ${league.name}:`, e);
