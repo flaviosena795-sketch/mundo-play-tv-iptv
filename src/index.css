@@ -198,3 +198,218 @@
     }
   }
 }
+
+/* FootyStats Widget - Mundo Play TV Dark Theme */
+#fs-fixtures {
+  --fs-bg: hsl(240 10% 5%);
+  --fs-text: hsl(0 0% 95%);
+  --fs-border: hsl(240 3.7% 20%);
+  --fs-accent: hsl(45 93% 47%);
+  
+  background: var(--fs-bg) !important;
+  color: var(--fs-text) !important;
+  border-radius: 1rem;
+  font-family: inherit !important;
+}
+
+#fs-fixtures * {
+  font-family: inherit !important;
+}
+
+/* Widget container */
+#fs-fixtures .fs-widget,
+#fs-fixtures .fixtures-widget {
+  background: transparent !important;
+  color: var(--fs-text) !important;
+}
+
+/* Headers and titles */
+#fs-fixtures h1,
+#fs-fixtures h2,
+#fs-fixtures h3,
+#fs-fixtures h4,
+#fs-fixtures .fs-header,
+#fs-fixtures .fs-title,
+#fs-fixtures .league-name,
+#fs-fixtures .competition-name {
+  color: var(--fs-text) !important;
+  font-weight: 700 !important;
+}
+
+/* Date headers */
+#fs-fixtures .date-header,
+#fs-fixtures .fs-date,
+#fs-fixtures .day-header {
+  background: hsl(240 5.9% 12%) !important;
+  color: hsl(45 93% 50%) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem 1rem !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(240 3.7% 20%) !important;
+}
+
+/* Match rows/cards */
+#fs-fixtures .match,
+#fs-fixtures .fixture,
+#fs-fixtures .fs-match,
+#fs-fixtures .match-row,
+#fs-fixtures tr {
+  background: hsl(240 5.9% 8%) !important;
+  border: 1px solid hsl(240 3.7% 15%) !important;
+  border-radius: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+#fs-fixtures .match:hover,
+#fs-fixtures .fixture:hover,
+#fs-fixtures .fs-match:hover,
+#fs-fixtures tr:hover {
+  background: hsl(240 5.9% 12%) !important;
+  border-color: hsl(45 93% 47% / 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* Team names */
+#fs-fixtures .team-name,
+#fs-fixtures .team,
+#fs-fixtures .home-team,
+#fs-fixtures .away-team,
+#fs-fixtures td {
+  color: var(--fs-text) !important;
+  font-weight: 500 !important;
+}
+
+/* Scores */
+#fs-fixtures .score,
+#fs-fixtures .result,
+#fs-fixtures .fs-score {
+  color: hsl(45 93% 50%) !important;
+  font-weight: 700 !important;
+  font-size: 1.1em !important;
+}
+
+/* Time */
+#fs-fixtures .time,
+#fs-fixtures .match-time,
+#fs-fixtures .kick-off,
+#fs-fixtures .fs-time {
+  color: hsl(142 76% 45%) !important;
+  font-weight: 600 !important;
+  background: hsl(142 76% 45% / 0.1) !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
+}
+
+/* Live indicator */
+#fs-fixtures .live,
+#fs-fixtures .is-live,
+#fs-fixtures .live-badge {
+  background: hsl(0 72% 51%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 9999px !important;
+  animation: pulse-live 2s infinite !important;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* League/Competition headers */
+#fs-fixtures .league,
+#fs-fixtures .competition,
+#fs-fixtures .fs-league,
+#fs-fixtures thead,
+#fs-fixtures th {
+  background: hsl(240 5.9% 10%) !important;
+  color: hsl(45 93% 50%) !important;
+  border-bottom: 2px solid hsl(45 93% 47% / 0.3) !important;
+  padding: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* Links */
+#fs-fixtures a {
+  color: var(--fs-text) !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+#fs-fixtures a:hover {
+  color: hsl(45 93% 50%) !important;
+}
+
+/* Tables */
+#fs-fixtures table {
+  background: transparent !important;
+  border-collapse: separate !important;
+  border-spacing: 0 0.5rem !important;
+  width: 100% !important;
+}
+
+/* Buttons */
+#fs-fixtures button,
+#fs-fixtures .btn,
+#fs-fixtures .fs-button {
+  background: hsl(240 5.9% 15%) !important;
+  color: var(--fs-text) !important;
+  border: 1px solid hsl(240 3.7% 25%) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+#fs-fixtures button:hover,
+#fs-fixtures .btn:hover,
+#fs-fixtures .fs-button:hover {
+  background: hsl(45 93% 47%) !important;
+  color: hsl(240 10% 3.9%) !important;
+  border-color: hsl(45 93% 47%) !important;
+}
+
+/* Scrollbar styling */
+#fs-fixtures::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+#fs-fixtures::-webkit-scrollbar-track {
+  background: hsl(240 5.9% 10%);
+  border-radius: 4px;
+}
+
+#fs-fixtures::-webkit-scrollbar-thumb {
+  background: hsl(240 3.7% 25%);
+  border-radius: 4px;
+}
+
+#fs-fixtures::-webkit-scrollbar-thumb:hover {
+  background: hsl(45 93% 47%);
+}
+
+/* Loading state */
+#fs-fixtures .loading,
+#fs-fixtures .fs-loading {
+  color: hsl(45 93% 50%) !important;
+}
+
+/* Hide any white backgrounds */
+#fs-fixtures div,
+#fs-fixtures span,
+#fs-fixtures p {
+  background-color: transparent !important;
+}
+
+/* Override any inline styles that might be white */
+#fs-fixtures [style*="background: white"],
+#fs-fixtures [style*="background-color: white"],
+#fs-fixtures [style*="background:#fff"],
+#fs-fixtures [style*="background-color:#fff"],
+#fs-fixtures [style*="background: #fff"],
+#fs-fixtures [style*="background-color: #fff"] {
+  background: hsl(240 5.9% 8%) !important;
+}
