@@ -18,7 +18,6 @@ const Pending = lazy(() => import("./pages/Pending"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const Jogos = lazy(() => import("./pages/Jogos"));
 
 // Use skeleton loader for better UX
 const PageLoader = () => <SimplePageSkeleton />;
@@ -36,7 +35,6 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/jogos" element={<Suspense fallback={<PageLoader />}><Jogos /></Suspense>} />
           <Route path="/sucesso" element={<Suspense fallback={<PageLoader />}><Success /></Suspense>} />
           <Route path="/pendente" element={<Suspense fallback={<PageLoader />}><Pending /></Suspense>} />
           <Route path="/falha" element={<Suspense fallback={<PageLoader />}><Failure /></Suspense>} />
