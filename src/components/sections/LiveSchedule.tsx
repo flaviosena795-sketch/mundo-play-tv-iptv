@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Calendar, MessageCircle, Loader2, RefreshCw, Trophy, Zap } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Calendar, MessageCircle, Loader2, RefreshCw, Trophy, Zap, Filter } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface GameData {
@@ -19,11 +19,25 @@ interface GameData {
   awayScore: number | null;
 }
 
+// League filter configuration with display names and colors
+const LEAGUE_FILTERS = [
+  { id: "all", name: "Todas as Ligas", color: "bg-premium-gold/20 text-premium-gold border-premium-gold/40" },
+  { id: "brasileirao", name: "Brasileirão", color: "bg-green-500/20 text-green-400 border-green-500/40", keywords: ["brasileirão", "série a", "brazil"] },
+  { id: "champions", name: "Champions League", color: "bg-blue-500/20 text-blue-400 border-blue-500/40", keywords: ["champions"] },
+  { id: "libertadores", name: "Libertadores", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/40", keywords: ["libertadores"] },
+  { id: "premier", name: "Premier League", color: "bg-purple-500/20 text-purple-400 border-purple-500/40", keywords: ["premier"] },
+  { id: "laliga", name: "La Liga", color: "bg-orange-500/20 text-orange-400 border-orange-500/40", keywords: ["la liga"] },
+  { id: "seriea", name: "Serie A (Itália)", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40", keywords: ["serie a", "italy"] },
+  { id: "bundesliga", name: "Bundesliga", color: "bg-red-500/20 text-red-400 border-red-500/40", keywords: ["bundesliga"] },
+  { id: "ligue1", name: "Ligue 1", color: "bg-sky-500/20 text-sky-400 border-sky-500/40", keywords: ["ligue 1"] },
+];
+
 const LiveSchedule = () => {
   const [games, setGames] = useState<GameData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
   const fetchGames = async () => {
     setLoading(true);
@@ -53,7 +67,7 @@ const LiveSchedule = () => {
       setLastUpdated(new Date());
 
       if (cleaned.length === 0) {
-        setError("Sem jogos das principais ligas hoje.");
+        setError("Sem jogos das principais ligas no momento.");
       }
     } catch (err) {
       console.error("Error:", err);
@@ -69,6 +83,35 @@ const LiveSchedule = () => {
     const interval = setInterval(fetchGames, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Filter games based on selected league
+  const filteredGames = useMemo(() => {
+    if (selectedFilter === "all") return games;
+    
+    const filter = LEAGUE_FILTERS.find(f => f.id === selectedFilter);
+    if (!filter || !filter.keywords) return games;
+    
+    return games.filter(game => {
+      const leagueLower = game.league.toLowerCase();
+      return filter.keywords!.some(keyword => leagueLower.includes(keyword));
+    });
+  }, [games, selectedFilter]);
+
+  // Get available leagues from current games
+  const availableFilters = useMemo(() => {
+    const available = new Set<string>(["all"]);
+    
+    games.forEach(game => {
+      const leagueLower = game.league.toLowerCase();
+      LEAGUE_FILTERS.forEach(filter => {
+        if (filter.keywords?.some(keyword => leagueLower.includes(keyword))) {
+          available.add(filter.id);
+        }
+      });
+    });
+    
+    return LEAGUE_FILTERS.filter(f => available.has(f.id));
+  }, [games]);
 
   const getLeagueGradient = (league: string) => {
     const l = league.toLowerCase();
@@ -133,11 +176,52 @@ const LiveSchedule = () => {
             </div>
           </motion.div>
 
+          {/* League Filters */}
+          {games.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="mb-8"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Filtrar por liga:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableFilters.map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setSelectedFilter(filter.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${
+                      selectedFilter === filter.id
+                        ? filter.color + " scale-105 shadow-lg"
+                        : "bg-muted/20 text-muted-foreground border-muted/30 hover:bg-muted/40"
+                    }`}
+                  >
+                    {filter.name}
+                    {filter.id !== "all" && (
+                      <span className="ml-2 text-xs opacity-70">
+                        ({games.filter(g => {
+                          const leagueLower = g.league.toLowerCase();
+                          return filter.keywords?.some(k => leagueLower.includes(k));
+                        }).length})
+                      </span>
+                    )}
+                    {filter.id === "all" && (
+                      <span className="ml-2 text-xs opacity-70">({games.length})</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           {/* Loading */}
           {loading && games.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="w-10 h-10 text-premium-gold animate-spin mb-4" />
-              <p className="text-muted-foreground">Carregando jogos de hoje...</p>
+              <p className="text-muted-foreground">Carregando jogos...</p>
             </div>
           )}
 
@@ -163,14 +247,32 @@ const LiveSchedule = () => {
             </motion.div>
           )}
 
+          {/* Filtered Empty State */}
+          {!loading && games.length > 0 && filteredGames.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12 bg-muted/10 rounded-2xl border border-muted/20"
+            >
+              <p className="text-2xl mb-2">🔍</p>
+              <p className="text-lg text-muted-foreground mb-2">Nenhum jogo desta liga no momento</p>
+              <button
+                onClick={() => setSelectedFilter("all")}
+                className="text-premium-gold hover:underline text-sm font-medium"
+              >
+                Ver todas as ligas
+              </button>
+            </motion.div>
+          )}
+
           {/* Games Grid */}
-          {games.length > 0 && (
+          {filteredGames.length > 0 && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
             >
-              {games.map((game, index) => (
+              {filteredGames.map((game, index) => (
                 <motion.div
                   key={`${game.id}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
