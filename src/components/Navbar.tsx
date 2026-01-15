@@ -3,11 +3,12 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "#sobre", label: "Sobre" },
-  { href: "#recursos", label: "Recursos" },
-  { href: "#planos", label: "Planos" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contato", label: "Contato" },
+  { href: "#sobre", label: "Quem Somos" },
+  { href: "#canais", label: "Canais" },
+  { href: "#recursos", label: "Vantagens" },
+  { href: "#planos", label: "Nossos Planos" },
+  { href: "#faq", label: "Dúvidas" },
+  { href: "#contato", label: "Fale Conosco" },
 ];
 
 const Navbar = () => {

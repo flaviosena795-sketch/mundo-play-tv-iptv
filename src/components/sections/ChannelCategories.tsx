@@ -82,7 +82,7 @@ const itemVariants = {
 
 const ChannelCategories = () => {
   return (
-    <section className="py-20 bg-background" aria-labelledby="channels-heading">
+    <section id="canais" className="py-20 bg-background" aria-labelledby="channels-heading">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
