@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Tv, Film, Clapperboard, Baby, Trophy, Music, Newspaper, Gamepad2 } from "lucide-react";
+import iptvChannelsImg from "@/assets/iptv-channels.jpeg";
 
 const categories = [
   {
@@ -137,11 +138,25 @@ const ChannelCategories = () => {
         </motion.div>
 
         <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mt-12 rounded-2xl overflow-hidden border border-subtle-border shadow-2xl"
+        >
+          <img 
+            src={iptvChannelsImg} 
+            alt="Variedade de canais IPTV disponíveis - mais de 700 canais ao vivo"
+            className="w-full h-auto object-cover"
+          />
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-12 text-center"
+          className="mt-8 text-center"
         >
           <p className="text-muted-foreground">
             <span className="text-premium-gold font-semibold">+ VOD</span> com milhares de filmes e séries sob demanda
