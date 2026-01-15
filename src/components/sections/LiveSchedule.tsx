@@ -1,9 +1,7 @@
-import { Calendar, Clock, Tv, Loader2, RefreshCw, Filter, Trophy, Zap, CalendarDays } from "lucide-react";
+import { Calendar, Clock, Loader2, RefreshCw, Trophy, Zap, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, startOfDay, endOfDay } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
 interface GameData {
   id: number;
@@ -34,7 +32,9 @@ const teamData: Record<string, { icon: string; primaryColor: string; secondaryCo
   "Grêmio": { icon: "🔵", primaryColor: "#0066B3", secondaryColor: "#000000" },
   "Internacional": { icon: "🔴", primaryColor: "#E4002B", secondaryColor: "#FFFFFF" },
   "Atlético-MG": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
-  // Premier League
+  "Vasco": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
+  "Cruzeiro": { icon: "🔵", primaryColor: "#003DA5", secondaryColor: "#FFFFFF" },
+  // European
   "Real Madrid": { icon: "👑", primaryColor: "#FEBE10", secondaryColor: "#FFFFFF" },
   "Barcelona": { icon: "🔵", primaryColor: "#A50044", secondaryColor: "#004D98" },
   "Man City": { icon: "🔵", primaryColor: "#6CABDD", secondaryColor: "#1C2C5B" },
@@ -42,77 +42,27 @@ const teamData: Record<string, { icon: string; primaryColor: string; secondaryCo
   "Liverpool": { icon: "🔴", primaryColor: "#C8102E", secondaryColor: "#00B2A9" },
   "Arsenal": { icon: "🔴", primaryColor: "#EF0107", secondaryColor: "#063672" },
   "Chelsea": { icon: "🔵", primaryColor: "#034694", secondaryColor: "#DBA111" },
-  "Man United": { icon: "🔴", primaryColor: "#DA291C", secondaryColor: "#FBE122" },
-  "Manchester United": { icon: "🔴", primaryColor: "#DA291C", secondaryColor: "#FBE122" },
-  "Tottenham": { icon: "⚪", primaryColor: "#132257", secondaryColor: "#FFFFFF" },
-  // La Liga
-  "Atlético": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
-  "Atlético Madrid": { icon: "🔴", primaryColor: "#CB3524", secondaryColor: "#FFFFFF" },
-  // Bundesliga
   "Bayern": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
-  "Bayern Munich": { icon: "🔴", primaryColor: "#DC052D", secondaryColor: "#0066B2" },
-  "Borussia Dortmund": { icon: "💛", primaryColor: "#FDE100", secondaryColor: "#000000" },
-  "Dortmund": { icon: "💛", primaryColor: "#FDE100", secondaryColor: "#000000" },
-  "RB Leipzig": { icon: "🔴", primaryColor: "#DD0741", secondaryColor: "#FFFFFF" },
-  "Bayer Leverkusen": { icon: "🔴", primaryColor: "#E32221", secondaryColor: "#000000" },
-  "Leverkusen": { icon: "🔴", primaryColor: "#E32221", secondaryColor: "#000000" },
-  // Serie A (Italy)
+  "PSG": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
   "Juventus": { icon: "⚫", primaryColor: "#000000", secondaryColor: "#FFFFFF" },
   "Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
-  "AC Milan": { icon: "🔴", primaryColor: "#AC1818", secondaryColor: "#000000" },
   "Inter": { icon: "🔵", primaryColor: "#010E80", secondaryColor: "#000000" },
-  "Inter Milan": { icon: "🔵", primaryColor: "#010E80", secondaryColor: "#000000" },
-  "Napoli": { icon: "🔵", primaryColor: "#12A0D7", secondaryColor: "#FFFFFF" },
-  "Roma": { icon: "🟡", primaryColor: "#8E1F2F", secondaryColor: "#F0BC42" },
-  "AS Roma": { icon: "🟡", primaryColor: "#8E1F2F", secondaryColor: "#F0BC42" },
-  // Ligue 1
-  "PSG": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
-  "Paris Saint-Germain": { icon: "🔵", primaryColor: "#004170", secondaryColor: "#DA291C" },
-  "Marseille": { icon: "🔵", primaryColor: "#2FAEE0", secondaryColor: "#FFFFFF" },
-  "Lyon": { icon: "🔵", primaryColor: "#1B4F9B", secondaryColor: "#ED1C24" },
-  "Monaco": { icon: "🔴", primaryColor: "#E2001A", secondaryColor: "#FFFFFF" },
   // Libertadores
   "Boca Juniors": { icon: "💛", primaryColor: "#FFD700", secondaryColor: "#00008B" },
   "River Plate": { icon: "🔴", primaryColor: "#FF0000", secondaryColor: "#FFFFFF" },
 };
 
 const getTeamData = (teamName: string) => {
-  // Try exact match first
   if (teamData[teamName]) return teamData[teamName];
-  // Try partial match
   const key = Object.keys(teamData).find(k => teamName.toLowerCase().includes(k.toLowerCase()));
   return key ? teamData[key] : { icon: "⚽", primaryColor: "#FFB800", secondaryColor: "#1a1a1a" };
 };
-
-// Date filter options
-const BRASILIA_TZ = "America/Sao_Paulo";
-
-const dateFilters = [
-  { id: "all", label: "Todos" },
-  { id: "today", label: "Hoje" },
-  { id: "tomorrow", label: "Amanhã" },
-  { id: "week", label: "Esta Semana" },
-];
-
-const leagueFilters = [
-  { id: "all", label: "Todos", icon: "🏆" },
-  { id: "brasileirao", label: "Brasileirão", icon: "🇧🇷", keywords: ["Brasileirão", "Serie A Brazil", "Série A"] },
-  { id: "champions", label: "Champions", icon: "⭐", keywords: ["Champions", "UEFA Champions"] },
-  { id: "premier", label: "Premier", icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", keywords: ["Premier League", "English Premier"] },
-  { id: "laliga", label: "La Liga", icon: "🇪🇸", keywords: ["La Liga", "LaLiga", "Spanish"] },
-  { id: "bundesliga", label: "Bundesliga", icon: "🇩🇪", keywords: ["Bundesliga", "German"] },
-  { id: "seriea", label: "Serie A", icon: "🇮🇹", keywords: ["Serie A Italy", "Italian Serie A", "Serie A TIM"] },
-  { id: "ligue1", label: "Ligue 1", icon: "🇫🇷", keywords: ["Ligue 1", "French Ligue", "Ligue 1 Uber"] },
-  { id: "libertadores", label: "Libertadores", icon: "🏆", keywords: ["Libertadores", "Copa Libertadores"] },
-];
 
 const LiveSchedule = () => {
   const [games, setGames] = useState<GameData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [activeDateFilter, setActiveDateFilter] = useState("all");
 
   const fetchGames = async () => {
     setLoading(true);
@@ -124,7 +74,7 @@ const LiveSchedule = () => {
       if (fnError) {
         console.error("Error fetching games:", fnError);
         setGames([]);
-        setError("Não foi possível carregar os jogos agora.");
+        setError("Não foi possível carregar os jogos.");
         return;
       }
 
@@ -141,135 +91,63 @@ const LiveSchedule = () => {
       setGames(cleaned);
       setLastUpdated(new Date());
 
-      if (data?.source === "fallback") {
-        // Se a função do backend devolveu fallback, NÃO exibimos (para não aparecer jogo “inventado”)
-        setGames([]);
-        setError("Dados indisponíveis no momento (sem fallback). Tente atualizar em instantes.");
+      if (cleaned.length === 0) {
+        setError("Sem jogos das principais ligas hoje.");
       }
     } catch (err) {
       console.error("Error:", err);
       setGames([]);
-      setError("Não foi possível carregar os jogos agora.");
+      setError("Não foi possível carregar os jogos.");
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
     fetchGames();
-    
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchGames, 5 * 60 * 1000);
+    // Refresh every 2 minutes for live scores
+    const interval = setInterval(fetchGames, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Helper to parse game date string ("Hoje", "Amanhã", "Dom, 15/1", etc.) to a Date
-  const parseGameDate = (dateStr: string): Date => {
-    const nowInBrasilia = toZonedTime(new Date(), BRASILIA_TZ);
-    const todayBrasilia = startOfDay(nowInBrasilia);
-    
-    if (dateStr.toLowerCase() === "hoje") {
-      return todayBrasilia;
+  const getLeagueColor = (league: string) => {
+    const l = league.toLowerCase();
+    if (l.includes('brasileirão') || l.includes('série a') || l.includes('serie a brazil')) {
+      return "from-green-500/20 to-yellow-500/10 border-green-500/40";
     }
-    if (dateStr.toLowerCase() === "amanhã") {
-      return addDays(todayBrasilia, 1);
+    if (l.includes('champions')) {
+      return "from-blue-600/20 to-indigo-500/10 border-blue-500/40";
     }
-    
-    // Try to parse "Sex, 10/10" or "15/1" format
-    const match = dateStr.match(/(\d{1,2})\/(\d{1,2})/);
-    if (match) {
-      const day = parseInt(match[1], 10);
-      const month = parseInt(match[2], 10) - 1; // 0-indexed
-      const year = todayBrasilia.getFullYear();
-      const parsedDate = new Date(year, month, day);
-      // If the date is in the past (e.g. January when we're in December), assume next year
-      if (parsedDate < todayBrasilia && month < todayBrasilia.getMonth()) {
-        parsedDate.setFullYear(year + 1);
-      }
-      return parsedDate;
+    if (l.includes('premier')) {
+      return "from-purple-500/20 to-purple-600/10 border-purple-500/40";
     }
-    
-    return todayBrasilia;
+    if (l.includes('la liga') || l.includes('laliga')) {
+      return "from-orange-500/20 to-red-500/10 border-orange-500/40";
+    }
+    if (l.includes('bundesliga')) {
+      return "from-red-500/20 to-yellow-500/10 border-red-500/40";
+    }
+    if (l.includes('serie a') && !l.includes('brazil')) {
+      return "from-green-600/20 to-emerald-500/10 border-green-600/40";
+    }
+    if (l.includes('ligue 1')) {
+      return "from-blue-500/20 to-red-500/10 border-blue-500/40";
+    }
+    if (l.includes('libertadores')) {
+      return "from-yellow-500/20 to-amber-500/10 border-yellow-500/40";
+    }
+    return "from-premium-gold/20 to-premium-gold/10 border-premium-gold/40";
   };
 
-  // Filter games based on active league and date filter
-  const filteredGames = useMemo(() => {
-    const nowInBrasilia = toZonedTime(new Date(), BRASILIA_TZ);
-    const todayStart = startOfDay(nowInBrasilia);
-    const todayEnd = endOfDay(nowInBrasilia);
-    const tomorrowStart = startOfDay(addDays(nowInBrasilia, 1));
-    const tomorrowEnd = endOfDay(addDays(nowInBrasilia, 1));
-    const weekEnd = endOfDay(addDays(nowInBrasilia, 7));
-    
-    let result = games;
-    
-    // Apply league filter
-    if (activeFilter !== "all") {
-      const filter = leagueFilters.find(f => f.id === activeFilter);
-      if (filter?.keywords) {
-        result = result.filter(game =>
-          filter.keywords!.some(keyword =>
-            game.league.toLowerCase().includes(keyword.toLowerCase())
-          )
-        );
-      }
-    }
-    
-    // Apply date filter
-    if (activeDateFilter !== "all") {
-      result = result.filter(game => {
-        const gameDate = parseGameDate(game.date);
-        
-        switch (activeDateFilter) {
-          case "today":
-            return gameDate >= todayStart && gameDate <= todayEnd;
-          case "tomorrow":
-            return gameDate >= tomorrowStart && gameDate <= tomorrowEnd;
-          case "week":
-            return gameDate >= todayStart && gameDate <= weekEnd;
-          default:
-            return true;
-        }
-      });
-    }
-    
-    return result;
-  }, [games, activeFilter, activeDateFilter]);
-
-  const getLeagueColor = (league: string) => {
-    const leagueLower = league.toLowerCase();
-    if (leagueLower.includes('brasileirão') || leagueLower.includes('série a')) {
-      return "from-green-500/20 to-yellow-600/10 border-green-500/30";
-    }
-    if (leagueLower.includes('champions')) {
-      return "from-blue-500/20 to-blue-600/10 border-blue-500/30";
-    }
-    if (leagueLower.includes('premier')) {
-      return "from-purple-500/20 to-purple-600/10 border-purple-500/30";
-    }
-    if (leagueLower.includes('la liga') || leagueLower.includes('laliga') || leagueLower.includes('spanish')) {
-      return "from-orange-500/20 to-red-600/10 border-orange-500/30";
-    }
-    if (leagueLower.includes('bundesliga') || leagueLower.includes('german')) {
-      return "from-red-500/20 to-yellow-600/10 border-red-500/30";
-    }
-    if (leagueLower.includes('serie a') || leagueLower.includes('italian')) {
-      return "from-green-600/20 to-white/10 border-green-600/30";
-    }
-    if (leagueLower.includes('ligue 1') || leagueLower.includes('french')) {
-      return "from-blue-600/20 to-red-600/10 border-blue-600/30";
-    }
-    if (leagueLower.includes('libertadores')) {
-      return "from-yellow-500/20 to-yellow-600/10 border-yellow-500/30";
-    }
-    return "from-premium-gold/20 to-premium-gold/10 border-premium-gold/30";
+  const createWhatsAppLink = (game: GameData) => {
+    const message = `Olá! Quero assistir ${game.homeTeam} x ${game.awayTeam} (${game.league}) ao vivo!`;
+    return `https://wa.me/5521966238378?text=${encodeURIComponent(message)}`;
   };
 
   return (
     <section
       id="programacao"
-      className="py-20 bg-gradient-to-b from-background to-darker-bg"
+      className="py-16 md:py-24 bg-gradient-to-b from-background via-darker-bg to-background"
       aria-labelledby="schedule-heading"
     >
       <div className="container mx-auto px-4">
@@ -280,20 +158,20 @@ const LiveSchedule = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            className="text-center mb-10"
           >
-            <div className="inline-flex items-center gap-2 bg-premium-gold/10 px-4 py-2 rounded-full mb-6">
-              <Calendar className="w-4 h-4 text-premium-gold" />
-              <span className="text-premium-gold font-semibold text-sm uppercase tracking-wide">
-                Programação ao Vivo
+            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-full mb-6">
+              <Calendar className="w-4 h-4 text-green-400" />
+              <span className="text-green-400 font-semibold text-sm uppercase tracking-wide">
+                Jogos de Hoje
               </span>
             </div>
-            <h2 id="schedule-heading" className="text-4xl md:text-5xl font-bold mb-4">
-              📺 Próximos <span className="text-premium-gold">Jogos ao Vivo</span>
+            
+            <h2 id="schedule-heading" className="text-3xl md:text-5xl font-bold mb-4">
+              ⚽ Jogos <span className="text-premium-gold">Ao Vivo Hoje</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Confira a programação dos principais eventos esportivos. 
-              Assista tudo em qualidade 4K, sem travamentos!
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Assista aos principais jogos de futebol em qualidade 4K com a <span className="text-premium-gold font-semibold">Mundo Play TV</span>
             </p>
             
             {/* Last Updated & Refresh */}
@@ -306,7 +184,7 @@ const LiveSchedule = () => {
               <button
                 onClick={fetchGames}
                 disabled={loading}
-                className="inline-flex items-center gap-1 text-xs text-premium-gold hover:text-premium-gold-hover transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 text-xs text-green-400 hover:text-green-300 transition-colors disabled:opacity-50 bg-green-500/10 px-3 py-1.5 rounded-full"
               >
                 <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
                 Atualizar
@@ -314,342 +192,229 @@ const LiveSchedule = () => {
             </div>
           </motion.div>
 
-          {/* Date Filters */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="mb-6"
-          >
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <CalendarDays className="w-4 h-4 text-muted-foreground mr-2" />
-              {dateFilters.map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveDateFilter(filter.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    activeDateFilter === filter.id
-                      ? "bg-green-600 text-white shadow-lg shadow-green-600/25"
-                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* League Filters */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="mb-8"
-          >
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <Filter className="w-4 h-4 text-muted-foreground mr-2" />
-              {leagueFilters.map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveFilter(filter.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    activeFilter === filter.id
-                      ? "bg-premium-gold text-black shadow-lg shadow-premium-gold/25"
-                      : "bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  }`}
-                >
-                  <span>{filter.icon}</span>
-                  <span className="hidden sm:inline">{filter.label}</span>
-                </button>
-              ))}
-            </div>
-            
-            {/* Active filter count */}
-            {(activeFilter !== "all" || activeDateFilter !== "all") && (
-              <p className="text-center text-sm text-muted-foreground mt-3">
-                {filteredGames.length} jogo{filteredGames.length !== 1 ? 's' : ''} encontrado{filteredGames.length !== 1 ? 's' : ''}
-                {activeDateFilter !== "all" && ` para ${dateFilters.find(f => f.id === activeDateFilter)?.label.toLowerCase()}`}
-              </p>
-            )}
-          </motion.div>
-
           {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 text-premium-gold animate-spin" />
+          {loading && games.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-10 h-10 text-premium-gold animate-spin mb-4" />
+              <p className="text-muted-foreground">Carregando jogos de hoje...</p>
             </div>
           )}
 
-          {/* No games message */}
-          {!loading && filteredGames.length === 0 && (
+          {/* Error/Empty State */}
+          {!loading && games.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-12"
+              className="text-center py-16 bg-muted/10 rounded-2xl border border-muted/20"
             >
-              <p className="text-xl text-muted-foreground mb-2">😔 Nenhum jogo encontrado</p>
-              <p className="text-sm text-muted-foreground">
-                Não há jogos agendados para os filtros selecionados.
-              </p>
-              <button
-                onClick={() => {
-                  setActiveFilter("all");
-                  setActiveDateFilter("all");
-                }}
-                className="mt-4 text-premium-gold hover:text-premium-gold-hover transition-colors text-sm"
+              <p className="text-2xl mb-2">📺</p>
+              <p className="text-lg text-muted-foreground mb-2">Sem jogos no momento</p>
+              <p className="text-sm text-muted-foreground mb-4">{error}</p>
+              <a
+                href="https://wa.me/5521966238378?text=Olá!%20Quero%20saber%20mais%20sobre%20a%20Mundo%20Play%20TV!"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 text-white font-semibold px-6 py-3 rounded-full hover:bg-green-500 transition-colors"
               >
-                Limpar filtros →
-              </button>
+                <MessageCircle className="w-5 h-5" />
+                Falar no WhatsApp
+              </a>
             </motion.div>
           )}
 
           {/* Games Grid */}
           <AnimatePresence mode="wait">
-            <motion.div 
-              key={`${activeFilter}-${activeDateFilter}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {filteredGames.map((game, index) => {
-                const homeTeamData = getTeamData(game.homeTeam);
-                const awayTeamData = getTeamData(game.awayTeam);
-                
-                return (
-                  <motion.div
-                    key={`${game.id}-${index}`}
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.08 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${getLeagueColor(
-                      game.league
-                    )} border backdrop-blur-sm transition-all duration-500 cursor-pointer`}
-                  >
-                    {/* Animated background glow on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-premium-gold/0 to-premium-gold/0 group-hover:from-premium-gold/5 group-hover:to-transparent transition-all duration-500" />
-                    
-                    {/* Decorative corner accent */}
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-premium-gold/10 rounded-full blur-2xl group-hover:bg-premium-gold/20 transition-all duration-500" />
-                    
-                    {/* Live Indicator with pulse animation */}
-                    {game.isLive && (
-                      <motion.div 
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="absolute top-4 right-4 z-10"
-                      >
-                        <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-red-500 px-3 py-1.5 rounded-full shadow-lg shadow-red-500/40">
-                          <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                          </span>
-                          <span className="text-white text-xs font-bold uppercase tracking-wider">Ao Vivo</span>
-                          <Zap className="w-3 h-3 text-yellow-300 animate-pulse" />
-                        </div>
-                      </motion.div>
-                    )}
+            {games.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
+              >
+                {games.map((game, index) => {
+                  const homeTeamInfo = getTeamData(game.homeTeam);
+                  const awayTeamInfo = getTeamData(game.awayTeam);
+                  
+                  return (
+                    <motion.div
+                      key={`${game.id}-${index}`}
+                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      whileHover={{ y: -6, scale: 1.02 }}
+                      className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${getLeagueColor(game.league)} border backdrop-blur-sm`}
+                    >
+                      {/* Glow effect */}
+                      <div className="absolute -top-8 -right-8 w-20 h-20 bg-premium-gold/10 rounded-full blur-2xl group-hover:bg-premium-gold/20 transition-all" />
+                      
+                      {/* Live Badge */}
+                      {game.isLive && (
+                        <motion.div 
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="absolute top-3 right-3 z-10"
+                        >
+                          <div className="flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-red-500 px-3 py-1 rounded-full shadow-lg shadow-red-500/40">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            <span className="text-white text-xs font-bold uppercase tracking-wider">Ao Vivo</span>
+                            <Zap className="w-3 h-3 text-yellow-300" />
+                          </div>
+                        </motion.div>
+                      )}
 
-                    <div className="relative p-6">
-                      {/* League Header */}
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="relative">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-premium-gold/20 to-premium-gold/5 flex items-center justify-center border border-premium-gold/20">
-                            <Trophy className="w-5 h-5 text-premium-gold" />
+                      <div className="relative p-5">
+                        {/* League Header */}
+                        <div className="flex items-center gap-2.5 mb-5">
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-premium-gold/20 to-premium-gold/5 flex items-center justify-center border border-premium-gold/20">
+                            <Trophy className="w-4 h-4 text-premium-gold" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] text-premium-gold uppercase tracking-widest font-semibold">
+                              {game.sport}
+                            </p>
+                            <p className="text-sm font-bold text-foreground truncate">
+                              {game.league}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] text-premium-gold uppercase tracking-widest font-semibold">
-                            {game.sport}
-                          </p>
-                          <p className="text-sm font-bold text-foreground truncate">
-                            {game.league}
-                          </p>
-                        </div>
-                      </div>
 
-                      {/* Teams Section - Enhanced */}
-                      <div className="flex items-center justify-between mb-6 relative">
-                        {/* Home Team */}
-                        <motion.div 
-                          className="text-center flex-1 group/team"
-                          whileHover={{ scale: 1.05 }}
-                          transition={{ type: "spring", stiffness: 400 }}
-                        >
-                          <div className="relative mx-auto mb-3">
-                            {game.homeLogo ? (
-                              <div className="relative">
-                                <div 
-                                  className="absolute inset-0 rounded-full blur-lg opacity-40 transition-opacity group-hover/team:opacity-60"
-                                  style={{ backgroundColor: homeTeamData.primaryColor }}
-                                />
+                        {/* Teams Section */}
+                        <div className="flex items-center justify-between mb-5">
+                          {/* Home Team */}
+                          <div className="text-center flex-1">
+                            <div className="relative mx-auto mb-2">
+                              {game.homeLogo ? (
                                 <img 
                                   src={game.homeLogo} 
                                   alt={game.homeTeam}
-                                  className="relative w-16 h-16 mx-auto object-contain drop-shadow-lg"
+                                  className="w-14 h-14 mx-auto object-contain drop-shadow-lg"
                                   loading="lazy"
                                 />
+                              ) : (
+                                <div 
+                                  className="w-14 h-14 mx-auto rounded-full flex items-center justify-center shadow-lg"
+                                  style={{ 
+                                    background: `linear-gradient(135deg, ${homeTeamInfo.primaryColor} 0%, ${homeTeamInfo.secondaryColor} 100%)`,
+                                    boxShadow: `0 6px 16px ${homeTeamInfo.primaryColor}40`
+                                  }}
+                                >
+                                  <span className="text-xl">{homeTeamInfo.icon}</span>
+                                </div>
+                              )}
+                            </div>
+                            <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
+                              {game.homeTeam}
+                            </p>
+                            {game.isLive && game.homeScore !== null && (
+                              <p className="text-2xl font-black text-premium-gold mt-1">
+                                {game.homeScore}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {/* VS / Score */}
+                          <div className="px-3 flex flex-col items-center">
+                            {game.isLive && game.homeScore !== null ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-xl font-black text-muted-foreground">-</span>
+                                <span className="text-[10px] text-red-400 font-semibold uppercase animate-pulse">
+                                  {game.status}
+                                </span>
                               </div>
                             ) : (
-                              <div 
-                                className="relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg transition-transform group-hover/team:scale-110"
-                                style={{ 
-                                  background: `linear-gradient(135deg, ${homeTeamData.primaryColor} 0%, ${homeTeamData.secondaryColor} 100%)`,
-                                  boxShadow: `0 8px 20px ${homeTeamData.primaryColor}40`
-                                }}
-                              >
-                                <span className="text-2xl filter drop-shadow">{homeTeamData.icon}</span>
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-premium-gold/30 to-premium-gold/10 flex items-center justify-center border border-premium-gold/30">
+                                <span className="text-xs font-black text-premium-gold">VS</span>
                               </div>
                             )}
                           </div>
-                          <p className="font-bold text-foreground text-sm truncate max-w-[90px] mx-auto">
-                            {game.homeTeam}
-                          </p>
-                          {game.isLive && game.homeScore !== null && (
-                            <motion.p 
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className="text-3xl font-black text-premium-gold mt-2 drop-shadow-lg"
-                            >
-                              {game.homeScore}
-                            </motion.p>
-                          )}
-                        </motion.div>
-                        
-                        {/* VS Divider */}
-                        <div className="px-4 flex flex-col items-center">
-                          {game.isLive && game.homeScore !== null ? (
-                            <div className="flex flex-col items-center gap-1">
-                              <span className="text-2xl font-black text-muted-foreground">-</span>
-                              <span className="text-[10px] text-red-400 font-semibold uppercase tracking-wider animate-pulse">
-                                {game.status}
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="relative">
-                              <div className="absolute inset-0 bg-premium-gold/20 rounded-full blur-md" />
-                              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-premium-gold/30 to-premium-gold/10 flex items-center justify-center border border-premium-gold/30">
-                                <span className="text-sm font-black text-premium-gold">VS</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Away Team */}
-                        <motion.div 
-                          className="text-center flex-1 group/team"
-                          whileHover={{ scale: 1.05 }}
-                          transition={{ type: "spring", stiffness: 400 }}
-                        >
-                          <div className="relative mx-auto mb-3">
-                            {game.awayLogo ? (
-                              <div className="relative">
-                                <div 
-                                  className="absolute inset-0 rounded-full blur-lg opacity-40 transition-opacity group-hover/team:opacity-60"
-                                  style={{ backgroundColor: awayTeamData.primaryColor }}
-                                />
+                          
+                          {/* Away Team */}
+                          <div className="text-center flex-1">
+                            <div className="relative mx-auto mb-2">
+                              {game.awayLogo ? (
                                 <img 
                                   src={game.awayLogo} 
                                   alt={game.awayTeam}
-                                  className="relative w-16 h-16 mx-auto object-contain drop-shadow-lg"
+                                  className="w-14 h-14 mx-auto object-contain drop-shadow-lg"
                                   loading="lazy"
                                 />
-                              </div>
-                            ) : (
-                              <div 
-                                className="relative w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg transition-transform group-hover/team:scale-110"
-                                style={{ 
-                                  background: `linear-gradient(135deg, ${awayTeamData.primaryColor} 0%, ${awayTeamData.secondaryColor} 100%)`,
-                                  boxShadow: `0 8px 20px ${awayTeamData.primaryColor}40`
-                                }}
-                              >
-                                <span className="text-2xl filter drop-shadow">{awayTeamData.icon}</span>
-                              </div>
+                              ) : (
+                                <div 
+                                  className="w-14 h-14 mx-auto rounded-full flex items-center justify-center shadow-lg"
+                                  style={{ 
+                                    background: `linear-gradient(135deg, ${awayTeamInfo.primaryColor} 0%, ${awayTeamInfo.secondaryColor} 100%)`,
+                                    boxShadow: `0 6px 16px ${awayTeamInfo.primaryColor}40`
+                                  }}
+                                >
+                                  <span className="text-xl">{awayTeamInfo.icon}</span>
+                                </div>
+                              )}
+                            </div>
+                            <p className="font-bold text-foreground text-xs truncate max-w-[80px] mx-auto">
+                              {game.awayTeam}
+                            </p>
+                            {game.isLive && game.awayScore !== null && (
+                              <p className="text-2xl font-black text-premium-gold mt-1">
+                                {game.awayScore}
+                              </p>
                             )}
                           </div>
-                          <p className="font-bold text-foreground text-sm truncate max-w-[90px] mx-auto">
-                            {game.awayTeam}
-                          </p>
-                          {game.isLive && game.awayScore !== null && (
-                            <motion.p 
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className="text-3xl font-black text-premium-gold mt-2 drop-shadow-lg"
-                            >
-                              {game.awayScore}
-                            </motion.p>
-                          )}
-                        </motion.div>
-                      </div>
+                        </div>
 
-                      {/* Date & Time - Enhanced */}
-                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
-                            <Calendar className="w-4 h-4 text-premium-gold" />
+                        {/* Time & Date */}
+                        <div className="flex items-center justify-between mb-4 py-3 border-t border-white/10">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-foreground/80">{game.date}</span>
                           </div>
-                          <span className="text-sm font-medium text-foreground/80">{game.date}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-premium-gold/10 flex items-center justify-center">
+                          <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-premium-gold" />
+                            <span className="text-sm font-bold text-premium-gold">{game.time}</span>
                           </div>
-                          <span className="text-sm font-bold text-premium-gold">{game.time}</span>
                         </div>
-                      </div>
-                      
-                      {/* Hover CTA */}
-                      <motion.div 
-                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                      >
+                        
+                        {/* WhatsApp CTA Button - Always visible */}
                         <a
-                          href="https://wa.me/5521966238378?text=Olá!%20Quero%20assistir%20esportes%20ao%20vivo!"
+                          href={createWhatsAppLink(game)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full bg-premium-gold text-black font-bold py-2.5 rounded-lg hover:bg-premium-gold-hover transition-colors text-sm"
+                          className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-600/30 hover:shadow-green-500/40"
                         >
-                          <Tv className="w-4 h-4" />
-                          Assistir Agora
+                          <MessageCircle className="w-5 h-5" />
+                          Assistir no WhatsApp
                         </a>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* Error message */}
-          {error && (
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              ⚠️ {error}
-            </p>
-          )}
-
-          {/* CTA */}
+          {/* Bottom CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="text-center mt-12"
           >
             <a
-              href="https://wa.me/5521966238378?text=Olá!%20Quero%20assistir%20esportes%20ao%20vivo!"
+              href="https://wa.me/5521966238378?text=Olá!%20Quero%20assinar%20a%20Mundo%20Play%20TV!"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-premium-gold text-black font-bold px-8 py-4 rounded-full hover:bg-premium-gold-hover transition-premium shadow-lg shadow-premium-gold/25 text-lg"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-500 text-white font-bold px-8 py-4 rounded-full hover:from-green-500 hover:to-green-400 transition-all shadow-xl shadow-green-600/30 text-lg"
             >
-              <Tv className="w-5 h-5" />
-              Assista Todos os Jogos Agora
+              <MessageCircle className="w-6 h-6" />
+              Assinar Mundo Play TV
             </a>
             <p className="text-sm text-muted-foreground mt-4">
-              ✓ Qualidade 4K • ✓ Sem travamentos • ✓ Todos os campeonatos
+              ✓ 4K Ultra HD • ✓ Sem travamentos • ✓ +20.000 canais
             </p>
           </motion.div>
         </div>
