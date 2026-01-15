@@ -1,7 +1,50 @@
 import { motion } from "framer-motion";
 import { Calendar, MessageCircle } from "lucide-react";
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    fsFixtures: ((action: string, params: object) => void) & { q?: unknown[] };
+  }
+}
 
 const LiveSchedule = () => {
+  useEffect(() => {
+    // Check if script already exists
+    if (document.getElementById('fsFixtures')) return;
+
+    // Load FootyStats widget script
+    const script = document.createElement('script');
+    script.id = 'fsFixtures';
+    script.src = 'https://cdn.footystats.org/embeds/fixtures-loc.js';
+    script.async = true;
+    
+    script.onload = () => {
+      if (window.fsFixtures) {
+        window.fsFixtures('params', {
+          lang: 'pt',
+          timezone: 'America/Sao_Paulo'
+        });
+      }
+    };
+
+    const firstScript = document.getElementsByTagName('script')[0];
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+
+    // Initialize fsFixtures function
+    window.fsFixtures = window.fsFixtures || function(...args: unknown[]) {
+      (window.fsFixtures.q = window.fsFixtures.q || []).push(args);
+    };
+
+    return () => {
+      // Cleanup on unmount
+      const existingScript = document.getElementById('fsFixtures');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
   return (
     <section
       id="programacao"
@@ -33,23 +76,15 @@ const LiveSchedule = () => {
             </p>
           </motion.div>
 
-          {/* Iframe Container */}
+          {/* FootyStats Widget Container */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="rounded-2xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur-sm shadow-2xl shadow-premium-gold/5"
+            className="rounded-2xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur-sm shadow-2xl shadow-premium-gold/5 p-4 md:p-6"
           >
-            <iframe 
-              src="https://footystats.org/pt/fixtures" 
-              width="100%" 
-              height="700"
-              className="border-0"
-              title="Jogos de Futebol - FootyStats"
-              loading="lazy"
-              style={{ colorScheme: 'dark' }}
-            />
+            <div id="fs-fixtures" className="min-h-[500px]" />
           </motion.div>
 
           {/* CTA Button */}
