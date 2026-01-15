@@ -142,12 +142,13 @@ const ChannelCategories = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="mt-12 rounded-2xl overflow-hidden border border-subtle-border shadow-2xl"
+          whileHover={{ scale: 1.02 }}
+          className="mt-12 rounded-2xl overflow-hidden border border-subtle-border shadow-2xl cursor-pointer group transition-all duration-500 hover:border-premium-gold/50 hover:shadow-premium-gold/20 hover:shadow-3xl"
         >
           <img 
             src={iptvChannelsImg} 
             alt="Variedade de canais IPTV disponíveis - mais de 700 canais ao vivo"
-            className="w-full h-auto object-cover"
+            className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 group-hover:brightness-110"
           />
         </motion.div>
 
