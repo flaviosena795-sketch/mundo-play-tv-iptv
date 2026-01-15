@@ -4,7 +4,6 @@ import Hero from "@/components/sections/Hero";
 import Announcement from "@/components/sections/Announcement";
 import About from "@/components/sections/About";
 import Features from "@/components/sections/Features";
-import LiveSchedule from "@/components/sections/LiveSchedule";
 import FreeTrialBanner from "@/components/sections/FreeTrialBanner";
 import Plans from "@/components/sections/Plans";
 import PlansComparison from "@/components/sections/PlansComparison";
@@ -51,7 +50,6 @@ const Index = () => {
         <Announcement />
         <About />
         <Features />
-        <LiveSchedule />
         <FreeTrialBanner />
         <Plans />
         <PlansComparison />
