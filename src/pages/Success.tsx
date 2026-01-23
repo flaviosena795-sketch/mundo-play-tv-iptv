@@ -18,6 +18,17 @@ const Success = () => {
   
   const supportNumber = '5521966238378';
 
+  // Format phone number for display
+  const formatPhoneDisplay = (phoneNumber: string): string => {
+    const digits = phoneNumber.replace(/\D/g, '');
+    if (digits.length === 11) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    } else if (digits.length === 10) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+    return phoneNumber;
+  };
+
   useEffect(() => {
     const storedName = localStorage.getItem('mp_full_name') || '';
     const storedPhone = localStorage.getItem('mp_phone') || '';
@@ -31,13 +42,19 @@ const Success = () => {
     setPhone(clientPhone);
     setPlano(clientPlan);
     
+    // Format phone for display in message
+    const formattedPhone = formatPhoneDisplay(clientPhone);
+    
+    // Format plan with amount in the format: "Mensal (R$29.9)"
+    const planWithAmount = valor ? `${clientPlan} (R$${valor})` : clientPlan;
+    
     // Auto redirect to WhatsApp after 2 seconds
     const timer = setTimeout(() => {
       const message = encodeURIComponent(
         `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
         `👤 Nome: ${clientName}\n` +
-        `📱 WhatsApp: ${clientPhone}\n` +
-        `📦 Plano: ${clientPlan}${valor ? ` (R$${valor})` : ''}\n` +
+        `📱 WhatsApp: ${formattedPhone}\n` +
+        `📦 Plano: ${planWithAmount}\n` +
         `💳 ID do Pagamento: ${collectionId}\n\n` +
         `Solicito ativação imediata.`
       );
@@ -51,11 +68,15 @@ const Success = () => {
     return () => clearTimeout(timer);
   }, [nomeUrl, planoUrl, valor, collectionId]);
 
+  // Format plan with amount for display
+  const planWithAmount = valor ? `${plano} (R$${valor})` : plano;
+  const formattedPhoneDisplay = formatPhoneDisplay(phone);
+
   const whatsappMessage = encodeURIComponent(
     `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
     `👤 Nome: ${fullName}\n` +
-    `📱 WhatsApp: ${phone}\n` +
-    `📦 Plano: ${plano}${valor ? ` (R$${valor})` : ''}\n` +
+    `📱 WhatsApp: ${formattedPhoneDisplay}\n` +
+    `📦 Plano: ${planWithAmount}\n` +
     `💳 ID do Pagamento: ${collectionId}\n\n` +
     `Solicito ativação imediata.`
   );
