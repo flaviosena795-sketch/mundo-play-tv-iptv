@@ -18,6 +18,12 @@ const Success = () => {
   
   const supportNumber = '5521966238378';
 
+  // Format value with comma for Brazilian format
+  const formatValue = (val: string) => {
+    if (!val) return '';
+    return val.replace('.', ',');
+  };
+
   useEffect(() => {
     const storedName = localStorage.getItem('mp_full_name') || '';
     const storedPhone = localStorage.getItem('mp_phone') || '';
@@ -33,17 +39,18 @@ const Success = () => {
     
     // Auto redirect to WhatsApp after 2 seconds
     const timer = setTimeout(() => {
-      const message = encodeURIComponent(
-        `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
-        `👤 Nome: ${clientName}\n` +
-        `📱 WhatsApp: ${clientPhone}\n` +
-        `📦 Plano: ${clientPlan}${valor ? ` (R$ ${valor})` : ''}\n` +
-        `💳 ID do Pagamento: ${collectionId}\n\n` +
-        `✅ Pagamento confirmado com sucesso.\n` +
-        `Solicito ativação imediata do serviço.`
-      );
+      const formattedValue = formatValue(valor);
+      const message = `🎉 NOVO PAGAMENTO APROVADO!
+
+👤 Nome: ${clientName}
+📱 WhatsApp: ${clientPhone}
+📦 Plano: ${clientPlan}${formattedValue ? ` (R$ ${formattedValue})` : ''}
+💳 ID do Pagamento: ${collectionId}
+
+✅ Pagamento confirmado com sucesso.
+Solicito ativação imediata do serviço.`;
       
-      const waUrl = `https://wa.me/${supportNumber}?text=${message}`;
+      const waUrl = `https://wa.me/${supportNumber}?text=${encodeURIComponent(message)}`;
       
       setRedirecting(false);
       window.location.href = waUrl;
@@ -52,17 +59,18 @@ const Success = () => {
     return () => clearTimeout(timer);
   }, [nomeUrl, planoUrl, valor, collectionId]);
 
-  const whatsappMessage = encodeURIComponent(
-    `🎉 NOVO PAGAMENTO APROVADO!\n\n` +
-    `👤 Nome: ${fullName}\n` +
-    `📱 WhatsApp: ${phone}\n` +
-    `📦 Plano: ${plano}${valor ? ` (R$ ${valor})` : ''}\n` +
-    `💳 ID do Pagamento: ${collectionId}\n\n` +
-    `✅ Pagamento confirmado com sucesso.\n` +
-    `Solicito ativação imediata do serviço.`
-  );
+  const formattedValue = formatValue(valor);
+  const whatsappMessage = `🎉 NOVO PAGAMENTO APROVADO!
 
-  const waUrl = `https://wa.me/${supportNumber}?text=${whatsappMessage}`;
+👤 Nome: ${fullName}
+📱 WhatsApp: ${phone}
+📦 Plano: ${plano}${formattedValue ? ` (R$ ${formattedValue})` : ''}
+💳 ID do Pagamento: ${collectionId}
+
+✅ Pagamento confirmado com sucesso.
+Solicito ativação imediata do serviço.`;
+
+  const waUrl = `https://wa.me/${supportNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 flex items-center justify-center px-4">
