@@ -42,13 +42,9 @@ const Success = () => {
       const formattedValue = formatValue(valor);
       const message = `🎉 NOVO PAGAMENTO APROVADO!
 
-👤 Nome: ${clientName}
-📱 WhatsApp: ${clientPhone}
-📦 Plano: ${clientPlan}${formattedValue ? ` (R$ ${formattedValue})` : ''}
-💳 ID do Pagamento: ${collectionId}
+👤 Nome: ${clientName} 📱 WhatsApp: ${clientPhone} 📦 Plano: ${clientPlan}${formattedValue ? ` (R$ ${formattedValue})` : ''} 💳 ID do Pagamento: ${collectionId}
 
-✅ Pagamento confirmado com sucesso.
-Solicito ativação imediata do serviço.`;
+✅ Pagamento confirmado com sucesso. Solicito ativação imediata do serviço.`;
       
       const waUrl = `https://wa.me/${supportNumber}?text=${encodeURIComponent(message)}`;
       
@@ -62,13 +58,9 @@ Solicito ativação imediata do serviço.`;
   const formattedValue = formatValue(valor);
   const whatsappMessage = `🎉 NOVO PAGAMENTO APROVADO!
 
-👤 Nome: ${fullName}
-📱 WhatsApp: ${phone}
-📦 Plano: ${plano}${formattedValue ? ` (R$ ${formattedValue})` : ''}
-💳 ID do Pagamento: ${collectionId}
+👤 Nome: ${fullName} 📱 WhatsApp: ${phone} 📦 Plano: ${plano}${formattedValue ? ` (R$ ${formattedValue})` : ''} 💳 ID do Pagamento: ${collectionId}
 
-✅ Pagamento confirmado com sucesso.
-Solicito ativação imediata do serviço.`;
+✅ Pagamento confirmado com sucesso. Solicito ativação imediata do serviço.`;
 
   const waUrl = `https://wa.me/${supportNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
