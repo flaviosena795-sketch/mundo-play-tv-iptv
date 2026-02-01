@@ -237,12 +237,32 @@ serve(async (req) => {
         date_approved: payment.date_approved
       }));
 
-      // Extract plan name from external_reference (format: "plano_nome_telefone")
+      // Extract data from external_reference (format: "PLAN_NAME_PHONE_TIMESTAMP")
       const externalRef = payment.external_reference || "";
       const refParts = externalRef.split("_");
-      const planName = refParts[0] || null;
-      const payerName = refParts.length > 1 ? refParts.slice(1, -1).join(" ") : payment.payer?.first_name;
-      const payerPhone = refParts.length > 1 ? refParts[refParts.length - 1] : null;
+      // Format: PLAN_NAME_PHONE_TIMESTAMP (4 parts)
+      let planName: string | null = null;
+      let payerName: string | null = null;
+      let payerPhone: string | null = null;
+      
+      if (refParts.length >= 4) {
+        // New format: PLAN_NAME_PHONE_TIMESTAMP
+        planName = refParts[0] || null;
+        payerName = refParts[1] || null;
+        payerPhone = refParts[2] || null;
+        // refParts[3] is timestamp, ignored
+      } else if (refParts.length >= 2) {
+        // Legacy format: PLAN_TIMESTAMP
+        planName = refParts[0] || null;
+      }
+      
+      // Fallback to payer info from MercadoPago
+      if (!payerName) {
+        payerName = payment.payer?.first_name || null;
+      }
+      if (!payerPhone && payment.payer?.phone?.number) {
+        payerPhone = payment.payer.phone.number;
+      }
 
       // Prepare payment data for database
       const paymentData = {
