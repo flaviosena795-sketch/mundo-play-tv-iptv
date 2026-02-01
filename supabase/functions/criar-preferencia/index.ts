@@ -127,6 +127,20 @@ serve(async (req) => {
     // Webhook URL for automatic notifications
     const webhookUrl = `https://ychdztoixsefnpurmmhi.supabase.co/functions/v1/mercadopago-webhook`;
     
+    // Sanitize name for external_reference (remove special chars, limit length)
+    const sanitizedName = clientName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-zA-Z0-9\s]/g, '') // Keep only alphanumeric and spaces
+      .replace(/\s+/g, '') // Remove spaces
+      .slice(0, 50); // Limit length
+    
+    // Format phone (digits only)
+    const sanitizedPhone = clientPhone.replace(/\D/g, '').slice(0, 11);
+    
+    // external_reference format: PLAN_NAME_PHONE_TIMESTAMP
+    const externalReference = `${planNome.replace(/\s+/g, '_').toUpperCase()}_${sanitizedName}_${sanitizedPhone}_${Date.now()}`;
+
     const prefPayload = {
       items: [
         {
@@ -149,7 +163,7 @@ serve(async (req) => {
         pending: `${origin}/pendente?plano=${encodeURIComponent(planNome)}&valor=${planValor}&nome=${encodeURIComponent(clientName)}&telefone=${encodeURIComponent(clientPhone)}`
       },
       auto_return: "approved",
-      external_reference: `${planNome.replace(/\s+/g, '_').toUpperCase()}_${Date.now()}`,
+      external_reference: externalReference,
       notification_url: webhookUrl,
       statement_descriptor: "MUNDO PLAY TV"
     };
