@@ -83,19 +83,31 @@ async function verifySignature(req: Request, bodyText: string): Promise<{ valid:
     return { valid: false, reason: 'timestamp_expired' };
   }
 
-  // Parse body to get data.id for the manifest
-  let dataId = '';
-  try {
-    const payload = JSON.parse(bodyText);
-    dataId = payload.data?.id?.toString() || '';
-  } catch {
-    logSecurityEvent(req, 'invalid_body_json', xSignature, xRequestId);
-    return { valid: false, reason: 'invalid_body' };
+  // IMPORTANT: Get data.id from URL query parameter (this is what Mercado Pago uses for signature)
+  // The signature is computed using the data.id from the URL, NOT from the body
+  const url = new URL(req.url);
+  let dataId = url.searchParams.get('data.id') || url.searchParams.get('id') || '';
+  
+  // If not in URL, try to get from body as fallback
+  if (!dataId) {
+    try {
+      const payload = JSON.parse(bodyText);
+      dataId = payload.data?.id?.toString() || '';
+    } catch {
+      // Body parse failed, continue with empty dataId
+    }
   }
 
   // Build the manifest string as per Mercado Pago docs
-  // manifest = "id:{data.id};request-id:{x-request-id};ts:{ts};"
+  // IMPORTANT: The format must be exactly: "id:[data.id];request-id:[x-request-id];ts:[ts];"
+  // Note: data.id may be empty for some notification types (like merchant_order)
   const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  console.log("[mercadopago-webhook] Verificando assinatura:", {
+    dataIdSource: url.searchParams.get('data.id') ? 'url' : 'body',
+    dataId: dataId || '(empty)',
+    manifest: manifest.substring(0, 60) + '...'
+  });
 
   // Generate HMAC-SHA256
   const encoder = new TextEncoder();
