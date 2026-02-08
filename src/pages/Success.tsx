@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle, MessageCircle, Clock, Tv, Loader2 } from "lucide-react";
+import { CheckCircle, MessageCircle, Clock, Tv, Loader2, Sparkles, Shield, Zap } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -10,7 +10,6 @@ const Success = () => {
   const nomeUrl = searchParams.get('nome') || '';
   const collectionId = searchParams.get('collection_id') || searchParams.get('payment_id') || '';
   
-  // Get data from URL or localStorage
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [plano, setPlano] = useState('');
@@ -18,7 +17,6 @@ const Success = () => {
   
   const supportNumber = '5521966238378';
 
-  // Format value with comma for Brazilian format
   const formatValue = (val: string) => {
     if (!val) return '';
     return val.replace('.', ',');
@@ -37,7 +35,6 @@ const Success = () => {
     setPhone(clientPhone);
     setPlano(clientPlan);
     
-    // Auto redirect to WhatsApp after 2 seconds
     const timer = setTimeout(() => {
       const formattedValue = formatValue(valor);
       const message = `🎉 NOVO PAGAMENTO APROVADO!
@@ -64,131 +61,182 @@ const Success = () => {
 
   const waUrl = `https://wa.me/${supportNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
+  const steps = [
+    { icon: MessageCircle, title: "Solicite suas credenciais", desc: "Clique no botão abaixo para receber via WhatsApp" },
+    { icon: Zap, title: "Instale o aplicativo", desc: "Baixe o app recomendado para seu dispositivo" },
+    { icon: Tv, title: "Aproveite!", desc: "+15.000 canais em 4K Ultra HD à sua disposição" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 flex items-center justify-center px-4">
-      <motion.div
-        className="max-w-2xl w-full"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Success Icon */}
+    <div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center px-4 py-12">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="flex justify-center mb-8"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl"
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      <motion.div
+        className="max-w-xl w-full relative z-10"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Success Animation */}
+        <motion.div
+          className="flex justify-center mb-6"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 150, damping: 15 }}
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-premium-gold/20 rounded-full blur-xl"></div>
-            <CheckCircle className="w-24 h-24 text-premium-gold relative z-10" />
+            <motion.div
+              className="absolute -inset-4 bg-accent/20 rounded-full blur-2xl"
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <div className="relative w-20 h-20 bg-gradient-gold rounded-full flex items-center justify-center shadow-gold">
+              <CheckCircle className="w-10 h-10 text-accent-foreground" />
+            </div>
+            <motion.div
+              className="absolute -top-2 -right-2"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, type: "spring" }}
+            >
+              <Sparkles className="w-6 h-6 text-accent" />
+            </motion.div>
           </div>
         </motion.div>
 
         {/* Main Card */}
         <motion.div
-          className="bg-gradient-card rounded-2xl shadow-gold p-8 md:p-12 border border-premium-gold/20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          className="bg-gradient-card rounded-2xl border border-accent/20 overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          style={{ boxShadow: 'var(--shadow-gold)' }}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-premium-gold">
-            🎉 Pagamento Confirmado!
-          </h1>
-          
-          {redirecting && (
-            <div className="flex items-center justify-center gap-2 mb-4 text-premium-gold">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Redirecionando para WhatsApp...</span>
-            </div>
-          )}
-          
-          {fullName && (
-            <p className="text-center text-foreground mb-2 text-lg">
-              Obrigado, <span className="text-premium-gold font-semibold">{fullName}</span>!
-            </p>
-          )}
-          
-          <p className="text-center text-muted-foreground mb-2 text-lg">
-            Seu <span className="text-premium-gold font-semibold">Plano {plano}</span> foi ativado com sucesso!
-          </p>
-          {valor && (
-            <p className="text-center text-sm text-muted-foreground mb-2">
-              Valor: R$ {valor}
-            </p>
-          )}
-          {collectionId && (
-            <p className="text-center text-xs text-muted-foreground mb-8">
-              ID do Pagamento: {collectionId}
-            </p>
-          )}
+          {/* Header */}
+          <div className="p-6 md:p-8 text-center border-b border-border/50">
+            <motion.h1
+              className="text-2xl md:text-3xl font-bold text-accent mb-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              Pagamento Confirmado!
+            </motion.h1>
 
-          {/* Instructions */}
-          <div className="space-y-6 mb-8">
-            <div className="flex items-start gap-4 p-4 bg-accent/10 rounded-lg">
-              <Clock className="w-6 h-6 text-premium-gold flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">Próximos Passos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Clique no botão abaixo para receber suas credenciais de acesso por WhatsApp.
-                </p>
-              </div>
-            </div>
+            {redirecting && (
+              <motion.div
+                className="flex items-center justify-center gap-2 text-accent/80 text-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Redirecionando para WhatsApp...</span>
+              </motion.div>
+            )}
 
-            <div className="flex items-start gap-4 p-4 bg-accent/10 rounded-lg">
-              <Tv className="w-6 h-6 text-premium-gold flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">Como Ativar</h3>
-                <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>1. Baixe o aplicativo recomendado para seu dispositivo</li>
-                  <li>2. Use as credenciais enviadas por WhatsApp</li>
-                  <li>3. Aproveite +15.000 canais em 4K Ultra HD!</li>
-                </ul>
-              </div>
-            </div>
+            {fullName && (
+              <motion.p
+                className="text-foreground mt-3 text-base"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                Obrigado, <span className="text-accent font-semibold">{fullName}</span>!
+              </motion.p>
+            )}
+          </div>
 
-            <div className="flex items-start gap-4 p-4 bg-accent/10 rounded-lg">
-              <MessageCircle className="w-6 h-6 text-premium-gold flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">Suporte 24/7</h3>
-                <p className="text-sm text-muted-foreground">
-                  Qualquer dúvida, nossa equipe está pronta para ajudar via WhatsApp.
-                </p>
-              </div>
+          {/* Plan Info Badge */}
+          <div className="px-6 md:px-8 -mt-4 flex justify-center">
+            <motion.div
+              className="bg-accent/10 border border-accent/30 rounded-full px-5 py-2 inline-flex items-center gap-2"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Shield className="w-4 h-4 text-accent" />
+              <span className="text-sm font-semibold text-accent">Plano {plano}</span>
+              {formattedValue && (
+                <span className="text-xs text-muted-foreground">• R$ {formattedValue}</span>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Steps */}
+          <div className="p-6 md:px-8 md:pt-6 md:pb-4">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4 text-center font-medium">
+              Próximos passos
+            </p>
+            <div className="space-y-3">
+              {steps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  className="flex items-center gap-4 p-3 rounded-xl bg-secondary/50 border border-border/50"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <step.icon className="w-4 h-4 text-accent" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                    <p className="text-xs text-muted-foreground">{step.desc}</p>
+                  </div>
+                  <span className="ml-auto text-xs font-bold text-accent/40 flex-shrink-0">{i + 1}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
 
           {/* WhatsApp CTA */}
-          <div className="space-y-4">
-            <a 
+          <div className="p-6 md:px-8 md:pb-8">
+            <motion.a
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full text-lg py-4 px-6 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-lg transition-colors"
+              className="group flex items-center justify-center gap-3 w-full py-4 px-6 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(37,211,102,0.4)] relative overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <MessageCircle className="w-5 h-5" />
-              Receber Credenciais no WhatsApp
-            </a>
+              <MessageCircle className="w-5 h-5 relative z-10" />
+              <span className="relative z-10">Receber Credenciais no WhatsApp</span>
+            </motion.a>
 
-            <p className="text-center text-xs text-muted-foreground">
-              Clique no botão acima para solicitar suas credenciais de acesso
-            </p>
+            {collectionId && (
+              <p className="text-center text-[10px] text-muted-foreground/50 mt-3 font-mono">
+                ID: {collectionId}
+              </p>
+            )}
           </div>
         </motion.div>
 
-        {/* Back to Home */}
+        {/* Support + Home link */}
         <motion.div
-          className="text-center mt-8"
+          className="flex items-center justify-between mt-6 px-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.8 }}
         >
-          <a 
-            href="/" 
-            className="text-premium-gold hover:underline text-sm"
-          >
-            ← Voltar para página inicial
+          <a href="/" className="text-muted-foreground hover:text-accent text-xs transition-colors">
+            ← Página inicial
           </a>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+            <Shield className="w-3 h-3" />
+            <span>Suporte 24/7</span>
+          </div>
         </motion.div>
       </motion.div>
     </div>
